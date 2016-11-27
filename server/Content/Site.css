@@ -1,0 +1,334 @@
+﻿/* TODO this entire file needs extensive cleanup and removal of old content. */
+
+/* Special box that looks like a console. */
+.consoleSubBox {
+    background-color: #111111;
+    color: #FFFFFF;
+    font-family:'Segoe UI', Verdana, sans-serif;
+}
+
+.terminalColor {
+    color: #00FFFF;
+}
+
+/* Logo image size and resizing when the screen size decreases.*/
+.logoImage {
+    width: 620px;
+}
+
+@media only screen and (max-width: 670px) {
+    .logoImage {
+        max-width: 100%;
+    }
+}
+
+.aside600px {
+    background-color: #E0FFE0;
+}
+
+@media only screen and (max-width: 600px) {
+    .aside600px {
+        float: left;
+    }
+}
+
+.aside960px {
+}
+
+@media only screen and (max-width: 960px) {
+    .aside960px {
+        float: left;
+    }
+}
+
+.logoMain {
+    float: left;
+    width: 280px;
+}
+
+.menuMain {
+    float: right;
+}
+
+@media only screen and (max-width: 800px) {
+    .logoMain {
+        width: 100%;
+    }
+    
+    .menuMain {
+        float: left;
+    }
+}
+
+/* Subheader floats right but not too much when the screen size is very large. */
+#subHeader {
+    background-color: #E4F4FE;
+    margin: 0px 5px 5px 0px;
+    float: right;
+    padding: 4px;
+}
+
+@media only screen and (min-width: 1170px) {
+    #subHeader {
+        background-color: #E4F4FE;
+        margin: 0px 5px 5px 320px;
+        float: left;
+        padding: 4px;
+    }
+}
+
+/* Background blue, no margin or padding */
+html {
+    background-color: #D0E6EF;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ligher blue body, 10px margin around, 10px padding around. */
+/* Slightly-smaller font, not-quite-black*/
+body {
+    background-color: #D6EEF9;
+    color: #020202;
+    font-size: 0.88em;
+    font-family: "Segoe UI", Sans-Serif;
+    margin: 10px 10px 10px 10px;
+    padding: 10px;
+}
+
+/* Green hyperlinks, no underline, and padding to look like buttons.*/
+a {
+    color: #419963;
+    padding: 0px 3px 0px 3px;
+    text-decoration: none;
+}
+
+/* Light green body when links are hovered-over */
+a:hover {
+    background-color: #B2FFD4;
+}
+
+/* Float left and float right are defined here so we can drop the style for mobile screens. */
+.float-left {
+    float: left;
+}
+.float-right {
+    float: right;
+}
+
+/* Nice-looking headers*/
+h1 {
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+h2 {
+    font-size: 1.75em;
+    font-weight: 400;
+    margin: 12px 4px 2px 2px;
+}
+h3 {
+    font-size: 1.2em;
+    font-weight: 400;
+}
+h4 {
+    font-size: 1.1em;
+    font-weight: 400;
+    font-style: italic;
+    margin: 2px 8px 2px 8px;
+}
+
+/* Wrapper to hold the float-left and float-right stuff to make it look like one block*/
+.content-wrapper {
+    max-width: 1000px;
+    display: inline-block;
+}
+
+.block-special {
+    display: inline-block;
+    text-align: left;
+    max-width: 100%;
+}
+
+/* Rather simple background color with margin. */
+#body {
+    background-color: #F2FFF2;
+    clear: both;
+    padding: 5px 5px 5px 5px;
+    text-align: center;
+}
+
+.submenu {
+    list-style:none;
+    margin: 0px;
+    padding: 0px 5px 0px 7px;
+}
+
+.subbox {
+    background-color: #E0FFE0;
+}
+
+.errorSubbox {
+    background-color: #ff9494;
+    padding: 2px 2px 2px 2px;
+}
+
+.equationSubBox {
+    background-color: #D0FFE0;
+}
+
+.disabled {
+    color: #0E0E0E;
+}
+
+a span {
+    display: none;
+}
+
+a:hover span {
+    display: block;
+    position: absolute;
+    padding: 3px;
+    margin: 2px;
+    z-index: 2;
+    color: #020202;
+    background: white;
+    }
+
+.inline {
+    text-align:right;
+}
+
+h1, h2, h3, h4, p, label, form, img, ul, ol {
+    text-align:left;
+}
+
+/* Footer seems a bit stretched and is lighter in color, with a darker background */
+/* The footer also has plending of padding*/
+footer {
+    display: block;
+    clear: both;
+    background-color: #E2F2FC;
+    font-size: 0.80em;
+    margin: 5px 0px 0px 0px; 
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+}
+
+/* Main title text, which, albeit being a link, has the styles reset.*/
+.site-title {
+    font-family: Consolas, Courier, monospace;
+    font-size: 2.3em;
+    margin: 0px 20px 5px 20px;
+}
+.site-title a, .site-title a:hover {
+    background: url("/Content/helium24.png");
+    background-size: 100% 100%;
+    color: #c8c8c8;
+    text-decoration: none;
+}
+
+/* Upper menu with major commands */
+/* These links just plain look different from normal links */
+ul#menu {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin: 0px 0px 0px 0px;
+    text-align: center;
+}
+    ul#menu li {
+        display: inline;
+        list-style: none;
+        padding-left: 5px;
+    }
+        ul#menu li a {
+            background: none;
+            color: #999;
+        }
+        ul#menu li a:hover {
+            color: #020202;
+        }
+
+/* Articles with side-notes */
+article {
+    text-align: left;
+    float: left;
+    margin: 5px;
+    padding: 4px 8px 4px 8px;
+}
+
+aside {
+    text-align:left;
+    float: right;
+    margin: 5px;
+    padding: 4px 8px 4px 8px;
+    font-weight: 200;
+}
+
+/* Input Boxes*/
+input {
+    float:none;
+    margin: 5px 5px 5px 5px;
+}
+
+select {
+    width: 220px;
+}
+
+canvas {
+    border: 1px dashed;
+}
+
+label {
+    margin: 5px 5px 5px 5px;
+}
+
+/* Hide the checkbox in the toggle switch off screen, but make the label now the checkbox. */
+.toggle {
+  position: absolute;
+  visibility: hidden;
+}
+.toggle+label {
+  display: block;
+  position: relative;
+  user-select: none;
+}
+
+/* Define the size of the toggle */
+input.toggle-flat+label {
+  width: 60px;
+  height: 20px;
+}
+input.toggle-flat+label:before,
+input.toggle-flat+label:after {
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  content: "";
+}
+
+/* Define how the toggle switches from red to green */
+input.toggle-flat+label:before {
+  right: 1px;
+  background-color: #fb5050;
+  transition: background 0.4s;
+}
+input.toggle-flat+label:after {
+  width: 20px;
+  background-color: #a9a667;
+  transition: margin 0.2s;
+}
+input.toggle-flat:checked+label:before {
+  background-color: #419963;
+}
+input.toggle-flat:checked+label:after {
+  margin-left: 38px;
+}
+
+/* General aside scalings. */
+@media only screen and (max-width: 900px) {
+    .asideServerStatus {
+        float: left;
+    }
+}

@@ -1,0 +1,33 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@RenderSection("Title")</title>
+    <link rel="stylesheet" href="~/Content/Site.css">
+    @RenderSection("StyleSheets", false)
+</head>
+<body>
+    <header>
+        <div class="menuMain">
+            <ul id="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="https://github.com/GuMiner/napack/blob/master/docs/Readme.md">Documentation</a></li>
+                <li><a href="/Search">Search</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!--Main Page-->
+    @RenderBody()
+    <footer>
+        TODO Terms of use, TODO privacy policy.
+        <a href="https://github.com/GuMiner/napack/blob/master/LICENSE">Napack Framework Server License</a>
+    </footer>
+
+    <!--Scripts!-->
+    @RenderSection("Scripts", false)
+</body>
+</html>
