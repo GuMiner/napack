@@ -1,0 +1,92 @@
+﻿using NapackCommon;
+using Newtonsoft.Json;
+using Ookii.CommandLine;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NapackClient
+{
+    class NapackClient
+    {
+        private const int ERROR = 1;
+        private const int SUCCESS = 0;
+
+        public static int Main(string[] args)
+        {
+            Serializer.Setup();
+
+            NapackArguments arguments = NapackClient.ParseArguments(args);
+            if (arguments == null)
+            {
+                return ERROR;
+            }
+
+            List<DefinedNapackVersion> napacks = NapackClient.ParseNapackJsonFile(arguments.NapackJson);
+            if (napacks == null)
+            {
+                return ERROR;
+            }
+
+            NapackClientSettings clientSettings = NapackClient.ParseNapackSettingsFile(arguments.NapackSettings);
+            if (clientSettings == null)
+            {
+                return ERROR;
+            }
+
+            return new NapackOperator(arguments.NapackDirectory, napacks, clientSettings).Process() ? SUCCESS : ERROR;
+        }
+
+        private static NapackClientSettings ParseNapackSettingsFile(string napackSettingsJsonFile)
+        {
+            return NapackClient.PerformTryCatchOperation(() =>
+            {
+                string napackSettingsJson = File.ReadAllText(napackSettingsJsonFile);
+                return Serializer.Deserialize<NapackClientSettings>(napackSettingsJson);
+            }, () => Console.Error.WriteLine("Error parsing the Napack Settings JSON file!"));
+        }
+
+        private static List<DefinedNapackVersion> ParseNapackJsonFile(string napackJsonFile)
+        {
+            return NapackClient.PerformTryCatchOperation(() =>
+            {
+                string napackJson = File.ReadAllText(napackJsonFile);
+                Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(napackJson);
+                List<DefinedNapackVersion> napacks = rawNapacks.Select(item => new DefinedNapackVersion(item.Key, item.Value)).ToList();
+                return napacks;
+            }, () => Console.Error.WriteLine("Error parsing the Napack JSON file!"));
+        }
+
+        private static NapackArguments ParseArguments(string[] args)
+        {
+            CommandLineParser parser = new CommandLineParser(typeof(NapackArguments));
+            return NapackClient.PerformTryCatchOperation(() =>
+            {
+                NapackArguments arguments = parser.Parse(args) as NapackArguments;
+                return arguments;
+            }, () => parser.WriteUsageToConsole());
+        }
+
+        /// <summary>
+        /// Performs an operation that may fail, returning the operation results or the default for the type.
+        /// </summary>
+        /// <param name="operation">The operation to perform.</param>
+        /// <param name="errorCallback">The function to call when an error is encountered.</param>
+        private static T PerformTryCatchOperation<T>(Func<T> operation, Action errorCallback)
+        {
+            try
+            {
+                return operation();
+            }
+            catch (Exception ex)
+            {
+                errorCallback();
+                Console.Error.WriteLine(ex.Message);
+                return default(T);
+            }
+        }
+    }
+}

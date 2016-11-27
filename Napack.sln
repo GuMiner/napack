@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackServer", "server\NapackServer.csproj", "{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackCommon", "common\NapackCommon\NapackCommon.csproj", "{7B703C18-18CD-4849-B486-4583C30C4D67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackClient", "client\NapackClient\NapackClient.csproj", "{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B703C18-18CD-4849-B486-4583C30C4D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B703C18-18CD-4849-B486-4583C30C4D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B703C18-18CD-4849-B486-4583C30C4D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B703C18-18CD-4849-B486-4583C30C4D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

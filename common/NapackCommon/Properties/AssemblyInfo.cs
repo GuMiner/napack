@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("NapackServer")]
-[assembly: AssemblyDescription("Runs the Napack Framwork Server which hosts and provides Napacks.")]
+[assembly: AssemblyTitle("NapackCommon")]
+[assembly: AssemblyDescription("Contains common code between the Napack Framework Server and Napack Client.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NapackServer")]
+[assembly: AssemblyProduct("NapackCommon")]
 [assembly: AssemblyCopyright("Copyright © Gustave Granroth 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191")]
+[assembly: Guid("7b703c18-18cd-4849-b486-4583c30c4d67")]
 [assembly: AssemblyVersion("0.1.0")]
