@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -29,6 +29,9 @@ namespace Napack.Server
         /// </summary>
         public License License { get; set; }
 
+        /// <summary>
+        /// Gets the server-side version of a <see cref="NapackVersion"/>
+        /// </summary>
         public NapackVersion GetVersion(int minorVersion, int patchVersion)
         {
             NapackVersion foundVersion = this.Versions.FirstOrDefault(version => version.Minor == minorVersion && version.Patch == patchVersion);
@@ -38,6 +41,20 @@ namespace Napack.Server
             }
 
             return foundVersion;
+        }
+
+        /// <summary>
+        /// Gets the client-side version of a <see cref="Common.NapackVersion"/>
+        /// </summary>
+        public Common.NapackVersion GetDownloadableVersion(int minorVersion, int patchVersion)
+        {
+            NapackVersion foundVersion = this.Versions.FirstOrDefault(version => version.Minor == minorVersion && version.Patch == patchVersion);
+            if (foundVersion == null)
+            {
+                throw new NapackVersionNotFoundException(this.Major, minorVersion, patchVersion);
+            }
+
+            return new Common.NapackVersion(this.Major, foundVersion.Minor, foundVersion.Patch, foundVersion.Authors, foundVersion.Files, this.License);
         }
 
         /// <summary>

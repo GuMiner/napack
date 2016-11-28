@@ -1,12 +1,9 @@
-﻿using NapackCommon;
-using Newtonsoft.Json;
-using Ookii.CommandLine;
+﻿using Ookii.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Napack.Common;
 
 namespace NapackClient
 {

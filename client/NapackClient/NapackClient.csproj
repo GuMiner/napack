@@ -52,11 +52,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefinedNapackVersion.cs" />
+    <Compile Include="INapackServerClient.cs" />
+    <Compile Include="InvalidNapackException.cs" />
     <Compile Include="InvalidNapackVersionException.cs" />
     <Compile Include="NapackArguments.cs" />
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />
+    <Compile Include="NapackFrameworkServerUnavailable.cs" />
     <Compile Include="NapackOperator.cs" />
+    <Compile Include="NapackRecalledException.cs" />
+    <Compile Include="NapackServerClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

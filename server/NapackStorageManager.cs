@@ -5,7 +5,7 @@ namespace Napack.Server
     /// <summary>
     /// Manages storage of Napacks and their files.
     /// </summary>
-    public class NapackStorageManager : INapackStorageManater
+    public class NapackStorageManager : INapackStorageManager
     {
         /// <summary>
         /// Gets the specified napack package from the database.

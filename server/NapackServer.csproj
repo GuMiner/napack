@@ -106,14 +106,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Definitions\License.cs" />
     <Compile Include="Definitions\NapackPackage.cs" />
     <Compile Include="Definitions\NapackMajorVersion.cs" />
     <Compile Include="Definitions\NapackVersion.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
-    <Compile Include="Exceptions\NapackVersionNotFoundException.cs" />
     <Compile Include="Exceptions\NapackNotFoundException.cs" />
     <Compile Include="INapackStorageManater.cs" />
+    <Compile Include="Modules\UserIdentifierModule.cs" />
+    <Compile Include="Modules\NapackDownloadModule.cs" />
     <Compile Include="Modules\NapackModule.cs" />
     <Compile Include="NapackStorageManager.cs" />
     <Compile Include="Utils\NancyBootstrapper.cs" />

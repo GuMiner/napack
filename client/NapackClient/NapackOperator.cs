@@ -66,6 +66,10 @@ namespace NapackClient
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Found {0} new napacks, {1} existing napacks, {2} unused napacks, and {3} unknown folders in the napack directory.",
                 newNapacks.Count, existingNapacks.Count, unusedNapacks.Count, unknownFolders.Count));
 
+            // Variables to declare in a config settings
+            int maxParallelism = 20;
+
+
             // TODO: Ignore the binaries folder.
             // Download the new napacks into their corresponding folders.
             // Create binaries for the new napacks, replacing existing napacks that may or may not be there.

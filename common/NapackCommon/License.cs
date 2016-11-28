@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Napack.Server
+namespace Napack.Common
 {
     public class License
     {
@@ -35,7 +35,7 @@ namespace Napack.Server
         /// </summary>
         public string LicenseText { get; set; }
 
-        internal object AsSummaryJson()
+        public object AsSummaryJson()
         {
             return new
             {

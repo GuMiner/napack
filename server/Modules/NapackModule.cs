@@ -1,6 +1,5 @@
 ﻿using System;
 using Nancy;
-using Nancy.Extensions;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,10 +11,7 @@ namespace Napack.Server.Modules
     /// </summary>
     public class NapackModule : NancyModule
     {
-        // TODO use Nancy IOC to fill this in.
-        private static INapackStorageManater NapackManager;
-
-        public NapackModule()
+        public NapackModule(INapackStorageManager napackManager)
             : base("/napacks")
         {
             // Gets a Napack package or series of package versions.
@@ -36,7 +32,7 @@ namespace Napack.Server.Modules
                 if (version == null)
                 {
                     // The user is asking for all major versions of the specified package.
-                    NapackPackage package = NapackManager.GetPackage(packageName);
+                    NapackPackage package = napackManager.GetPackage(packageName);
                     return this.Response.AsJson(package.AsSummaryJson());
                 }
                 else
@@ -58,7 +54,7 @@ namespace Napack.Server.Modules
                     }
 
                     // Handle the resulting version components.
-                    NapackPackage package = NapackManager.GetPackage(packageName);
+                    NapackPackage package = napackManager.GetPackage(packageName);
                     NapackMajorVersion majorVersion = package.GetMajorVersion(components[0]);
                     if (components.Count == 1)
                     {

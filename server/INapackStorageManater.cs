@@ -3,7 +3,7 @@
     /// <summary>
     /// Gets the specified napack package from the database.
     /// </summary>
-    public interface INapackStorageManater
+    public interface INapackStorageManager
     {
         NapackPackage GetPackage(string packageName);
     }

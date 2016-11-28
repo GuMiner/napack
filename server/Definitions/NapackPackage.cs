@@ -1,7 +1,7 @@
-﻿using Napack.Server.Definitions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -44,7 +44,7 @@ namespace Napack.Server
         /// Gets the specified major version.
         /// </summary>
         /// <param name="majorVersion">The major version to get.</param>
-        /// <returns></returns>
+        /// <exception cref="NapackVersionNotFoundException">If the specified major version was not found.</exception>
         public NapackMajorVersion GetMajorVersion(int majorVersion)
         {
             if (majorVersion < 1 || majorVersion > this.Versions.Count)

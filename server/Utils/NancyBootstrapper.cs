@@ -20,7 +20,7 @@ namespace Napack.Server
         {
             base.ApplicationStartup(container, pipelines);
             Csrf.Enable(pipelines);
-            
+
             StaticConfiguration.DisableErrorTraces = false;
             pipelines.OnError += (context, exception) =>
             {
@@ -29,6 +29,16 @@ namespace Napack.Server
                 return null;
             };
         }
+
+        /// <summary>
+        /// Modify our container registration so that it auto-loads our interfaces we use.
+        /// </summary>
+        protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
+        {
+            base.ConfigureRequestContainer(container, context);
+            container.Register<INapackStorageManager, NapackStorageManager>();
+        }
+
 
         /// <summary>
         /// Modify our root path to be the application working directory.

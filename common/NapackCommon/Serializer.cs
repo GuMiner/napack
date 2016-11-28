@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace NapackCommon
+namespace Napack.Common
 {
     /// <summary>
     /// Abstracts away Newtonsoft.JSON's interface.

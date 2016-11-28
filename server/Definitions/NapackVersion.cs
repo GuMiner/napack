@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Napack.Server
 {
@@ -24,9 +23,9 @@ namespace Napack.Server
         /// The files associated with the package.
         /// </summary>
         /// <remarks>
-        /// The keys are the path of the file, the values are IDs of package file references.
+        /// The keys are the path of the file, the values are the files themselves
         /// </remarks>
-        public Dictionary<string, Guid> Files { get; set; }
+        public Dictionary<string, string> Files { get; set; }
 
         /// <summary>
         /// Returns a JSON-serializable summary of this napack version.
