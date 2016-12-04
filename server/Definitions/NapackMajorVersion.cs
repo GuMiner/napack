@@ -54,7 +54,7 @@ namespace Napack.Server
                 throw new NapackVersionNotFoundException(this.Major, minorVersion, patchVersion);
             }
 
-            return new Common.NapackVersion(this.Major, foundVersion.Minor, foundVersion.Patch, foundVersion.Authors, foundVersion.Files, this.License);
+            return new Common.NapackVersion(this.Major, foundVersion.Minor, foundVersion.Patch, foundVersion.Authors, foundVersion.Files, this.License, foundVersion.Dependencies);
         }
 
         /// <summary>

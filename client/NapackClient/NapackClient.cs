@@ -33,8 +33,25 @@ namespace NapackClient
             {
                 return ERROR;
             }
+            
+            try
+            {
+                using (NapackServerClient client = new NapackServerClient(clientSettings.NapackFrameworkServer))
+                {
+                    NapackOperation napackOperation = new NapackOperation(client, napacks, clientSettings);
+                    napackOperation.AcquireNapacks(arguments.NapackDirectory);
 
-            return new NapackOperator(arguments.NapackDirectory, napacks, clientSettings).Process() ? SUCCESS : ERROR;
+                    // TODO doesn't require client.
+                    napackOperation.UpdateTargets(arguments.NapackDirectory);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return ERROR;
+            }
+
+            return SUCCESS;
         }
 
         private static NapackClientSettings ParseNapackSettingsFile(string napackSettingsJsonFile)

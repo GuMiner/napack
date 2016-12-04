@@ -5,6 +5,7 @@ Changes to the **Napack.settings** file are applied automatically on the next re
 ###Default Settings
 ```json
 {
+"napackFrameworkServer":"https://WhereYouDownloadedTheClientFrom:443",
 "allowCommercial":"false",
 "allowCopyLeft":"false",
 "allowCustomLicenses":"false",

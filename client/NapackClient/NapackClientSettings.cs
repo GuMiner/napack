@@ -8,6 +8,11 @@ namespace NapackClient
     public class NapackClientSettings
     {
         /// <summary>
+        /// The server hosting Napacks.
+        /// </summary>
+        public Uri NapackFrameworkServer { get; set; }
+
+        /// <summary>
         /// Allows the inclusion of commercially-licensed napacks.
         /// </summary>
         public bool AllowCommercial { get; set; }

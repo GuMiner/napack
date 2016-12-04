@@ -59,9 +59,10 @@
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />
     <Compile Include="NapackFrameworkServerUnavailable.cs" />
-    <Compile Include="NapackOperator.cs" />
+    <Compile Include="NapackOperation.cs" />
     <Compile Include="NapackRecalledException.cs" />
     <Compile Include="NapackServerClient.cs" />
+    <Compile Include="NapackTargets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

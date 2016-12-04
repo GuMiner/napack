@@ -11,7 +11,7 @@ namespace Napack.Common
         {
         }
 
-        public NapackVersion(int major, int minor, int patch, List<string> authors, Dictionary<string, string> files, License license)
+        public NapackVersion(int major, int minor, int patch, List<string> authors, Dictionary<string, string> files, License license, List<NapackMajorVersion> depedencies)
         {
             this.Major = major;
             this.Minor = minor;
@@ -19,6 +19,7 @@ namespace Napack.Common
             this.Authors = authors;
             this.Files = files;
             this.License = license;
+            this.Dependencies = depedencies;
         }
 
         public int Major { get; set; }
@@ -41,5 +42,10 @@ namespace Napack.Common
         /// The license of the package.
         /// </summary>
         public License License { get; set; }
+
+        /// <summary>
+        /// The dependent napacks for this package.
+        /// </summary>
+        public List<NapackMajorVersion> Dependencies { get; set; }
     }
 }

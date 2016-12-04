@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="License.cs" />
+    <Compile Include="NapackMajorVersion.cs" />
     <Compile Include="NapackVersion.cs" />
     <Compile Include="NapackVersionNotFoundException.cs" />
     <Compile Include="Serializer.cs" />
