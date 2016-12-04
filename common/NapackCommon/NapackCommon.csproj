@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="License.cs" />
+    <Compile Include="LicenseType.cs" />
     <Compile Include="NapackMajorVersion.cs" />
     <Compile Include="NapackVersion.cs" />
     <Compile Include="NapackVersionNotFoundException.cs" />
@@ -53,6 +54,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="LicenseFormatStrings\FPLv1_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\ISC_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\MIT_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\PublicDomain_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\SimplifiedBSD_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\WTFPLv2_FS.txt" />
+    <EmbeddedResource Include="LicenseFormatStrings\Zlib-Libpng_FS.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

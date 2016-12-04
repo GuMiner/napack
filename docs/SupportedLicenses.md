@@ -18,7 +18,7 @@ This list only covers the attribution-only open-source licenses that Napack supp
 * Simplified BSD License
 * zlib/libpng License
 * ISC License
-* WTFPL License Versions 1 and 2
+* WTFPL License Version 2
 * Free Public License 1.0.0
 * Public Domain
 

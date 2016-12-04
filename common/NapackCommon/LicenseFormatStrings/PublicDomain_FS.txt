@@ -1,0 +1,3 @@
+Created By {0}, {1}.
+Public Domain.
+No warranty is offered or implied; use this code at your own risk.

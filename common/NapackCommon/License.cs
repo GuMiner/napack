@@ -7,7 +7,7 @@ namespace Napack.Common
         /// <summary>
         /// The name of the license.
         /// </summary>
-        public string LicenseName { get; set; }
+        public LicenseManagement.LicenseType LicenseName { get; set; }
 
         /// <summary>
         /// Returns true if this is a supported license.

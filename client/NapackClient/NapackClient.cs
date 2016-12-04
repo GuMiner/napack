@@ -43,6 +43,10 @@ namespace NapackClient
 
                     // TODO doesn't require client.
                     napackOperation.UpdateTargets(arguments.NapackDirectory);
+
+                    // TODO implement. Given that this definitely needs to use the package metadata, I'll do this when I refactor
+                    //  this section of the code to cache the metadata for future runs.
+                    // napackOperation.CreateAttributionFile(arguments.NapackDirectory);
                 }
             }
             catch (Exception ex)
