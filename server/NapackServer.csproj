@@ -115,6 +115,7 @@
     <Compile Include="Modules\UserIdentifierModule.cs" />
     <Compile Include="Modules\NapackDownloadModule.cs" />
     <Compile Include="Modules\NapackModule.cs" />
+    <Compile Include="InMemoryNapackStorageManager.cs" />
     <Compile Include="NapackStorageManager.cs" />
     <Compile Include="Utils\NancyBootstrapper.cs" />
     <Compile Include="Utils\RootPathProvider.cs" />
