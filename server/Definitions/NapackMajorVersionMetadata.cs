@@ -25,15 +25,6 @@ namespace Napack.Server
         public License License { get; set; }
 
         /// <summary>
-        /// The dependent napacks for this Napack major version.
-        /// </summary>
-        /// <remarks>
-        /// Adding, removing, or modifying a Napack depedency is a breaking change.
-        /// TODO document why, as this isn't very clear.
-        /// </remarks>
-        public List<NapackMajorVersion> Dependencies { get; set; }
-        
-        /// <summary>
         /// Lists the summary of this major version as a dynamic object.
         /// </summary>
         public object AsSummaryJson()
@@ -42,7 +33,6 @@ namespace Napack.Server
             {
                 Recalled = this.Recalled,
                 Versions = this.Versions.SelectMany(version => version.Value.Select(patchVersion => version.Key + "." + patchVersion)),
-                Dependencies = this.Dependencies.Select(dependency => dependency.Name + "." + dependency.Major),
                 License = this.License.AsSummaryJson(),
             };
         }

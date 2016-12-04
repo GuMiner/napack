@@ -1,8 +1,10 @@
 ﻿using System;
-using Nancy;
-using Microsoft.CSharp.RuntimeBinder;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.CSharp.RuntimeBinder;
+using Nancy;
+using Napack.Common;
+using Nancy.ModelBinding;
 
 namespace Napack.Server.Modules
 {
@@ -17,8 +19,6 @@ namespace Napack.Server.Modules
             // Gets a Napack package or series of package versions.
             Get["/{packageName}/{version?}"] = parameters =>
             {
-                Global.Log("");
-                
                 string packageName = parameters.packageName;
                 string version = null;
                 try
@@ -70,6 +70,63 @@ namespace Napack.Server.Modules
                         return this.Response.AsJson(new { Error = "An invalid number of version components was provided in the version string!", Message = $"Components provided: {components.Count}" });
                     }
                 }
+            };
+
+            // Creates a new Napack package.
+            Post["/{packageName}"] = parameters =>
+            {
+                string packageName = parameters.packageName;
+                try
+                {
+                    NapackMetadata package = napackManager.GetPackageMetadata(packageName);
+                    return this.Response.AsJson(new
+                    {
+                        Error = "Found an existing package with the same name!",
+                        Message = "Package name: " + package.Name
+                    }, HttpStatusCode.BadRequest);
+                }
+                catch (NapackNotFoundException)
+                {
+                    // Expected.
+                }
+
+                NewNapack newNapack = this.Bind<NewNapack>();
+                // TODO validate and save
+
+                return this.Response.AsJson(new
+                {
+                    Message = "Created package " + packageName
+                }, HttpStatusCode.Created);
+            };
+
+            // Updates an existing Napack package.
+            Patch["/{packageName}"] = parameters =>
+            {
+                NewNapackVersion newNapackVersion = this.Bind<NewNapackVersion>();
+
+                NapackMetadata package;
+                string packageName = parameters.packageName;
+                try
+                {
+                    package = napackManager.GetPackageMetadata(packageName);
+                    
+                }
+                catch (NapackNotFoundException nfe)
+                {
+                    return this.Response.AsJson(new
+                    {
+                        Error = "Did not find the specified package to update!",
+                        Message = nfe.Message
+                    }, HttpStatusCode.BadRequest);
+                }
+
+                // TODO perform cross-validation to determine how the napack will be updated.
+
+                return this.Response.AsJson(new
+                {
+                    Message = "Update package " + packageName,
+                    // TODO log major, minor, patch versions here.
+                });
             };
         }
     }

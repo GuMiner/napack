@@ -122,7 +122,7 @@ namespace Napack.Server.Modules
 
                 NapackVersion specifiedVersion = napackManager.GetPackageVersion(new NapackVersionIdentifier(name, major, minor, patch));
                 Common.NapackVersion downloadableVersion = new Common.NapackVersion(major, minor, patch,
-                    specifiedVersion.Authors, specifiedVersion.Files, majorVersion.License, majorVersion.Dependencies);
+                    specifiedVersion.Authors, specifiedVersion.Files, majorVersion.License, specifiedVersion.Dependencies);
                 return this.Response.AsJson(downloadableVersion, HttpStatusCode.OK);
             }
             catch (NapackVersionNotFoundException vnf)

@@ -23,7 +23,7 @@ namespace Napack.Server
         /// <remarks>
         /// The reverse of this operation can be done by reading the dependencies specified in the metadata.
         /// </remarks>
-        IEnumerable<Common.NapackMajorVersion> GetPackageConsumers(Common.NapackMajorVersion packageMajorVersion);
+        IEnumerable<Common.NapackVersionIdentifier> GetPackageConsumers(Common.NapackMajorVersion packageMajorVersion);
 
         /// <summary>
         /// Gets all package names the user is authorized to edit.

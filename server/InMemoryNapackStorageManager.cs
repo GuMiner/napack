@@ -23,7 +23,7 @@ namespace Napack.Server
         /// <summary>
         /// The listing of package major version => napacks on this server consuming said package.
         /// </summary>
-        private readonly Dictionary<string, List<NapackMajorVersion>> consumingPackages;
+        private readonly Dictionary<string, List<NapackVersionIdentifier>> consumingPackages;
 
         /// <summary>
         /// The listing of package name => package metadata
@@ -39,9 +39,8 @@ namespace Napack.Server
         public InMemoryNapackStorageManager()
         {
             this.authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
-            this.consumingPackages = new Dictionary<string, List<NapackMajorVersion>>(StringComparer.InvariantCultureIgnoreCase);
             this.authorizedPackages = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
-            this.consumingPackages = new Dictionary<string, List<NapackMajorVersion>>(StringComparer.InvariantCultureIgnoreCase);
+            this.consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
             this.packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCultureIgnoreCase);
             this.packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCultureIgnoreCase);
         }
@@ -61,7 +60,7 @@ namespace Napack.Server
             return this.authorizedPackages[userHash];
         }
 
-        public IEnumerable<NapackMajorVersion> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
+        public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
             return this.consumingPackages[packageMajorVersion.ToString()];
         }

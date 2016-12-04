@@ -24,7 +24,7 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
-        public IEnumerable<NapackMajorVersion> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
+        public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
             throw new NotImplementedException();
         }

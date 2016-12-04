@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -18,6 +20,11 @@ namespace Napack.Server
         public Dictionary<string, string> Files { get; set; }
 
         /// <summary>
+        /// The dependent napacks for this Napack major version.
+        /// </summary>
+        public List<NapackMajorVersion> Dependencies { get; set; }
+
+        /// <summary>
         /// Returns a JSON-serializable summary of this napack version.
         /// </summary>
         public object AsSummaryJson()
@@ -26,6 +33,7 @@ namespace Napack.Server
             {
                 this.Authors,
                 Files = this.Files.Keys,
+                Dependencies = this.Dependencies.Select(dependency => dependency.Name + "." + dependency.Major),
             };
         }
     }
