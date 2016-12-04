@@ -106,12 +106,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Definitions\NapackPackage.cs" />
-    <Compile Include="Definitions\NapackMajorVersion.cs" />
+    <Compile Include="Definitions\NapackMetadata.cs" />
+    <Compile Include="Definitions\NapackMajorVersionMetadata.cs" />
     <Compile Include="Definitions\NapackVersion.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="Exceptions\NapackNotFoundException.cs" />
-    <Compile Include="INapackStorageManater.cs" />
+    <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Modules\UserIdentifierModule.cs" />
     <Compile Include="Modules\NapackDownloadModule.cs" />
     <Compile Include="Modules\NapackModule.cs" />

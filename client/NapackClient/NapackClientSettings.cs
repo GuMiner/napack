@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NapackClient
+namespace Napack.Client
 {
     /// <summary>
     /// Defines the napack client settings.

@@ -1,7 +1,7 @@
 ﻿using Ookii.CommandLine;
 using System.ComponentModel;
 
-namespace NapackClient
+namespace Napack.Client
 {
     [Description("Manages Napacks consumed within the current project.")]
     public class NapackArguments

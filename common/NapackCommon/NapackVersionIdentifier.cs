@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NapackClient
+namespace Napack.Common
 {
     /// <summary>
     /// Holds a validly defined napack version. This doesn't mean the napack exists, only that it's format is valid.
     /// </summary>
-    public class DefinedNapackVersion
+    public class NapackVersionIdentifier
     {
-        public DefinedNapackVersion(string napackDirectoryName)
+        public NapackVersionIdentifier(string napackDirectoryName)
         {
             List<string> components = napackDirectoryName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             if (components.Count != 4)
@@ -31,7 +31,7 @@ namespace NapackClient
             this.Patch = versionComponents[2];
         }
 
-        public DefinedNapackVersion(string napackName, string versionString)
+        public NapackVersionIdentifier(string napackName, string versionString)
         {
             this.NapackName = napackName;
 
@@ -44,6 +44,14 @@ namespace NapackClient
             this.Major = components[0];
             this.Minor = components[1];
             this.Patch = components[2];
+        }
+
+        public NapackVersionIdentifier(string napackName, int major, int minor, int patch)
+        {
+            this.NapackName = napackName;
+            this.Major = major;
+            this.Minor = minor;
+            this.Patch = patch;
         }
 
         public string NapackName { get; private set; }
@@ -64,7 +72,7 @@ namespace NapackClient
                 return false;
             }
 
-            DefinedNapackVersion other = obj as DefinedNapackVersion;
+            NapackVersionIdentifier other = obj as NapackVersionIdentifier;
             if (other == null)
             {
                 return false;

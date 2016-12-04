@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Napack.Common;
 
-namespace NapackClient
+namespace Napack.Client
 {
     class NapackClient
     {
@@ -22,7 +22,7 @@ namespace NapackClient
                 return ERROR;
             }
 
-            List<DefinedNapackVersion> napacks = NapackClient.ParseNapackJsonFile(arguments.NapackJson);
+            List<NapackVersionIdentifier> napacks = NapackClient.ParseNapackJsonFile(arguments.NapackJson);
             if (napacks == null)
             {
                 return ERROR;
@@ -67,13 +67,13 @@ namespace NapackClient
             }, () => Console.Error.WriteLine("Error parsing the Napack Settings JSON file!"));
         }
 
-        private static List<DefinedNapackVersion> ParseNapackJsonFile(string napackJsonFile)
+        private static List<NapackVersionIdentifier> ParseNapackJsonFile(string napackJsonFile)
         {
             return NapackClient.PerformTryCatchOperation(() =>
             {
                 string napackJson = File.ReadAllText(napackJsonFile);
                 Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(napackJson);
-                List<DefinedNapackVersion> napacks = rawNapacks.Select(item => new DefinedNapackVersion(item.Key, item.Value)).ToList();
+                List<NapackVersionIdentifier> napacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key, item.Value)).ToList();
                 return napacks;
             }, () => Console.Error.WriteLine("Error parsing the Napack JSON file!"));
         }

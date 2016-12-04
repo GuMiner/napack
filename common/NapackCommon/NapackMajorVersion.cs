@@ -27,5 +27,10 @@
         /// The major version of this package.
         /// </summary>
         public int Major { get; set; }
+
+        public override string ToString()
+        {
+            return this.Name + "." + this.Major;
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Napack.Common
         /// <summary>
         /// The name of the license.
         /// </summary>
-        public LicenseManagement.LicenseType LicenseName { get; set; }
+        public LicenseManagement.LicenseType LicenseType { get; set; }
 
         /// <summary>
         /// Returns true if this is a supported license.
@@ -39,11 +39,11 @@ namespace Napack.Common
         {
             return new
             {
-                Name = this.LicenseName,
+                Type = this.LicenseType,
                 this.IsSupportedLicense,
                 this.IsCopyLeft,
                 this.IsCommercial,
-                this.IsCustomLicense
+                this.IsCustomLicense,
             };
         }
     }

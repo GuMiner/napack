@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NapackClient
+namespace Napack.Common
 {
     public class InvalidNapackVersionException : Exception
     {

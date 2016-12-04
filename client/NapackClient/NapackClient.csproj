@@ -7,8 +7,8 @@
     <ProjectGuid>{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NapackClient</RootNamespace>
-    <AssemblyName>NapackClient</AssemblyName>
+    <RootNamespace>Napack.Client</RootNamespace>
+    <AssemblyName>Napack.Client</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -51,10 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefinedNapackVersion.cs" />
     <Compile Include="INapackServerClient.cs" />
     <Compile Include="InvalidNapackException.cs" />
-    <Compile Include="InvalidNapackVersionException.cs" />
     <Compile Include="NapackArguments.cs" />
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />

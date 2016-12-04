@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using Napack.Common;
 
-namespace NapackClient
+namespace Napack.Client
 {
     /// <summary>
     /// Performs the napack analysis and (potentially) update operations based on the current settings.
@@ -15,10 +15,10 @@ namespace NapackClient
     internal class NapackOperation
     {
         private readonly INapackServerClient nfsClient;
-        private readonly List<DefinedNapackVersion> napacks;
+        private readonly List<NapackVersionIdentifier> napacks;
         private readonly NapackClientSettings clientSettings;
 
-        public NapackOperation(INapackServerClient nfsClient, List<DefinedNapackVersion> napacks, NapackClientSettings clientSettings)
+        public NapackOperation(INapackServerClient nfsClient, List<NapackVersionIdentifier> napacks, NapackClientSettings clientSettings)
         {
             this.nfsClient = nfsClient;
             this.napacks = napacks;
@@ -32,18 +32,18 @@ namespace NapackClient
         {
             // TODO implement a cleanup mechanism to get rid of old napacks.
             // TODO detect dependent napacks to avoid listing them in the unused section.
-            List<DefinedNapackVersion> newNapacks = new List<DefinedNapackVersion>(napacks);
-            List<DefinedNapackVersion> existingNapacks = new List<DefinedNapackVersion>();
-            List<DefinedNapackVersion> unusedNapacks = new List<DefinedNapackVersion>();
+            List<NapackVersionIdentifier> newNapacks = new List<NapackVersionIdentifier>(napacks);
+            List<NapackVersionIdentifier> existingNapacks = new List<NapackVersionIdentifier>();
+            List<NapackVersionIdentifier> unusedNapacks = new List<NapackVersionIdentifier>();
             List<string> unknownFolders = new List<string>();
             
             foreach (string directory in Directory.EnumerateDirectories(napackDirectory))
             {
                 string napackDirectoryName = Path.GetFileName(directory);
-                DefinedNapackVersion napackVersion = null;
+                NapackVersionIdentifier napackVersion = null;
                 try
                 {
-                     napackVersion = new DefinedNapackVersion(napackDirectoryName);
+                     napackVersion = new NapackVersionIdentifier(napackDirectoryName);
                 }
                 catch (Exception ex)
                 {
@@ -92,14 +92,14 @@ namespace NapackClient
         public void UpdateTargets(string napackDirectory)
         {
             // TODO a rewrite should have this use the information from our Napack JSON file, new napacks, to avoid rescanning our directory tree
-            List<DefinedNapackVersion> newestNapackVersions = new List<DefinedNapackVersion>();
+            List<NapackVersionIdentifier> newestNapackVersions = new List<NapackVersionIdentifier>();
             foreach (string directory in Directory.GetDirectories(napackDirectory))
             {
                 string napackDirectoryName = Path.GetFileName(directory);
-                DefinedNapackVersion napackVersion = null;
+                NapackVersionIdentifier napackVersion = null;
                 try
                 {
-                    napackVersion = new DefinedNapackVersion(napackDirectoryName);
+                    napackVersion = new NapackVersionIdentifier(napackDirectoryName);
                 }
                 catch (Exception ex)
                 {
@@ -108,7 +108,7 @@ namespace NapackClient
                     Console.Error.WriteLine(ex.Message);
                 }
 
-                DefinedNapackVersion existingVersion = newestNapackVersions.SingleOrDefault(
+                NapackVersionIdentifier existingVersion = newestNapackVersions.SingleOrDefault(
                     version => version.NapackName.Equals(napackVersion.NapackName, StringComparison.OrdinalIgnoreCase) && version.Major == napackVersion.Major);
                 if (existingVersion == null)
                 {
@@ -129,7 +129,7 @@ namespace NapackClient
         /// <summary>
         /// Tabulates new dependencies by adding the new napacks to the downloaded list, and removing dependencies that have already been retrieved.
         /// </summary>
-        private void TabulateNewDependencies(List<DefinedNapackVersion> existingNapacks, List<DefinedNapackVersion> newNapacks, List<NapackMajorVersion> dependencies)
+        private void TabulateNewDependencies(List<NapackVersionIdentifier> existingNapacks, List<NapackVersionIdentifier> newNapacks, List<NapackMajorVersion> dependencies)
         {
             // TODO this doesn't detect duplicates, which is OK for now.
             existingNapacks.AddRange(newNapacks);
@@ -163,12 +163,12 @@ namespace NapackClient
             return dependencies;
         }
 
-        private List<NapackMajorVersion> DownloadNewNapacks(string napackDirectory, List<DefinedNapackVersion> newNapacks)
+        private List<NapackMajorVersion> DownloadNewNapacks(string napackDirectory, List<NapackVersionIdentifier> newNapacks)
         {
             // TODO parallelize
             Stopwatch timer = Stopwatch.StartNew();
             List<NapackMajorVersion> dependencies = new List<NapackMajorVersion>();
-            foreach (DefinedNapackVersion napackVersion in newNapacks)
+            foreach (NapackVersionIdentifier napackVersion in newNapacks)
             {
                 NapackVersion version = this.nfsClient.GetNapackVersionAsync(napackVersion).GetAwaiter().GetResult();
                 SaveNapack(napackDirectory, napackVersion.NapackName, version);

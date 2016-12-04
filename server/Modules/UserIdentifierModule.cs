@@ -6,7 +6,7 @@ using Nancy.ModelBinding;
 namespace Napack.Server
 {
     /// <summary>
-    /// Handles User ID generation.
+    /// Handles Napack Framwork Server User ID generation.
     /// </summary>
     public class UserIdentifierModule : NancyModule
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -8,26 +9,32 @@ namespace Napack.Server
     /// </summary>
     public class NapackStorageManager : INapackStorageManager
     {
-        /// <summary>
-        /// Gets the specified napack package from the database.
-        /// </summary>
-        public NapackPackage GetPackage(string packageName)
-        {
-            // TODO setup unit testing of the modules and fill in the interface.
-            throw new NapackNotFoundException(packageName);
-        }
-
-        public void UpdatePackage(NapackPackage package)
+        public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
         {
             throw new NotImplementedException();
         }
 
-        public List<NapackMajorVersion> GetFlattenedPackageDependencies(string packageName)
+        public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
             throw new NotImplementedException();
         }
 
-        public List<NapackMajorVersion> GetPackageDependencies(string packageName)
+        public IEnumerable<string> GetAuthorizedPackages(string userHash)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<NapackMajorVersion> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NapackMetadata GetPackageMetadata(string packageName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
             throw new NotImplementedException();
         }

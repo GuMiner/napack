@@ -8,16 +8,6 @@ namespace Napack.Server
     public class UserIdentifier
     {
         /// <summary>
-        /// The email the user has provided.
-        /// </summary>
-        public string UserEmail { get; set; }
-
-        /// <summary>
-        /// The SHA512 hash of the user's access keys.
-        /// </summary>
-        public string UserHash { get; set; }
-
-        /// <summary>
         /// Creates a new user identifier for the specified email, leaving the user's hash blank.
         /// </summary>
         /// <param name="userEmail">The email to associated with the hash. Not used in hash generation.</param>
@@ -26,6 +16,16 @@ namespace Napack.Server
             this.UserEmail = userEmail;
             this.UserHash = null;
         }
+
+        /// <summary>
+        /// The email the user has provided.
+        /// </summary>
+        public string UserEmail { get; set; }
+
+        /// <summary>
+        /// The SHA512 hash of the user's access keys.
+        /// </summary>
+        public string UserHash { get; set; }
 
         /// <summary>
         /// Returns true if the provided user hashes match.

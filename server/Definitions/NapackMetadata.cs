@@ -5,7 +5,7 @@ using Napack.Common;
 
 namespace Napack.Server
 {
-    public class NapackPackage
+    public class NapackMetadata
     {
         /// <summary>
         /// The name of the package.
@@ -28,31 +28,27 @@ namespace Napack.Server
         public List<string> Tags { get; set; }
 
         /// <summary>
-        /// The users authorized to modify this package.
+        /// The hashes of users authorized to modify this package.
         /// </summary>
-        public List<UserIdentifier> AuthorizedUsers { get; set; }
+        public List<string> AuthorizedUserHashes { get; set; }
 
         /// <summary>
-        /// A package version.
+        /// Mapping of the available major
         /// </summary>
-        /// <remarks>
-        /// Package version major IDs are the same as the element index.
-        /// </remarks>
-        public List<NapackMajorVersion> Versions { get; set; }
+        public Dictionary<int, NapackMajorVersionMetadata> Versions { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// Gets the specified major version.
         /// </summary>
-        /// <param name="majorVersion">The major version to get.</param>
         /// <exception cref="NapackVersionNotFoundException">If the specified major version was not found.</exception>
-        public NapackMajorVersion GetMajorVersion(int majorVersion)
+        public NapackMajorVersionMetadata GetMajorVersion(int majorVersion)
         {
-            if (majorVersion < 1 || majorVersion > this.Versions.Count)
+            if (!this.Versions.ContainsKey(majorVersion))
             {
                 throw new NapackVersionNotFoundException(majorVersion);
             }
 
-            return this.Versions[majorVersion--];
+            return this.Versions[majorVersion];
         }
 
         /// <summary>
@@ -67,8 +63,8 @@ namespace Napack.Server
                 this.Description,
                 this.MoreInformation,
                 this.Tags,
-                ValidVersions = this.Versions.Where(version => !version.Recalled).Select(version => version.Major),
-                RecalledVersions = this.Versions.Where(version => version.Recalled).Select(version => version.Major)
+                ValidVersions = this.Versions.Where(version => !version.Value.Recalled).Select(version => version.Key),
+                RecalledVersions = this.Versions.Where(version => version.Value.Recalled).Select(version => version.Key)
             };
         }
     }

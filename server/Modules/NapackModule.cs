@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Napack.Server.Modules
 {
     /// <summary>
-    /// Handles Napack Framework Server API operations.
+    /// Handles Napack Framework Server query operations.
     /// </summary>
     public class NapackModule : NancyModule
     {
@@ -32,7 +32,7 @@ namespace Napack.Server.Modules
                 if (version == null)
                 {
                     // The user is asking for all major versions of the specified package.
-                    NapackPackage package = napackManager.GetPackage(packageName);
+                    NapackMetadata package = napackManager.GetPackageMetadata(packageName);
                     return this.Response.AsJson(package.AsSummaryJson());
                 }
                 else
@@ -54,19 +54,15 @@ namespace Napack.Server.Modules
                     }
 
                     // Handle the resulting version components.
-                    NapackPackage package = napackManager.GetPackage(packageName);
-                    NapackMajorVersion majorVersion = package.GetMajorVersion(components[0]);
-                    if (components.Count == 1)
+                    if (components.Count == 1 || components.Count == 2)
                     {
-                        return this.Response.AsJson(majorVersion.AsSummaryJson(null));
-                    }
-                    else if (components.Count == 2)
-                    {
-                        return this.Response.AsJson(majorVersion.AsSummaryJson(components[1]));
+                        NapackMetadata package = napackManager.GetPackageMetadata(packageName);
+                        NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(components[0]);
+                        return this.Response.AsJson(majorVersion.AsSummaryJson());
                     }
                     else if (components.Count == 3)
                     {
-                        NapackVersion specificVersion = majorVersion.GetVersion(components[1], components[2]);
+                        NapackVersion specificVersion = napackManager.GetPackageVersion(new Common.NapackVersionIdentifier(packageName, components[0], components[1], components[2]));
                         return this.Response.AsJson(specificVersion.AsSummaryJson());
                     }
                     else

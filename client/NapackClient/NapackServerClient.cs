@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Napack.Common;
 
-namespace NapackClient
+namespace Napack.Client
 {
     public class NapackServerClient : INapackServerClient, IDisposable
     {
@@ -33,7 +33,7 @@ namespace NapackClient
         /// <exception cref="NapackRecalledException">If the Napack was found, but is no longer available for download.</exception>
         /// <exception cref="NapackVersionNotFoundException">If the specified Napack version was not found.</exception>
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
-        public async Task<NapackVersion> GetNapackVersionAsync(DefinedNapackVersion napackVersionDefinition)
+        public async Task<NapackVersion> GetNapackVersionAsync(NapackVersionIdentifier napackVersionDefinition)
         {
             string responseContent = await this.GetWithCommonExceptionHandlingAsync("/napackDownload/" + napackVersionDefinition.GetDirectoryName(),
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);

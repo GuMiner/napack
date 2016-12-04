@@ -7,7 +7,7 @@ using Napack.Common;
 namespace Napack.Server.Modules
 {
     /// <summary>
-    /// Handles Napack Framework Server API operations.
+    /// Handles Napack Framework Server download operations.
     /// </summary>
     public class NapackDownloadModule : NancyModule
     {
@@ -86,41 +86,28 @@ namespace Napack.Server.Modules
 
         private Response GetMostRecentMajorVersion(INapackStorageManager napackManager, string name, int major)
         {
-            NapackPackage package = napackManager.GetPackage(name);
-
-            try
+            int minorVersion = 0;
+            return this.GetPackage(napackManager, name, major, (majorVersion) =>
             {
-                NapackMajorVersion majorVersion = package.GetMajorVersion(major);
-                if (majorVersion.Recalled)
-                {
-                    return this.Response.AsJson(new
-                    {
-                        Error = "The specified major version, " + major + ", has been recalled.",
-                        Message = "..."
-                    }, HttpStatusCode.NoContent);
-                }
-
-                NapackVersion lastMajorVersion = majorVersion.Versions[majorVersion.Versions.Count - 1];
-                Common.NapackVersion specificVersion = majorVersion.GetDownloadableVersion(lastMajorVersion.Minor, lastMajorVersion.Patch);
-                return this.Response.AsJson(specificVersion, HttpStatusCode.OK);
-            }
-            catch (NapackVersionNotFoundException vnf)
-            {
-                return this.Response.AsJson(new
-                {
-                    Error = "The specified napack package or version was not found.",
-                    Message = vnf.Message
-                }, HttpStatusCode.NotFound);
-            }
+                minorVersion = majorVersion.Versions.Max(version => version.Key);
+                return minorVersion;
+            },
+            (majorVersion) => majorVersion.Versions[minorVersion].Max());
         }
 
         private Response GetSpecificPackage(INapackStorageManager napackManager, string name, int major, int minor, int patch)
         {
-            NapackPackage package = napackManager.GetPackage(name);
+            return this.GetPackage(napackManager, name, major, (unused) => minor, (unused) => patch);
+        }
+
+        private Response GetPackage(INapackStorageManager napackManager, string name, int major, 
+            Func<NapackMajorVersionMetadata, int> minorVersionComputer, Func<NapackMajorVersionMetadata, int> patchVersionComputer)
+        {
+            NapackMetadata package = napackManager.GetPackageMetadata(name);
 
             try
             {
-                NapackMajorVersion majorVersion = package.GetMajorVersion(major);
+                NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(major);
                 if (majorVersion.Recalled)
                 {
                     return this.Response.AsJson(new
@@ -130,8 +117,13 @@ namespace Napack.Server.Modules
                     }, HttpStatusCode.NoContent);
                 }
 
-                Common.NapackVersion specificVersion = majorVersion.GetDownloadableVersion(minor, patch);
-                return this.Response.AsJson(specificVersion, HttpStatusCode.OK);
+                int minor = minorVersionComputer(majorVersion);
+                int patch = patchVersionComputer(majorVersion);
+
+                NapackVersion specifiedVersion = napackManager.GetPackageVersion(new NapackVersionIdentifier(name, major, minor, patch));
+                Common.NapackVersion downloadableVersion = new Common.NapackVersion(major, minor, patch,
+                    specifiedVersion.Authors, specifiedVersion.Files, majorVersion.License, majorVersion.Dependencies);
+                return this.Response.AsJson(downloadableVersion, HttpStatusCode.OK);
             }
             catch (NapackVersionNotFoundException vnf)
             {

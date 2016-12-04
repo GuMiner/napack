@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace NapackClient
+namespace Napack.Client
 {
     /// <summary>
     /// Defines the Napack .targets file, stored as XML
@@ -11,12 +11,12 @@ namespace NapackClient
     {
         private const string napackFilename = "napack.targets";
         
-        public static void SaveNapackTargetsFile(string napackDirectory, List<DefinedNapackVersion> currentNapacks)
+        public static void SaveNapackTargetsFile(string napackDirectory, List<Common.NapackVersionIdentifier> currentNapacks)
         {
             StringBuilder fileBuilder = new StringBuilder();
             fileBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 
-            foreach (DefinedNapackVersion napack in currentNapacks)
+            foreach (Common.NapackVersionIdentifier napack in currentNapacks)
             {
                 // TODO remove code duplication here.
                 fileBuilder.AppendLine("<Import Project=\"" + napack.GetDirectoryName() + "\\" + 

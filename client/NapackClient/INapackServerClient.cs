@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Napack.Common;
 
-namespace NapackClient
+namespace Napack.Client
 {
     /// <summary>
     /// Defines the client-server communication mechanism the Napack Client uses.
@@ -17,7 +17,7 @@ namespace NapackClient
         /// <exception cref="NapackRecalledException">If the Napack was found, but is no longer available for download.</exception>
         /// <exception cref="NapackVersionNotFoundException">If the specified Napack version was not found.</exception>
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
-        Task<NapackVersion> GetNapackVersionAsync(DefinedNapackVersion napackVersionDefinition);
+        Task<NapackVersion> GetNapackVersionAsync(NapackVersionIdentifier napackVersionDefinition);
 
         /// <summary>
         /// Retrieves the most recent minor/patch version of a major version'd <see cref="NapackVersion"/> from the Napack Framework Server.
