@@ -23,6 +23,11 @@ namespace Napack.Server
         NapackVersion GetPackageVersion(Common.NapackVersionIdentifier packageVersion);
 
         /// <summary>
+        /// Gets the Napack-determined publically-facing specification of the specified package version.
+        /// </summary>
+        NapackSpec GetPackageSpecification(Common.NapackVersionIdentifier packageVersion);
+
+        /// <summary>
         /// Gets all packages consuming the specified major version of a package.
         /// </summary>
         /// <remarks>

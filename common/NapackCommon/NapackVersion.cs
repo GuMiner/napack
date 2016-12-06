@@ -11,7 +11,7 @@ namespace Napack.Common
         {
         }
 
-        public NapackVersion(int major, int minor, int patch, List<string> authors, Dictionary<string, string> files, License license, List<NapackMajorVersion> depedencies)
+        public NapackVersion(int major, int minor, int patch, List<string> authors, Dictionary<string, NapackFile> files, License license, List<NapackMajorVersion> depedencies)
         {
             this.Major = major;
             this.Minor = minor;
@@ -36,7 +36,7 @@ namespace Napack.Common
         /// <remarks>
         /// The keys are the path of the file within the napack, the values are the files themselves
         /// </remarks>
-        public Dictionary<string, string> Files { get; set; }
+        public Dictionary<string, NapackFile> Files { get; set; }
 
         /// <summary>
         /// The license of the package.

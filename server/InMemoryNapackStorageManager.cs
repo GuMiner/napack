@@ -34,15 +34,20 @@ namespace Napack.Server
         /// The listing of package identifier => package
         /// </summary>
         private readonly Dictionary<string, NapackVersion> packageStore;
-        
+
+        /// <summary>
+        /// The listing of package identifier => package specification
+        /// </summary>
+        private readonly Dictionary<string, NapackSpec> specStore;
 
         public InMemoryNapackStorageManager()
         {
             this.authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
-            this.authorizedPackages = new Dictionary<string, List<string>>(StringComparer.InvariantCulture);
+            this.authorizedPackages = new Dictionary<string, List<string>>(StringComparer.InvariantCulture); // Hashes are case-sensitive.
             this.consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
             this.packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCultureIgnoreCase);
             this.packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCultureIgnoreCase);
+            this.specStore = new Dictionary<string, NapackSpec>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public bool ContainsNapack(string packageName)
@@ -78,6 +83,11 @@ namespace Napack.Server
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
             return this.packageStore[packageVersion.GetFullName()];
+        }
+
+        public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            return this.specStore[packageVersion.GetFullName()];
         }
     }
 }

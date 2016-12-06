@@ -185,11 +185,11 @@ namespace Napack.Client
         private void SaveNapack(string napackDirectory, string name, NapackVersion version)
         {
             // TODO parallelize asynchronously.
-            foreach (KeyValuePair<string, string> file in version.Files)
+            foreach (KeyValuePair<string, NapackFile> file in version.Files)
             {
                 try
                 {
-                    File.WriteAllText(Path.Combine(napackDirectory, file.Key), file.Value);
+                    File.WriteAllText(Path.Combine(napackDirectory, file.Key), file.Value.Contents);
                 }
                 catch (Exception ex)
                 {
@@ -199,10 +199,10 @@ namespace Napack.Client
             }
 
             string napackIdentifier = name + "_" + version.Major;
-            GenerateTarget(napackDirectory, name, version.Major, version.Minor, version.Patch, version.Files.Keys);
+            GenerateTarget(napackDirectory, name, version.Major, version.Minor, version.Patch, version.Files.ToDictionary(item => item.Key, item => item.Value.MsbuildType));
         }
 
-        private void GenerateTarget(string napackDirectory, string napack, int major, int minor, int patch, IEnumerable<string> targetFiles)
+        private void GenerateTarget(string napackDirectory, string napack, int major, int minor, int patch, IDictionary<string, string> targetFiles)
         {
             string napackFilename = napack + "_" + major + "_" + minor + "_" + patch;
 
@@ -212,9 +212,9 @@ namespace Napack.Client
             targetFileBuilder.AppendLine(napackFilename + "\" BeforeTargets=\"Build\">");
             targetFileBuilder.AppendLine("  <ItemGroup>");
 
-            foreach (string file in targetFiles)
+            foreach (KeyValuePair<string, string> file in targetFiles)
             {
-                targetFileBuilder.AppendLine("    <Content Include=\"" + file + "\" />");
+                targetFileBuilder.AppendLine("    <" + file.Value + " Include=\"" + file.Key + "\" />");
             }
 
             targetFileBuilder.AppendLine("  </ItemGroup>");

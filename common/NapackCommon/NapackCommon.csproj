@@ -45,10 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonHeaders.cs" />
+    <Compile Include="Exceptions\ExcessiveNapackException.cs" />
     <Compile Include="Exceptions\UnauthorizedUserException.cs" />
     <Compile Include="Exceptions\DuplicateNapackException.cs" />
     <Compile Include="Exceptions\NapackNotFoundException.cs" />
     <Compile Include="Exceptions\NapackRecalledException.cs" />
+    <Compile Include="NapackFile.cs" />
     <Compile Include="Uploading\NewNapackVersion.cs" />
     <Compile Include="Uploading\NewNapack.cs" />
     <Compile Include="NapackVersionIdentifier.cs" />

@@ -39,6 +39,11 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
+        public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            throw new NotImplementedException();
+        }
+
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
             throw new NotImplementedException();

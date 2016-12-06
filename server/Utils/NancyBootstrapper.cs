@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.IO;
 using Nancy.Responses;
 using Nancy.Security;
 using Nancy.TinyIoc;
@@ -17,6 +18,7 @@ namespace Napack.Server
                 // 400 -- Bad Request
                 [typeof(DuplicateNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNapackVersionException)] = HttpStatusCode.BadRequest,
+                [typeof(ExcessiveNapackException)] = HttpStatusCode.BadRequest,
 
                 // 401 -- Unauthorized
                 [typeof(UnauthorizedUserException)] = HttpStatusCode.Unauthorized,
@@ -41,6 +43,28 @@ namespace Napack.Server
             base.ApplicationStartup(container, pipelines);
             Csrf.Enable(pipelines);
 
+            pipelines.BeforeRequest += (ctx) =>
+            {
+                NancyContext context = ctx as NancyContext;
+
+                // Technically this is 7.4% over 1 MiB. I'm not going to be pedantic.
+                int maxIterations = 12;
+                int hundredKiB = 100 * 1024;
+                byte[] hundredK = new byte[hundredKiB];
+                RequestStream requestStream = context.Request.Body;
+                for (int i = 0; i < maxIterations; i++)
+                {
+                    // This unfortunately means we're processing the request stream twice.
+                    if (requestStream.Read(hundredK, 0, hundredKiB) != hundredKiB)
+                    {
+                        // The request is under 1 MiB
+                        return null;
+                    }
+                }
+
+                return this.GenerateJsonException(new ExcessiveNapackException(), HttpStatusCode.BadRequest);
+            };
+
             StaticConfiguration.DisableErrorTraces = false;
             pipelines.OnError += (context, exception) =>
             {
@@ -55,14 +79,7 @@ namespace Napack.Server
                     parsedException = new Exception("Unable to decode the detected exception!");
                 }
 
-                JsonResponse response = new JsonResponse(new
-                {
-                    Type = parsedException.GetType(),
-                    Message = parsedException.Message
-                }, new DefaultJsonSerializer());
-                
-                response.StatusCode = code;
-                return response;
+                return this.GenerateJsonException(parsedException, code);
             };
         }
 
@@ -82,6 +99,18 @@ namespace Napack.Server
         protected override IRootPathProvider RootPathProvider
         {
             get { return new RootPathProvider(); }
+        }
+
+        private JsonResponse GenerateJsonException(Exception exception, HttpStatusCode code)
+        {
+            JsonResponse response = new JsonResponse(new
+            {
+                Type = exception.GetType(),
+                Message = exception.Message
+            }, new DefaultJsonSerializer());
+
+            response.StatusCode = code;
+            return response;
         }
     }
 }

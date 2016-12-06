@@ -17,7 +17,7 @@ namespace Napack.Server
         /// <remarks>
         /// The keys are the path of the file, the values are the files themselves
         /// </remarks>
-        public Dictionary<string, string> Files { get; set; }
+        public Dictionary<string, NapackFile> Files { get; set; }
 
         /// <summary>
         /// The dependent napacks for this Napack major version.
