@@ -73,7 +73,7 @@ namespace Napack.Client
             {
                 string napackJson = File.ReadAllText(napackJsonFile);
                 Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(napackJson);
-                List<NapackVersionIdentifier> napacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key, item.Value)).ToList();
+                List<NapackVersionIdentifier> napacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key + "." + item.Value)).ToList();
                 return napacks;
             }, () => Console.Error.WriteLine("Error parsing the Napack JSON file!"));
         }

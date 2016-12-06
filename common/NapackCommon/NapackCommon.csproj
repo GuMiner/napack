@@ -7,8 +7,8 @@
     <ProjectGuid>{7B703C18-18CD-4849-B486-4583C30C4D67}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NapackCommon</RootNamespace>
-    <AssemblyName>NapackCommon</AssemblyName>
+    <RootNamespace>Napack.Common</RootNamespace>
+    <AssemblyName>Napack.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,6 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonHeaders.cs" />
+    <Compile Include="Exceptions\UnauthorizedUserException.cs" />
+    <Compile Include="Exceptions\DuplicateNapackException.cs" />
+    <Compile Include="Exceptions\NapackNotFoundException.cs" />
+    <Compile Include="Exceptions\NapackRecalledException.cs" />
     <Compile Include="Uploading\NewNapackVersion.cs" />
     <Compile Include="Uploading\NewNapack.cs" />
     <Compile Include="NapackVersionIdentifier.cs" />

@@ -110,7 +110,6 @@
     <Compile Include="Definitions\NapackMajorVersionMetadata.cs" />
     <Compile Include="Definitions\NapackVersion.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
-    <Compile Include="Exceptions\NapackNotFoundException.cs" />
     <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Modules\UserIdentifierModule.cs" />
     <Compile Include="Modules\NapackDownloadModule.cs" />
@@ -151,6 +150,7 @@
       <Name>NapackCommon</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Nancy.Viewengines.Razor.1.4.1\build\Nancy.ViewEngines.Razor.targets" Condition="Exists('packages\Nancy.Viewengines.Razor.1.4.1\build\Nancy.ViewEngines.Razor.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

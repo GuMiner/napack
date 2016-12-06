@@ -19,7 +19,7 @@ namespace Napack.Client
             foreach (Common.NapackVersionIdentifier napack in currentNapacks)
             {
                 // TODO remove code duplication here.
-                fileBuilder.AppendLine("<Import Project=\"" + napack.GetDirectoryName() + "\\" + 
+                fileBuilder.AppendLine("<Import Project=\"" + napack.GetFullName() + "\\" + 
                     napack.NapackName + "_" + napack.Major + "_" + napack.Minor + "_" + napack.Patch + ".targets\">");
             }
 

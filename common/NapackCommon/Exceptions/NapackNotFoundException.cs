@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Napack.Server
+namespace Napack.Common
 {
     public class NapackNotFoundException : Exception
     {

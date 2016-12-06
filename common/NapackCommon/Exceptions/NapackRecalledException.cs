@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Napack.Client
+namespace Napack.Common
 {
     public class NapackRecalledException : Exception
     {

@@ -1,16 +1,36 @@
-﻿using Nancy;
-using Nancy.Authentication.Forms;
+﻿using System;
+using System.Collections.Generic;
+using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Responses;
 using Nancy.Security;
 using Nancy.TinyIoc;
-using System;
+using Napack.Common;
 
 namespace Napack.Server
 {
     class NancyBootstrapper : DefaultNancyBootstrapper
     {
+        private IDictionary<Type, HttpStatusCode> exceptionStatusCodeMapping =
+            new Dictionary<Type, HttpStatusCode>()
+            {
+                // 400 -- Bad Request
+                [typeof(DuplicateNapackException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidNapackVersionException)] = HttpStatusCode.BadRequest,
+
+                // 401 -- Unauthorized
+                [typeof(UnauthorizedUserException)] = HttpStatusCode.Unauthorized,
+
+                // 404 -- Not Found
+                [typeof(NapackNotFoundException)] = HttpStatusCode.NotFound,
+                [typeof(NapackVersionNotFoundException)] = HttpStatusCode.NotFound,
+
+                // 410 -- Gone
+                [typeof(NapackRecalledException)] = HttpStatusCode.Gone
+            };
+
         /// <summary>
-        /// Modify our application startup to enable CSRF; adds an error filter.
+        /// Modifies our application startup to enable CSRF, and reparse thrown exceptions into messages and status codes.
         /// </summary>
         /// <remarks>
         /// To use this functionality, within every 'form' block, after all the inputs add '@Html.AntiForgeryToken()'.
@@ -24,9 +44,25 @@ namespace Napack.Server
             StaticConfiguration.DisableErrorTraces = false;
             pipelines.OnError += (context, exception) =>
             {
-                // TODO use NLOG
-                Global.Log(exception.Message);
-                return null;
+                HttpStatusCode code = HttpStatusCode.InternalServerError;
+                Exception parsedException = exception as Exception;
+                if (parsedException != null)
+                {
+                    exceptionStatusCodeMapping.TryGetValue(parsedException.GetType(), out code);
+                }
+                else
+                {
+                    parsedException = new Exception("Unable to decode the detected exception!");
+                }
+
+                JsonResponse response = new JsonResponse(new
+                {
+                    Type = parsedException.GetType(),
+                    Message = parsedException.Message
+                }, new DefaultJsonSerializer());
+                
+                response.StatusCode = code;
+                return response;
             };
         }
 

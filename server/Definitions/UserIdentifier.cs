@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -28,14 +29,6 @@ namespace Napack.Server
         public string UserHash { get; set; }
 
         /// <summary>
-        /// Returns true if the provided user hashes match.
-        /// </summary>
-        public bool DoHashes(string otherHash)
-        {
-            return this.UserHash.Equals(otherHash, StringComparison.InvariantCulture);
-        }
-
-        /// <summary>
         /// Assigns the user hash and returns the identifiers used in calculating that has.
         /// </summary>
         public List<Guid> AssignUserHash()
@@ -43,14 +36,14 @@ namespace Napack.Server
             Guid first = Guid.NewGuid();
             Guid second = Guid.NewGuid();
             Guid third = Guid.NewGuid();
-            this.UserHash = this.GetHashedIdentifiers(first, second, third);
+            this.UserHash = UserIdentifier.GetHashedIdentifiers(first, second, third);
             return new[] { first, second, third }.ToList();
         }
 
         /// <summary>
         /// Hashes the provided identifiers into a Base64 string using SHA512.
         /// </summary>
-        public string GetHashedIdentifiers(Guid first, Guid second, Guid third)
+        public static string GetHashedIdentifiers(Guid first, Guid second, Guid third)
         {
             byte[] firstGuid = first.ToByteArray();
             byte[] secondGuid = second.ToByteArray();
@@ -66,6 +59,35 @@ namespace Napack.Server
             {
                 byte[] resultingHash = sha256.ComputeHash(input);
                 return Convert.ToBase64String(resultingHash);
+            }
+        }
+
+        internal static void Validate(Dictionary<string, IEnumerable<string>> dictionary, List<string> authorizedUserHashes)
+        {
+            if (!dictionary.ContainsKey(CommonHeaders.UserKeys))
+            {
+                throw new UnauthorizedUserException();
+            }
+
+            List<Guid> keys;
+            try
+            {
+                keys = dictionary[CommonHeaders.UserKeys].Select(item => Guid.Parse(item)).ToList();
+            }
+            catch (Exception)
+            {
+                throw new UnauthorizedUserException();
+            }
+
+            if (keys.Count != 3)
+            {
+                throw new UnauthorizedUserException();
+            }
+
+            string hash = UserIdentifier.GetHashedIdentifiers(keys[0], keys[1], keys[2]);
+            if (!authorizedUserHashes.Contains(hash, StringComparer.InvariantCulture))
+            {
+                throw new UnauthorizedUserException();
             }
         }
     }

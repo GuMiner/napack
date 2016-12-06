@@ -8,6 +8,11 @@ namespace Napack.Server
     public interface INapackStorageManager
     {
         /// <summary>
+        /// Returns true if the napack exists, false otherwise.
+        /// </summary>
+        bool ContainsNapack(string packageName);
+
+        /// <summary>
         /// Gets the metadata for the specified package name.
         /// </summary>
         NapackMetadata GetPackageMetadata(string packageName);

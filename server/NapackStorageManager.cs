@@ -9,6 +9,11 @@ namespace Napack.Server
     /// </summary>
     public class NapackStorageManager : INapackStorageManager
     {
+        public bool ContainsNapack(string packageName)
+        {
+            throw new NotImplementedException();
+        }
+
         public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
         {
             throw new NotImplementedException();

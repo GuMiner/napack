@@ -35,7 +35,7 @@ namespace Napack.Client
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
         public async Task<NapackVersion> GetNapackVersionAsync(NapackVersionIdentifier napackVersionDefinition)
         {
-            string responseContent = await this.GetWithCommonExceptionHandlingAsync("/napackDownload/" + napackVersionDefinition.GetDirectoryName(),
+            string responseContent = await this.GetWithCommonExceptionHandlingAsync("/napackDownload/" + napackVersionDefinition.GetFullName(),
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);
             return DeserializeNapack(responseContent);
         }
@@ -70,7 +70,7 @@ namespace Napack.Client
                 throw new NapackFrameworkServerUnavailable(ex.Message);
             }
 
-            if (response.StatusCode == HttpStatusCode.NoContent)
+            if (response.StatusCode == HttpStatusCode.Gone)
             {
                 throw new NapackRecalledException(napackName, major);
             }

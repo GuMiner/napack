@@ -39,10 +39,15 @@ namespace Napack.Server
         public InMemoryNapackStorageManager()
         {
             this.authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
-            this.authorizedPackages = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
+            this.authorizedPackages = new Dictionary<string, List<string>>(StringComparer.InvariantCulture);
             this.consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase);
             this.packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCultureIgnoreCase);
             this.packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public bool ContainsNapack(string packageName)
+        {
+            return this.packageStore.ContainsKey(packageName);
         }
 
         public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
@@ -72,7 +77,7 @@ namespace Napack.Server
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
-            return this.packageStore[packageVersion.GetDirectoryName()];
+            return this.packageStore[packageVersion.GetFullName()];
         }
     }
 }

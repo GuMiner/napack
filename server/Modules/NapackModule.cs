@@ -43,14 +43,9 @@ namespace Napack.Server.Modules
                     {
                         components = version.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).Select(item => int.Parse(item)).ToList();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        // Ideally I'd separate out exceptions, but the end response is the same so there's no real point.
-                        return this.Response.AsJson(new
-                        {
-                            Error = "Could not parse the version string provided!",
-                            Message = ex.Message
-                        });
+                        throw new InvalidNapackVersionException();
                     }
 
                     // Handle the resulting version components.
@@ -67,7 +62,7 @@ namespace Napack.Server.Modules
                     }
                     else
                     {
-                        return this.Response.AsJson(new { Error = "An invalid number of version components was provided in the version string!", Message = $"Components provided: {components.Count}" });
+                        throw new InvalidNapackVersionException();
                     }
                 }
             };
@@ -76,21 +71,14 @@ namespace Napack.Server.Modules
             Post["/{packageName}"] = parameters =>
             {
                 string packageName = parameters.packageName;
-                try
+                if (napackManager.ContainsNapack(packageName))
                 {
-                    NapackMetadata package = napackManager.GetPackageMetadata(packageName);
-                    return this.Response.AsJson(new
-                    {
-                        Error = "Found an existing package with the same name!",
-                        Message = "Package name: " + package.Name
-                    }, HttpStatusCode.BadRequest);
-                }
-                catch (NapackNotFoundException)
-                {
-                    // Expected.
+                    throw new DuplicateNapackException();
                 }
 
                 NewNapack newNapack = this.Bind<NewNapack>();
+                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), newNapack.AuthorizedUserHashes);
+
                 // TODO validate and save
 
                 return this.Response.AsJson(new
@@ -104,21 +92,10 @@ namespace Napack.Server.Modules
             {
                 NewNapackVersion newNapackVersion = this.Bind<NewNapackVersion>();
 
-                NapackMetadata package;
+                
                 string packageName = parameters.packageName;
-                try
-                {
-                    package = napackManager.GetPackageMetadata(packageName);
-                    
-                }
-                catch (NapackNotFoundException nfe)
-                {
-                    return this.Response.AsJson(new
-                    {
-                        Error = "Did not find the specified package to update!",
-                        Message = nfe.Message
-                    }, HttpStatusCode.BadRequest);
-                }
+                NapackMetadata package = napackManager.GetPackageMetadata(packageName);
+                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), package.AuthorizedUserHashes);
 
                 // TODO perform cross-validation to determine how the napack will be updated.
 

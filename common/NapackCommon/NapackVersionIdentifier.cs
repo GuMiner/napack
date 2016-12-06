@@ -9,41 +9,26 @@ namespace Napack.Common
     /// </summary>
     public class NapackVersionIdentifier
     {
-        public NapackVersionIdentifier(string napackDirectoryName)
+        public NapackVersionIdentifier(string fullNapackName)
         {
-            List<string> components = napackDirectoryName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            List<string> components = fullNapackName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             if (components.Count != 4)
             {
-                throw new ArgumentException(napackDirectoryName);
+                throw new InvalidNapackVersionException();
             }
 
             this.NapackName = components[0];
             components.RemoveAt(0);
 
             List<int> versionComponents = components.Select(item => int.Parse(item)).ToList();
-            if (versionComponents.Any(item => item < 0))
+            if (components.Count != 3 || versionComponents.Any(item => item < 0))
             {
-                throw new InvalidNapackVersionException(string.Join(".", versionComponents));
+                throw new InvalidNapackVersionException();
             }
 
             this.Major = versionComponents[0];
             this.Minor = versionComponents[1];
             this.Patch = versionComponents[2];
-        }
-
-        public NapackVersionIdentifier(string napackName, string versionString)
-        {
-            this.NapackName = napackName;
-
-            List<int> components = versionString.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).Select(item => int.Parse(item)).ToList();
-            if (components.Count != 3 || components.Any(item => item < 0))
-            {
-                throw new InvalidNapackVersionException(versionString);
-            }
-
-            this.Major = components[0];
-            this.Minor = components[1];
-            this.Patch = components[2];
         }
 
         public NapackVersionIdentifier(string napackName, int major, int minor, int patch)
@@ -62,7 +47,7 @@ namespace Napack.Common
 
         public int Patch { get; private set; }
 
-        public string GetDirectoryName()
+        public string GetFullName()
             => this.NapackName + "." + this.Major + "." + this.Minor + "." + this.Patch;
 
         public override bool Equals(object obj)
