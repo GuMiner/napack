@@ -8,6 +8,12 @@ namespace Napack.Analyst.ApiSpec
     /// </summary>
     public class NapackSpec
     {
+        public NapackSpec()
+        {
+            this.UnknownFiles = new List<NapackFile>();
+            this.Classes = new List<NapackClassSpec>();
+        }
+
         /// <summary>
         /// Unknown files that are not compilable by the Roslyn API.
         /// </summary>

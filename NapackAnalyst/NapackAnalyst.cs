@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
 
@@ -27,8 +26,10 @@ namespace Napack.Analyst
     /// 
     /// This implementation uses the Roslyn API to analyze Napack files *without* compilation to focus on providing meaningful Napack restrictions without reimplementing C# parsing.
     /// </remarks>
-    public class NapackAnalyst
+    public static class NapackAnalyst
     {
+        private static PackageValidationConfig PackageValidationConfig = null;
+
         public enum UpversionType
         {
             Major = 0,
@@ -37,8 +38,19 @@ namespace Napack.Analyst
         }
 
         /// <summary>
+        /// Initializes the static configuration for this analyzer.
+        /// </summary>
+        public static void Initialize()
+        {
+            string configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PackageValidation.json");
+            NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(configFilePath);
+        }
+
+        /// <summary>
         /// Creates a Napack spec for the defined napack files.
         /// </summary>
+        /// <param name="napackName">The Napack package name.</param>
+        /// <param name="napackFiles">A mapping of file path + name -> file itself.</param>
         /// <remarks>
         /// Restrictions:
         /// - All Napack files with MSBuild type <see cref="NapackFile.ContentType"/> must be able to be analyzed by this system.
@@ -46,12 +58,34 @@ namespace Napack.Analyst
         /// - Although C# allows multiple namespaces in a single file, as they all must be the specified napack name doing so is prohibited.
         /// - Partial classes are disallowed as any non-code files won't have their namespace updated. (This may be changed to better support UI elements, etc in the future).
         /// </remarks>
+        /// <exception cref="InvalidNapackFileExtensionException">If a Napack file contains a prohibited extension.</exception>
         /// <exception cref="InvalidNamespaceException">If a compilable Napack file is in the wrong namespace.</exception>
         /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.ContentType"/>, but could not be analyzed.</exception>
         /// <exception cref="UnsupportedNapackFileException">If a Napack file uses C# functionality or syntax that the Napack system explicitly prohibits.</exception>
-        public NapackSpec CreateNapackSpec(string napackName, IEnumerable<NapackFile> napackFiles)
+        public static NapackSpec CreateNapackSpec(string napackName, IDictionary<string, NapackFile> napackFiles)
         {
-            throw new NotImplementedException();
+            NapackSpec spec = new NapackSpec();
+            foreach (KeyValuePair<string, NapackFile> fileEntry in napackFiles)
+            {
+                // Validate the extension.
+                string filename = Path.GetFileName(fileEntry.Key);
+                string extension = Path.GetExtension(fileEntry.Key);
+                if (!string.IsNullOrWhiteSpace(extension))
+                {
+                    NapackAnalyst.PackageValidationConfig.ValidateExtension(filename, extension);
+                }
+
+                if (fileEntry.Value.MsbuildType.Equals(NapackFile.ContentType, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    spec.Classes.Add(NapackClassAnalyzer.Analyze(filename, fileEntry.Value.Contents));
+                }
+                else
+                {
+                    spec.UnknownFiles.Add(fileEntry.Value);
+                }
+            }
+
+            return spec;
         }
 
         /// <summary>
@@ -62,7 +96,7 @@ namespace Napack.Analyst
         /// Minor == publically-facing API was added (but not changed or removed) from the new Napack.
         /// Patch == The publically-facing API is identical between both Napacks, excluding documentation.
         /// </remarks>
-        public UpversionType DeterminedRequiredUpversioning(NapackSpec oldNapack, NapackSpec newNapack)
+        public static UpversionType DeterminedRequiredUpversioning(NapackSpec oldNapack, NapackSpec newNapack)
         {
             throw new NotImplementedException();
         }

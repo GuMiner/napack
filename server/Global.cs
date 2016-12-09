@@ -4,6 +4,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Microsoft.Owin.Hosting;
+using Napack.Analyst;
 
 namespace Napack.Server
 {
@@ -40,13 +41,16 @@ namespace Napack.Server
             else
             {
                 Log("Napack Server Startup.");
-
                 Global.ShutdownEvent = new ManualResetEvent(false);
+
+                // Setup the analyzers from config.
+                NapackAnalyst.Initialize();
+                NapackNameValidator.Initialize();
 
                 using (WebApp.Start<Startup>(args[0]))
                 {
                     Global.ShutdownEvent.WaitOne();
-                    Global.Log("Helium24 Server Shutdown.");
+                    Global.Log("Napack Server Shutdown.");
                 }
             }
         }

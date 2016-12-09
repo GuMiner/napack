@@ -1,7 +1,18 @@
 # Versioning
-Napacks strictly follow [Semantic Versioning](http://semver.org/) with the basic MAJOR.MINOR.PATCH format. Therefore:
-* API changes require an increment to the MAJOR version.
-* Capability changes require an increment to the MINOR version.
-* Bug fixes require an increment to the PATCH version.
+Napacks follow a subset of [Semantic Versioning](http://semver.org/) with the basic MAJOR.MINOR.PATCH format.
+When packages are updated, the Napack framework will automatically detect API changes and perform the appropriate version increment.
 
-The Napack framework will automatically detect API changes and reject package changes that do not increment the MAJOR version. The framework will also reject package changes that use the same version as a previous package version.
+Therefore:
+* Breaking API changes will increment the MAJOR version.
+* Capability additions will increment the MINOR version.
+* Changes that don't affect the API (ususally bug fixes) will increment the PATCH version.
+
+This "auto-upversioning" can't prevent all breaking changes, but provides the following benefits:
+* A common understanding of what version changes represent.
+* An automated way of performing the version changes.
+* Automatic public API documentation
+
+## But what about prerelease/alpha/beta/rc packages?
+Napacks are intended to be small enough to not *need* a 'not for public consumption' tag. If you want to include such a tag in your Napack version, that usually indicates:
+* There are not sufficient unit tests associated with your Napack.
+* Your Napack is too large to be easily testable and verifiable.

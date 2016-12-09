@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Napack.Server</RootNamespace>
     <AssemblyName>Napack.Server</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -115,7 +116,6 @@
     <Compile Include="Modules\NapackDownloadModule.cs" />
     <Compile Include="Modules\NapackModule.cs" />
     <Compile Include="InMemoryNapackStorageManager.cs" />
-    <Compile Include="NapackSpec.cs" />
     <Compile Include="NapackStorageManager.cs" />
     <Compile Include="Utils\NancyBootstrapper.cs" />
     <Compile Include="Utils\RootPathProvider.cs" />
@@ -149,6 +149,10 @@
     <ProjectReference Include="..\common\NapackCommon\NapackCommon.csproj">
       <Project>{7b703c18-18cd-4849-b486-4583c30c4d67}</Project>
       <Name>NapackCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NapackAnalyst\NapackAnalyst.csproj">
+      <Project>{720175cd-ccc6-4ad3-9f30-db5b91426921}</Project>
+      <Name>NapackAnalyst</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

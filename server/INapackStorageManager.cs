@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Napack.Analyst.ApiSpec;
 
 namespace Napack.Server
 {

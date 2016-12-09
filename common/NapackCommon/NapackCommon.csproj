@@ -45,6 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonHeaders.cs" />
+    <Compile Include="Exceptions\UnsupportedNapackFileException.cs" />
+    <Compile Include="Exceptions\InvalidNapackFileExtensionException.cs" />
+    <Compile Include="Exceptions\InvalidNapackFileException.cs" />
+    <Compile Include="Exceptions\InvalidNamespaceException.cs" />
+    <Compile Include="Exceptions\InvalidNapackNameException.cs" />
     <Compile Include="Exceptions\ExcessiveNapackException.cs" />
     <Compile Include="Exceptions\UnauthorizedUserException.cs" />
     <Compile Include="Exceptions\DuplicateNapackException.cs" />

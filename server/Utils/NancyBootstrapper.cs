@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.IO;
@@ -19,6 +20,11 @@ namespace Napack.Server
                 [typeof(DuplicateNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNapackVersionException)] = HttpStatusCode.BadRequest,
                 [typeof(ExcessiveNapackException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidNapackNameException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidNapackFileException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidNapackFileExtensionException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidNamespaceException)] = HttpStatusCode.BadRequest,
+                [typeof(UnsupportedNapackFileException)] = HttpStatusCode.BadRequest,
 
                 // 401 -- Unauthorized
                 [typeof(UnauthorizedUserException)] = HttpStatusCode.Unauthorized,
@@ -57,7 +63,8 @@ namespace Napack.Server
                     // This unfortunately means we're processing the request stream twice.
                     if (requestStream.Read(hundredK, 0, hundredKiB) != hundredKiB)
                     {
-                        // The request is under 1 MiB
+                        // The request is under 1 MiB, so continue processing. Reset the stream so deserializing the JSON works.
+                        requestStream.Seek(0, SeekOrigin.Begin);
                         return null;
                     }
                 }

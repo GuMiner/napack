@@ -5,6 +5,8 @@ using Microsoft.CSharp.RuntimeBinder;
 using Nancy;
 using Napack.Common;
 using Nancy.ModelBinding;
+using Napack.Analyst;
+using Napack.Analyst.ApiSpec;
 
 namespace Napack.Server.Modules
 {
@@ -75,11 +77,14 @@ namespace Napack.Server.Modules
                 {
                     throw new DuplicateNapackException();
                 }
-
+                
                 NewNapack newNapack = this.Bind<NewNapack>();
                 UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), newNapack.AuthorizedUserHashes);
+                NapackNameValidator.Validate(packageName);
 
-                // TODO validate and save
+                NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
+
+                // TODO save, because at this point all our validation has passed.
 
                 return this.Response.AsJson(new
                 {

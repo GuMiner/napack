@@ -16,15 +16,14 @@
 }
 ```
 
-4. Visit the Napack Framework Server to upload the Napack. TODO write a cmd and GUI version.
+4. Visit the Napack Framework Server to upload the Napack. **TODO write a cmd and GUI version.**
 5. The Napack Framework Server will automatically:
  - Add the user uploading the Napack to the publishers of the Napack.
  - (Update only) Verify the current user has permissions to update the specified Napack.
- - Add the list of Napacks this Napack depends upon to the package information.
  - Verify the license is compatible with the dependent Napacks.
  - Scan the Napack to determine the publically-visible API and use the .NET documentation to generate visible API docs.
  - Verify the Napack contains no binary files. [Note 1] (#PermittedFiles)
- - Verify that API-breaking changes have updated the MAJOR package version.
+ - Automatically assign a version based on the public API changes.
  - Verify the Napack name is valid [Note 5] (#ValidNames)
 6. If successful, your Napack will be added to the Napacks on the Napack Framework Server.
 
@@ -37,4 +36,4 @@
 
 4 One of the [Supported Licenses](./SupportedLicenses.md), or the filename of a file containing custom license information. A word of warning: packages with custom licenses require explicit authorization by consumers to be used and are **not recommended.**
 
-5 Valid Napack names match the following Regex ```[a-zA-Z0-9\.-]*```. Packages with non-professional names (obscene (not 'E' rated), derrogatory, racist, etc) are subject to removal.
+5 Valid Napack names match the following Regex ```[a-zA-Z0-9\.-]*```, don't start with a number, are within [10, 100] characters (inclusive), and don't contain any prohibited subphrases. Packages with non-professional names (obscene (not 'E' rated), derrogatory, racist, etc) are subject to removal.

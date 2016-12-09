@@ -25,7 +25,7 @@ namespace Napack.Common
         /// <remarks>
         /// The keys are the path of the file within the napack, the values are the files themselves
         /// </remarks>
-        public Dictionary<string, string> Files { get; set; }
+        public Dictionary<string, NapackFile> Files { get; set; }
 
         /// <summary>
         /// The license of the package.
