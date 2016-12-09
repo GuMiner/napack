@@ -5,6 +5,14 @@
     /// </summary>
     public class NapackClassSpec
     {
+        public NapackClassSpec()
+        {
+            this.PublicFields = new FieldSpec();
+            this.PublicProperties = new PropertySpec();
+            this.PublicConstructors = new ConstructorSpec();
+            this.PublicFunctions = new FunctionSpec();
+        }
+
         /// <summary>
         /// The class name and documentation associated with the class.
         /// </summary>

@@ -77,7 +77,7 @@ namespace Napack.Analyst
 
                 if (fileEntry.Value.MsbuildType.Equals(NapackFile.ContentType, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    spec.Classes.Add(NapackClassAnalyzer.Analyze(filename, fileEntry.Value.Contents));
+                    spec.Classes.AddRange(NapackClassAnalyzer.Analyze(napackName, filename, fileEntry.Value.Contents));
                 }
                 else
                 {
