@@ -44,9 +44,19 @@ namespace Test
     public class First
     {
         /// <summary>
-        /// Summary goes here.
-        /// </summary>\r\n" +
-"       /// <param name=\"node\">Node goes here.</param>\r\n" +
+        /// Constructor summary goes here.
+        /// </summary>" +
+"\r\n   /// <param name=\"alpha\"></param>\r\n" +
+"       /// <param name=\"beta\"></param>\r\n" +
+@"      public First(int alpha, ref int beta)
+        {
+            // Random stuff exists here.
+        }
+
+        /// <summary>
+        /// Method summary goes here.
+        /// </summary>" +
+"\r\n   /// <param name=\"node\">Node goes here.</param>\r\n" +
 "       /// <param name=\"test\">Has no modifiers</param>\n" +
 "       /// <param name=\"result\">Result goes here.</param>\r" +
 @"      /// <returns>DocumentedElement item.</returns>

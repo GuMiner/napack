@@ -106,6 +106,16 @@ namespace Napack.Analyst
                 }
             }
 
+            // Parse constructors
+            foreach (ConstructorDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.ConstructorDeclaration)))
+            {
+                if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                {
+                    classSpec.PublicConstructors.Add(ConstructorSpec.LoadFromSyntaxNode(node));
+                }
+            }
+
             return classSpec;
         }
     }

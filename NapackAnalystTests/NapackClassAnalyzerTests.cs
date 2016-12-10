@@ -43,6 +43,12 @@ namespace NapackAnalystTests
             Assert.IsNotNull(method.Name);
             Assert.IsNotNull(method.Name.Name);
             Assert.IsNotNull(method.Name.Documentation);
+
+            Assert.IsTrue(classSpec.PublicConstructors.Count != 0);
+            ConstructorSpec constructor = classSpec.PublicConstructors.First();
+            Assert.IsNotNull(constructor.Name);
+            Assert.IsNotNull(constructor.Name.Name);
+            Assert.IsNotNull(constructor.Name.Documentation);
         }
 
         [TestMethod]
@@ -60,6 +66,21 @@ namespace NapackAnalystTests
             }
 
             Assert.IsNotNull(method.ReturnType);
+        }
+
+        [TestMethod]
+        public void ConstructorAndClassTest()
+        {
+            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            Assert.IsTrue(classSpec.PublicConstructors.Count != 0);
+
+            ConstructorSpec constructor = classSpec.PublicConstructors.First();
+            foreach (ParameterSpec parameter in constructor.Parameters)
+            {
+                Assert.IsNotNull(parameter.Name);
+                Assert.IsNotNull(parameter.Modifier);
+                Assert.IsNotNull(parameter.Type);
+            }
         }
     }
 }

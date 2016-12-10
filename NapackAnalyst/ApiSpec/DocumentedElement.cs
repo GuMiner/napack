@@ -28,6 +28,12 @@ namespace Napack.Analyst.ApiSpec
             return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, node.GetLeadingTrivia());
         }
 
+        internal static DocumentedElement LoadFromSyntaxNode(ConstructorDeclarationSyntax node)
+        {
+            SyntaxToken syntaxToken = node.ChildTokens().First(token => token.IsKind(SyntaxKind.IdentifierToken));
+            return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, node.GetLeadingTrivia());
+        }
+
         private static DocumentedElement LoadFromSyntaxTokenAndTrivia(SyntaxToken token, SyntaxTriviaList triviaList)
         {
             DocumentedElement element = new DocumentedElement();
