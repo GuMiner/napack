@@ -46,5 +46,37 @@ namespace Napack.Common
                 this.IsCustomLicense,
             };
         }
+
+        public void VerifyCompatibility(string napackName, int version, License license)
+        {
+            if (license.IsSupportedLicense && (this.IsSupportedLicense || this.IsCopyLeft))
+            {
+                // This is a supported license or a copy-left license.
+                return;
+            }
+            else if (license.IsCopyLeft && this.IsCopyLeft)
+            {
+                // Both are copy-left, likely ok.
+                return;
+            }
+            else if ((license.IsCommercial || license.IsCustomLicense) && (this.IsCommercial || this.IsCustomLicense))
+            {
+                // Both are commercial/custom, likely ok.
+                return;
+            }
+
+            // Note that this does not catch *all* incompatible cases, especially when delving into the realm of commercial or copy=left.
+            throw new InvalidNapackException("The package " + napackName + "." + version + " has an incompatible license with the provided license.");
+        }
+
+        public bool NeedsMajorUpversioning(License license)
+        {
+            return (this.LicenseType != license.LicenseType ||
+                    this.IsSupportedLicense != license.IsSupportedLicense ||
+                    this.IsCopyLeft != license.IsCopyLeft ||
+                    this.IsCommercial != license.IsCommercial ||
+                    this.IsCustomLicense != license.IsCommercial ||
+                    !this.LicenseText.Equals(license.LicenseText, StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 }

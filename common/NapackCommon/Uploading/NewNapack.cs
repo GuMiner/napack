@@ -35,5 +35,25 @@ namespace Napack.Common
         /// The new napack to use to create version 1.0.0 of this package.
         /// </summary>
         public NewNapackVersion NewNapackVersion { get; set; }
+
+        public void Validate()
+        {
+            if (this.Description == null)
+            {
+                throw new InvalidNapackException("The description must be specified.");
+            }
+
+            if (this.AuthorizedUserHashes == null || this.AuthorizedUserHashes.Count == 0)
+            {
+                throw new InvalidNapackException("At least one authorized user hash must be provided.");
+            }
+
+            if (this.NewNapackVersion == null)
+            {
+                throw new InvalidNapackException("The new napack version for this napack must be specified.");
+            }
+
+            this.NewNapackVersion.Validate();
+        }
     }
 }

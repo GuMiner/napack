@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
 
@@ -46,6 +47,16 @@ namespace Napack.Server
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveNewNapackVersion(NapackMetadata package, NapackVersionIdentifier currentVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion, NapackSpec newVersionSpec)
         {
             throw new NotImplementedException();
         }

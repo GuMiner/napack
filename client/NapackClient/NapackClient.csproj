@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="INapackServerClient.cs" />
-    <Compile Include="InvalidNapackException.cs" />
     <Compile Include="NapackArguments.cs" />
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Napack.Common
 {
@@ -14,9 +15,10 @@ namespace Napack.Common
     /// </remarks>
     public class NewNapackVersion
     {
-        /// <summary>
-        /// Authors
-        /// </summary>
+        public bool ForceMajorUpversioning { get; set; }
+
+        public bool ForceMinorUpversioning { get; set; }
+        
         public List<string> Authors { get; set; }
         
         /// <summary>
@@ -26,15 +28,33 @@ namespace Napack.Common
         /// The keys are the path of the file within the napack, the values are the files themselves
         /// </remarks>
         public Dictionary<string, NapackFile> Files { get; set; }
-
-        /// <summary>
-        /// The license of the package.
-        /// </summary>
+        
         public License License { get; set; }
 
         /// <summary>
         /// The dependent napacks for this package.
         /// </summary>
         public List<NapackMajorVersion> Dependencies { get; set; }
+
+        /// <summary>
+        /// Validates that this new version has the minimal set of required fields.
+        /// </summary>
+        public void Validate()
+        {
+            if (this.Authors == null || this.Authors.Count == 0)
+            {
+                throw new InvalidNapackException("At least one author must be specified per version.");
+            }
+
+            if (this.Files == null || this.Files.Count == 0 || !this.Files.Any(file => file.Value.MsbuildType == NapackFile.ContentType))
+            {
+                throw new InvalidNapackException("At least one file must be present of type Content.");
+            }
+
+            if (this.License == null)
+            {
+                throw new InvalidNapackException("The license must be specified");
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -21,12 +23,12 @@ namespace Napack.Server
         /// <summary>
         /// Gets the specified package version.
         /// </summary>
-        NapackVersion GetPackageVersion(Common.NapackVersionIdentifier packageVersion);
+        NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion);
 
         /// <summary>
         /// Gets the Napack-determined publically-facing specification of the specified package version.
         /// </summary>
-        NapackSpec GetPackageSpecification(Common.NapackVersionIdentifier packageVersion);
+        NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion);
 
         /// <summary>
         /// Gets all packages consuming the specified major version of a package.
@@ -34,7 +36,7 @@ namespace Napack.Server
         /// <remarks>
         /// The reverse of this operation can be done by reading the dependencies specified in the metadata.
         /// </remarks>
-        IEnumerable<Common.NapackVersionIdentifier> GetPackageConsumers(Common.NapackMajorVersion packageMajorVersion);
+        IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion);
 
         /// <summary>
         /// Gets all package names the user is authorized to edit.
@@ -44,7 +46,7 @@ namespace Napack.Server
         /// <summary>
         /// Gets all package version for which the given author is listed in the authors list.
         /// </summary>
-        IEnumerable<Common.NapackVersionIdentifier> GetAuthoredPackages(string authorName);
+        IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName);
 
         /// <summary>
         /// Performs a search through the package name, description, more information, and tags
@@ -55,5 +57,23 @@ namespace Napack.Server
         /// <param name="top">The maximum number of results to return.</param>
         /// <returns>Relevant package -> match percentage</returns>
         IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top);
+
+        /// <summary>
+        /// Creates and saves a new napack.
+        /// </summary>
+        /// <param name="napackName">The name of the napack</param>
+        /// <param name="newNapack">The new napack to create/save</param>
+        /// <param name="napackSpec">The napack specification</param>
+        void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec);
+
+        /// <summary>
+        /// Saves a new napack version onto an existing napack.
+        /// </summary>
+        /// <param name="package">The package metadata.</param>
+        /// <param name="currentVersion">The current version of the napack.</param>
+        /// <param name="upversionType">The type of upversioning to perform.</param>
+        /// <param name="newNapackVersion">The new napack version.</param>
+        /// <param name="newVersionSpec">The napack specification.</param>
+        void SaveNewNapackVersion(NapackMetadata package, NapackVersionIdentifier currentVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion, NapackSpec newVersionSpec);
     }
 }

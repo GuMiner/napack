@@ -51,6 +51,32 @@ namespace Napack.Server
             return this.Versions[majorVersion];
         }
 
+        public static NapackMetadata CreateFromNewNapack(string napackName, NewNapack newNapack)
+        {
+            NapackMetadata napackMetadata = new NapackMetadata()
+            {
+                Name = napackName,
+                Description = newNapack.Description,
+                MoreInformation = newNapack.MoreInformation,
+                Tags = newNapack.Tags ?? new List<string>(),
+                AuthorizedUserHashes = newNapack.AuthorizedUserHashes,
+                Versions = new Dictionary<int, NapackMajorVersionMetadata>()
+            };
+
+            NapackMajorVersionMetadata majorVersionMetadata = new NapackMajorVersionMetadata()
+            {
+                Recalled = false,
+                License = newNapack.NewNapackVersion.License,
+                Versions = new Dictionary<int, List<int>>
+                {
+                    [0] = new List<int> { 0 }
+                }
+            };
+
+            napackMetadata.Versions.Add(1, majorVersionMetadata);
+            return napackMetadata;
+        }
+
         /// <summary>
         /// Returns this object in summarized format.
         /// </summary>

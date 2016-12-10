@@ -17,6 +17,7 @@ namespace Napack.Server
             new Dictionary<Type, HttpStatusCode>()
             {
                 // 400 -- Bad Request
+                [typeof(InvalidNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(DuplicateNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNapackVersionException)] = HttpStatusCode.BadRequest,
                 [typeof(ExcessiveNapackException)] = HttpStatusCode.BadRequest,

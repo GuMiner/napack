@@ -24,6 +24,18 @@ namespace Napack.Server
         /// </summary>
         public List<NapackMajorVersion> Dependencies { get; set; }
 
+        public static NapackVersion CreateFromNewNapack(NewNapackVersion newNapackVersion)
+        {
+            NapackVersion version = new NapackVersion()
+            {
+                Authors = newNapackVersion.Authors,
+                Files = newNapackVersion.Files,
+                Dependencies = newNapackVersion.Dependencies ?? new List<NapackMajorVersion>()
+            };
+
+            return version;
+        }
+
         /// <summary>
         /// Returns a JSON-serializable summary of this napack version.
         /// </summary>

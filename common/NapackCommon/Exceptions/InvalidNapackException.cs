@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Napack.Client
+namespace Napack.Common
 {
-    internal class InvalidNapackException : Exception
+    public class InvalidNapackException : Exception
     {
         public InvalidNapackException()
             : base("The specified napack is invalid!")
