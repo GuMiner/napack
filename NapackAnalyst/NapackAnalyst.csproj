@@ -134,7 +134,7 @@
     <Compile Include="ApiSpec\DocumentedElement.cs" />
     <Compile Include="ApiSpec\FieldSpec.cs" />
     <Compile Include="ApiSpec\FunctionSpec.cs" />
-    <Compile Include="ApiSpec\NapackClassSpec.cs" />
+    <Compile Include="ApiSpec\ClassSpec.cs" />
     <Compile Include="ApiSpec\NapackSpec.cs" />
     <Compile Include="ApiSpec\ParameterSpec.cs" />
     <Compile Include="ApiSpec\PropertySpec.cs" />

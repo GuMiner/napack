@@ -27,7 +27,7 @@ namespace Napack.Analyst
         /// <exception cref="InvalidNamespaceException">If a compilable Napack file is in the wrong namespace.</exception>
         /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.ContentType"/>, but could not be analyzed.</exception>
         /// <exception cref="UnsupportedNapackFileException">If a Napack file uses C# functionality or syntax that the Napack system explicitly prohibits.</exception>
-        public static ICollection<NapackClassSpec> Analyze(string napackName, string filename, string contents)
+        public static ICollection<ClassSpec> Analyze(string napackName, string filename, string contents)
         {
             // Ensure we don't hang the server with someone sending invalid class files that take forever to parse.
             CancellationTokenSource cts = new CancellationTokenSource(NapackClassAnalyzer.MaxParseTime);
@@ -37,13 +37,15 @@ namespace Napack.Analyst
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(contents, NapackClassAnalyzer.ParseOptions, string.Empty, Encoding.Default, cts.Token);
                 return AnalyzeSyntaxTree(napackName, filename, tree).GetAwaiter().GetResult();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (
+                ex.GetType() != typeof(UnsupportedNapackFileException) && 
+                ex.GetType() != typeof(InvalidNapackFileException))
             {
                 throw new InvalidNapackFileException(filename, ex.GetType().ToString() + ": " + ex.Message);
             }
         }
 
-        private static async Task<ICollection<NapackClassSpec>> AnalyzeSyntaxTree(string napackName, string filename, SyntaxTree tree)
+        internal static async Task<ICollection<ClassSpec>> AnalyzeSyntaxTree(string napackName, string filename, SyntaxTree tree)
         {
             SyntaxNode root = await tree.GetRootAsync();
             
@@ -58,12 +60,12 @@ namespace Napack.Analyst
 
             // Switch to the namespace as the root and verify (CASE SENSITIVE)
             root = root.ChildNodes().SingleOrDefault(node => node.IsKind(SyntaxKind.NamespaceDeclaration));
-            if (!(root as NamespaceDeclarationSyntax).Name.ToFullString().Equals(napackName, StringComparison.InvariantCulture))
+            if (!(root as NamespaceDeclarationSyntax).Name.ToFullString().Trim().Equals(napackName, StringComparison.InvariantCulture))
             {
                 throw new InvalidNapackFileException(filename, "Namespace name is not " + napackName);
             }
 
-            List<NapackClassSpec> parsedPublicClasses = new List<NapackClassSpec>();
+            List<ClassSpec> parsedPublicClasses = new List<ClassSpec>();
             foreach (ClassDeclarationSyntax classNode in root.ChildNodes().Where(node => node.IsKind(SyntaxKind.ClassDeclaration)))
             {
                 if (classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)))
@@ -75,9 +77,25 @@ namespace Napack.Analyst
             return parsedPublicClasses;
         }
 
-        private static NapackClassSpec AnalyzeClassSyntaxTree(string napackName, string filename, ClassDeclarationSyntax classNode)
+        internal static ClassSpec AnalyzeClassSyntaxTree(string napackName, string filename, ClassDeclarationSyntax classNode)
         {
-            throw new NotImplementedException();
+            ClassSpec classSpec = new ClassSpec();
+            classSpec.Name = DocumentedElement.LoadFromSyntaxNode(classNode);
+            classSpec.IsAbstract = classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AbstractKeyword));
+            classSpec.IsStatic = classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
+            classSpec.IsSealed = classSpec.IsStatic || classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.SealedKeyword));
+
+            foreach (ClassDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.ClassDeclaration)))
+            {
+                if (classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                {
+                    // This recursion will exit because we aren't *compiling* the code, but merely parsing it.
+                    classSpec.PublicClasses.Add(AnalyzeClassSyntaxTree(napackName, filename, node));
+                }
+            }
+
+            return classSpec;
         }
     }
 }

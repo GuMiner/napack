@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackServer", "server\NapackServer.csproj", "{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackClient", "client\NapackClient\NapackClient.csproj", "{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackAnalyst", "NapackAnalyst\NapackAnalyst.csproj", "{720175CD-CCC6-4AD3-9F30-DB5B91426921}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackAnalystTests", "NapackAnalystTests\NapackAnalystTests.csproj", "{20D86DF6-FAE1-4BEA-B538-C807E77BFACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{720175CD-CCC6-4AD3-9F30-DB5B91426921}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{720175CD-CCC6-4AD3-9F30-DB5B91426921}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{720175CD-CCC6-4AD3-9F30-DB5B91426921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20D86DF6-FAE1-4BEA-B538-C807E77BFACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20D86DF6-FAE1-4BEA-B538-C807E77BFACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20D86DF6-FAE1-4BEA-B538-C807E77BFACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20D86DF6-FAE1-4BEA-B538-C807E77BFACD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

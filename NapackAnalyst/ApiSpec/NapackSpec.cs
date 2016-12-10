@@ -11,7 +11,7 @@ namespace Napack.Analyst.ApiSpec
         public NapackSpec()
         {
             this.UnknownFiles = new List<NapackFile>();
-            this.Classes = new List<NapackClassSpec>();
+            this.Classes = new List<ClassSpec>();
         }
 
         /// <summary>
@@ -29,6 +29,6 @@ namespace Napack.Analyst.ApiSpec
         /// <remarks>
         /// All fields listed within other *Spec files only list publically-visible types.
         /// </remarks>
-        public List<NapackClassSpec> Classes { get; set; }
+        public List<ClassSpec> Classes { get; set; }
     }
 }
