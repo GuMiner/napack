@@ -16,7 +16,7 @@ namespace Napack.Analyst.ApiSpec
             this.PublicFields = new List<FieldSpec>();
             this.PublicProperties = new List<PropertySpec>();
             this.PublicConstructors = new List<ConstructorSpec>();
-            this.PublicFunctions = new List<FunctionSpec>();
+            this.PublicMethods = new List<MethodSpec>();
             this.PublicClasses = new List<ClassSpec>();
         }
 
@@ -31,7 +31,7 @@ namespace Napack.Analyst.ApiSpec
 
         public IList<ConstructorSpec> PublicConstructors { get; set; }
 
-        public IList<FunctionSpec> PublicFunctions { get; set; }
+        public IList<MethodSpec> PublicMethods { get; set; }
 
         public IList<ClassSpec> PublicClasses { get; set; }
 

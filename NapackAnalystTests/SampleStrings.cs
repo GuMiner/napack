@@ -31,7 +31,7 @@ class First
 }
 ";
 
-        public const string DocumentationTest =
+        public const string LargeSampleClass =
 @"using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,6 +43,19 @@ namespace Test
     /// </summary>
     public class First
     {
+        /// <summary>
+        /// Summary goes here.
+        /// </summary>\r\n" +
+"       /// <param name=\"node\">Node goes here.</param>\r\n" +
+"       /// <param name=\"test\">Has no modifiers</param>\n" +
+"       /// <param name=\"result\">Result goes here.</param>\r" +
+@"      /// <returns>DocumentedElement item.</returns>
+        public DocumentedElement LoadFromSyntaxNode(ref ClassDeclarationSyntax node, int test, out int value)
+        {
+            // Random stuff exists here.
+            SyntaxToken syntaxToken = node.ChildTokens().First(token => token.IsKind(SyntaxKind.IdentifierToken));
+            return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, node.GetLeadingTrivia());
+        }
     }
 }
 ";

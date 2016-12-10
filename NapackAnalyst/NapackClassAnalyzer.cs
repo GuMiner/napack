@@ -85,13 +85,24 @@ namespace Napack.Analyst
             classSpec.IsStatic = classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
             classSpec.IsSealed = classSpec.IsStatic || classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.SealedKeyword));
 
+            // Parse classes
             foreach (ClassDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.ClassDeclaration)))
             {
-                if (classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
-                    (classSpec.ProtectedItemsConsideredPublic && classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
                 {
                     // This recursion will exit because we aren't *compiling* the code, but merely parsing it.
                     classSpec.PublicClasses.Add(AnalyzeClassSyntaxTree(napackName, filename, node));
+                }
+            }
+
+            // Parse methods
+            foreach (MethodDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.MethodDeclaration)))
+            {
+                if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                {
+                    classSpec.PublicMethods.Add(MethodSpec.LoadFromSyntaxNode(node));
                 }
             }
 
