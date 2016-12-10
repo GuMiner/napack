@@ -4,18 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3A5273D0-2BF4-481E-B0ED-81D93322D5CC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{1B97736A-C184-4AA6-96BB-F21ACDFEA297}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Napack.Client</RootNamespace>
-    <AssemblyName>Napack.Client</AssemblyName>
+    <RootNamespace>NapackClient.Common</RootNamespace>
+    <AssemblyName>NapackClient.Common</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,14 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Ookii.CommandLine, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Ookii.CommandLine.2.2\lib\Ookii.CommandLine.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,25 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UpdateOperation\UpdateOperationArguments.cs" />
-    <Compile Include="NapackClient.cs" />
-    <Compile Include="NapackClientSettings.cs" />
-    <Compile Include="UpdateOperation\UpdateOperation.cs" />
-    <Compile Include="UpdateOperation\NapackTargets.cs" />
+    <Compile Include="INapackServerClient.cs" />
+    <Compile Include="NapackFrameworkServerUnavailable.cs" />
+    <Compile Include="NapackServerClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\common\NapackCommon\NapackCommon.csproj">
-      <Project>{7b703c18-18cd-4849-b486-4583c30c4d67}</Project>
+    <ProjectReference Include="..\common\NapackCommon\NapackCommon.csproj">
+      <Project>{7B703C18-18CD-4849-B486-4583C30C4D67}</Project>
       <Name>NapackCommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NapackClient.Common\NapackClient.Common.csproj">
-      <Project>{1b97736a-c184-4aa6-96bb-f21acdfea297}</Project>
-      <Name>NapackClient.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

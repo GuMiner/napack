@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Napack.Common;
 
-namespace Napack.Client
+namespace Napack.Client.Common
 {
     /// <summary>
     /// Defines the client-server communication mechanism the Napack Client uses.

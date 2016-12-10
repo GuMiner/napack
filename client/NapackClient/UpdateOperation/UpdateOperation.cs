@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Napack.Client.Common;
 using Napack.Common;
 
 namespace Napack.Client
@@ -12,13 +13,13 @@ namespace Napack.Client
     /// <summary>
     /// Performs the napack analysis and (potentially) update operations based on the current settings.
     /// </summary>
-    internal class NapackOperation
+    internal class UpdateOperation
     {
         private readonly INapackServerClient nfsClient;
         private readonly List<NapackVersionIdentifier> napacks;
         private readonly NapackClientSettings clientSettings;
 
-        public NapackOperation(INapackServerClient nfsClient, List<NapackVersionIdentifier> napacks, NapackClientSettings clientSettings)
+        public UpdateOperation(INapackServerClient nfsClient, List<NapackVersionIdentifier> napacks, NapackClientSettings clientSettings)
         {
             this.nfsClient = nfsClient;
             this.napacks = napacks;

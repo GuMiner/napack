@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace Napack.Client
 {
     [Description("Manages Napacks consumed within the current project.")]
-    public class NapackArguments
+    public class UpdateOperationArguments
     {
         [CommandLineArgument(Position = 0, IsRequired = true)]
         [Description("The JSON file listing the Napacks used by the current project.")]

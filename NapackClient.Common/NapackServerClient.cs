@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Napack.Common;
 
-namespace Napack.Client
+namespace Napack.Client.Common
 {
     public class NapackServerClient : INapackServerClient, IDisposable
     {

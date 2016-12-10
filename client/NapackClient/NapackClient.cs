@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Napack.Common;
+using Napack.Client.Common;
 
 namespace Napack.Client
 {
@@ -16,7 +17,7 @@ namespace Napack.Client
         {
             Serializer.Setup();
 
-            NapackArguments arguments = NapackClient.ParseArguments(args);
+            UpdateOperationArguments arguments = NapackClient.ParseArguments(args);
             if (arguments == null)
             {
                 return ERROR;
@@ -38,7 +39,7 @@ namespace Napack.Client
             {
                 using (NapackServerClient client = new NapackServerClient(clientSettings.NapackFrameworkServer))
                 {
-                    NapackOperation napackOperation = new NapackOperation(client, napacks, clientSettings);
+                    UpdateOperation napackOperation = new UpdateOperation(client, napacks, clientSettings);
                     napackOperation.AcquireNapacks(arguments.NapackDirectory);
 
                     // TODO doesn't require client.
@@ -78,12 +79,12 @@ namespace Napack.Client
             }, () => Console.Error.WriteLine("Error parsing the Napack JSON file!"));
         }
 
-        private static NapackArguments ParseArguments(string[] args)
+        private static UpdateOperationArguments ParseArguments(string[] args)
         {
-            CommandLineParser parser = new CommandLineParser(typeof(NapackArguments));
+            CommandLineParser parser = new CommandLineParser(typeof(UpdateOperationArguments));
             return NapackClient.PerformTryCatchOperation(() =>
             {
-                NapackArguments arguments = parser.Parse(args) as NapackArguments;
+                UpdateOperationArguments arguments = parser.Parse(args) as UpdateOperationArguments;
                 return arguments;
             }, () => parser.WriteUsageToConsole());
         }

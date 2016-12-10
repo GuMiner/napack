@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Napack.Common;
 
 namespace Napack.Client
 {
@@ -11,12 +12,12 @@ namespace Napack.Client
     {
         private const string napackFilename = "napack.targets";
         
-        public static void SaveNapackTargetsFile(string napackDirectory, List<Common.NapackVersionIdentifier> currentNapacks)
+        public static void SaveNapackTargetsFile(string napackDirectory, List<NapackVersionIdentifier> currentNapacks)
         {
             StringBuilder fileBuilder = new StringBuilder();
             fileBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 
-            foreach (Common.NapackVersionIdentifier napack in currentNapacks)
+            foreach (NapackVersionIdentifier napack in currentNapacks)
             {
                 // TODO remove code duplication here.
                 fileBuilder.AppendLine("<Import Project=\"" + napack.GetFullName() + "\\" + 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Napack.Client
+namespace Napack.Client.Common
 {
     public class NapackFrameworkServerUnavailable : Exception
     {
