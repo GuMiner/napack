@@ -75,12 +75,20 @@ namespace NapackAnalystTests
             Assert.IsTrue(classSpec.PublicConstructors.Count != 0);
 
             ConstructorSpec constructor = classSpec.PublicConstructors.First();
+
+            bool oneHasDefault = false;
             foreach (ParameterSpec parameter in constructor.Parameters)
             {
                 Assert.IsNotNull(parameter.Name);
                 Assert.IsNotNull(parameter.Modifier);
                 Assert.IsNotNull(parameter.Type);
+                if (!string.IsNullOrWhiteSpace(parameter.Default))
+                {
+                    oneHasDefault = true;
+                }
             }
+
+            Assert.IsTrue(oneHasDefault);
         }
 
         [TestMethod]

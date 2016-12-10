@@ -13,12 +13,15 @@ namespace Napack.Analyst.ApiSpec
         
         public string Name { get; set; }
 
+        public string Default { get; set; }
+
         public static ParameterSpec LoadFromSyntaxNode(ParameterSyntax parameter)
         {
             ParameterSpec spec = new ParameterSpec();
             spec.Modifier = parameter.Modifiers.ToString();
             spec.Type = parameter.Type.ToString();
             spec.Name = parameter.Identifier.ToString();
+            spec.Default = parameter.Default?.ToString() ?? string.Empty;
             return spec;
         }
     }

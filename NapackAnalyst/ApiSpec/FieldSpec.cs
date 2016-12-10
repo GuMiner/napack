@@ -21,9 +21,9 @@ namespace Napack.Analyst.ApiSpec
 
         public bool IsConst { get; set; }
 
-        public bool IsStatic { get; set; }
-
         public bool IsReadonly { get; set; }
+
+        public bool IsStatic { get; set; }
 
         [JsonIgnore]
         public bool IsUserModifiable => !this.IsConst && !this.IsReadonly;
@@ -32,8 +32,8 @@ namespace Napack.Analyst.ApiSpec
         {
             FieldSpec fieldSpec = new FieldSpec();
             fieldSpec.IsConst = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ConstKeyword));
-            fieldSpec.IsStatic = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
             fieldSpec.IsReadonly = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ReadOnlyKeyword));
+            fieldSpec.IsStatic = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
 
             // Null access will throw and be caught in our overall analyzer handler.
             VariableDeclarationSyntax variable = node.ChildNodes()

@@ -103,10 +103,11 @@ namespace Napack.Analyst
             foreach (ClassSpec oldClassSpec in oldNapack.Classes)
             {
                 ClassSpec newClassSpec = newNapack.Classes
-                    .FirstOrDefault(cls => cls.Name.Name.Equals(oldClassSpec.Name.Name, StringComparison.OrdinalIgnoreCase));
-                UpversionType upversionType = NapackAnalyst.AnalyzeClasses(oldClassSpec, newClassSpec);
+                    .FirstOrDefault(cls => cls.Name.Name.Equals(oldClassSpec.Name.Name, StringComparison.InvariantCulture));
+                UpversionType upversionType = NapackAnalyst.AnalyzeClass(oldClassSpec, newClassSpec);
                 if (upversionType == UpversionType.Major)
                 {
+                    // Exit early, as we found a breaking change.
                     return UpversionType.Major;
                 }
                 else if (upversionType == UpversionType.Minor)
@@ -124,8 +125,9 @@ namespace Napack.Analyst
             return maxUpversionType;
         }
 
-        private static UpversionType AnalyzeClasses(ClassSpec oldClassSpec, ClassSpec newClassSpec)
+        private static UpversionType AnalyzeClass(ClassSpec oldClassSpec, ClassSpec newClassSpec)
         {
+            UpversionType maxUpversionType = UpversionType.Patch;
             if (newClassSpec == null)
             {
                 // The new spec removed a publically facing class.
@@ -140,7 +142,223 @@ namespace Napack.Analyst
                 return UpversionType.Major;
             }
 
+            // Verify all old fields exist
+            UpversionType upversionType = NapackAnalyst.AnalyzeFields(oldClassSpec.PublicFields, newClassSpec.PublicFields);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            upversionType = NapackAnalyst.AnalyzeProperties(oldClassSpec.PublicProperties, newClassSpec.PublicProperties);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            upversionType = NapackAnalyst.AnalyzeConstructors(oldClassSpec.PublicConstructors, newClassSpec.PublicConstructors);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            upversionType = NapackAnalyst.AnalyzeMethods(oldClassSpec.PublicMethods, newClassSpec.PublicMethods);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            // Analyze classes recursively.
+            foreach (ClassSpec oldClass in oldClassSpec.PublicClasses)
+            {
+                ClassSpec newClass = newClassSpec.PublicClasses
+                    .FirstOrDefault(cls => cls.Name.Name.Equals(oldClass.Name.Name, StringComparison.InvariantCulture));
+                upversionType = NapackAnalyst.AnalyzeClass(oldClass, newClass);
+                if (upversionType == UpversionType.Major)
+                {
+                    return upversionType;
+                }
+                else if (upversionType == UpversionType.Minor)
+                {
+                    maxUpversionType = UpversionType.Minor;
+                }
+            }
+
+            if (maxUpversionType == UpversionType.Patch && oldClassSpec.PublicClasses.Count != newClassSpec.PublicClasses.Count)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            return maxUpversionType;
+        }
+
+        private static UpversionType AnalyzeFields(IList<FieldSpec> oldFields, IList<FieldSpec> newFields)
+        {
+            foreach (FieldSpec oldField in oldFields)
+            {
+                FieldSpec newField = newFields
+                    .FirstOrDefault(field => field.Name.Name.Equals(oldField.Name.Name, StringComparison.InvariantCulture));
+                if (newField == null)
+                {
+                    return UpversionType.Major;
+                }
+
+                // Verify types are equal. This will false-positive on string/String conversions, but that's a minor issue for later consideration.
+                if (!oldField.Type.Equals(newField.Type, StringComparison.InvariantCulture))
+                {
+                    return UpversionType.Major;
+                }
+
+                // Validate modifiers.
+                if ((oldField.IsUserModifiable && !newField.IsUserModifiable) ||
+                    (oldField.IsStatic != newField.IsStatic))
+                {
+                    return UpversionType.Major;
+                }
+            }
+
+            if (newFields.Count != oldFields.Count)
+            {
+                return UpversionType.Minor;
+            }
+
             return UpversionType.Patch;
+        }
+
+        private static UpversionType AnalyzeProperties(IList<PropertySpec> oldProperties, IList<PropertySpec> newProperties)
+        {
+            foreach (PropertySpec oldProperty in oldProperties)
+            {
+                PropertySpec newProperty = newProperties
+                    .FirstOrDefault(prop => prop.Name.Name.Equals(oldProperty.Name.Name, StringComparison.InvariantCulture));
+                if (newProperty == null)
+                {
+                    return UpversionType.Major;
+                }
+
+                // Verify types are equal. This will false-positive on string/String conversions, but that's a minor issue for later consideration.
+                if (!oldProperty.Type.Equals(newProperty.Type, StringComparison.InvariantCulture))
+                {
+                    return UpversionType.Major;
+                }
+
+                // Validate modifier
+                if (oldProperty.IsStatic != newProperty.IsStatic)
+                {
+                    return UpversionType.Major;
+                }
+            }
+
+            if (newProperties.Count != oldProperties.Count)
+            {
+                return UpversionType.Minor;
+            }
+
+            return UpversionType.Patch;
+        }
+
+        private static UpversionType AnalyzeConstructors(IList<ConstructorSpec> oldConstructors, IList<ConstructorSpec> newConstructors)
+        {
+            UpversionType maxUpversionType = UpversionType.Patch;
+            foreach (ConstructorSpec oldConstructor in oldConstructors)
+            {
+                // Constructor matching is complicated as all constructors have the same name, but different parameters.
+                // For now, perform an inefficient n^2 matching by comparing each old constructor against each new one.
+                bool anyWithoutMajorChanges = false;
+                foreach (ConstructorSpec newConstructor in newConstructors)
+                {
+                    if (!NapackAnalyst.AnayzeParameters(oldConstructor.Parameters, newConstructor.Parameters))
+                    {
+                        anyWithoutMajorChanges = true;
+                        break;
+                    }
+                }
+
+                if (!anyWithoutMajorChanges)
+                {
+                    return UpversionType.Major;
+                }
+            }
+
+            if (maxUpversionType == UpversionType.Patch && newConstructors.Count != oldConstructors.Count)
+            {
+                return UpversionType.Minor;
+            }
+
+            return maxUpversionType;
+        }
+
+        private static UpversionType AnalyzeMethods(IList<MethodSpec> oldMethods, IList<MethodSpec> newMethods)
+        {
+            UpversionType maxUpversionType = UpversionType.Patch;
+            foreach (MethodSpec oldMethod in oldMethods)
+            {
+                MethodSpec newMethod = newMethods
+                    .FirstOrDefault(field => field.Name.Name.Equals(oldMethod.Name.Name, StringComparison.InvariantCulture));
+                if (newMethod == null)
+                {
+                    return UpversionType.Major;
+                }
+                
+                if (!newMethod.ReturnType.Equals(oldMethod.ReturnType, StringComparison.InvariantCulture))
+                {
+                    return UpversionType.Major;
+                }
+
+                // Check parameters
+                bool isMajorChange = NapackAnalyst.AnayzeParameters(oldMethod.Parameters, newMethod.Parameters);
+                if (isMajorChange)
+                {
+                    return UpversionType.Major;
+                }
+            }
+
+            if (maxUpversionType == UpversionType.Patch && newMethods.Count != oldMethods.Count)
+            {
+                return UpversionType.Minor;
+            }
+
+            return maxUpversionType;
+        }
+
+        /// <summary>
+        /// Returns true on a breaking change (MAJOR), false otherwise (PATCH)
+        /// </summary>
+        private static bool AnayzeParameters(List<ParameterSpec> oldParameters, List<ParameterSpec> newParameters)
+        {
+            if (newParameters.Count != oldParameters.Count)
+            {
+                return true;
+            }
+
+            // If parameter ordering changes, that's a breaking change.
+            for (int i = 0; i < oldParameters.Count; i++)
+            {
+                if (!oldParameters[i].Name.Equals(newParameters[i].Name, StringComparison.InvariantCulture) ||
+                    !oldParameters[i].Type.Equals(newParameters[i].Type, StringComparison.InvariantCulture) ||
+                    !oldParameters[i].Modifier.Equals(newParameters[i].Modifier, StringComparison.InvariantCulture) ||
+                    !oldParameters[i].Default.Equals(newParameters[i].Default, StringComparison.InvariantCulture))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
