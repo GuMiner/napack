@@ -82,5 +82,35 @@ namespace NapackAnalystTests
                 Assert.IsNotNull(parameter.Type);
             }
         }
+
+        [TestMethod]
+        public void FieldAndClassTest()
+        {
+            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            Assert.AreEqual(1, classSpec.PublicFields.Count);
+
+            FieldSpec field = classSpec.PublicFields.First();
+            Assert.IsNotNull(field.Name);
+            Assert.IsNotNull(field.Name.Name);
+            Assert.IsNotNull(field.Name.Documentation);
+            Assert.IsNotNull(field.Type);
+            Assert.IsTrue(field.IsConst);
+            Assert.IsFalse(field.IsStatic);
+            Assert.IsFalse(field.IsReadonly);
+        }
+
+        [TestMethod]
+        public void PropertyAndClassTest()
+        {
+            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            Assert.AreEqual(1, classSpec.PublicProperties.Count);
+
+            PropertySpec property = classSpec.PublicProperties.First();
+            Assert.IsNotNull(property.Name);
+            Assert.IsNotNull(property.Name.Name);
+            Assert.IsNotNull(property.Name.Documentation);
+            Assert.IsNotNull(property.Type);
+            Assert.IsFalse(property.IsStatic);
+        }
     }
 }

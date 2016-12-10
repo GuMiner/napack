@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="NapackComparisonTests.cs" />
     <Compile Include="SampleStrings.cs" />
     <Compile Include="NapackClassAnalyzerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

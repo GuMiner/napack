@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
@@ -98,7 +99,48 @@ namespace Napack.Analyst
         /// </remarks>
         public static UpversionType DeterminedRequiredUpversioning(NapackSpec oldNapack, NapackSpec newNapack)
         {
-            throw new NotImplementedException();
+            UpversionType maxUpversionType = UpversionType.Patch;
+            foreach (ClassSpec oldClassSpec in oldNapack.Classes)
+            {
+                ClassSpec newClassSpec = newNapack.Classes
+                    .FirstOrDefault(cls => cls.Name.Name.Equals(oldClassSpec.Name.Name, StringComparison.OrdinalIgnoreCase));
+                UpversionType upversionType = NapackAnalyst.AnalyzeClasses(oldClassSpec, newClassSpec);
+                if (upversionType == UpversionType.Major)
+                {
+                    return UpversionType.Major;
+                }
+                else if (upversionType == UpversionType.Minor)
+                {
+                    maxUpversionType = UpversionType.Minor;
+                }
+            }
+
+            // No APIs added in the prior classes. Did the new package add classes?
+            if (maxUpversionType == UpversionType.Patch && newNapack.Classes.Count != oldNapack.Classes.Count)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            return maxUpversionType;
+        }
+
+        private static UpversionType AnalyzeClasses(ClassSpec oldClassSpec, ClassSpec newClassSpec)
+        {
+            if (newClassSpec == null)
+            {
+                // The new spec removed a publically facing class.
+                return UpversionType.Major;
+            }
+
+            // Check if any modifier changes force a major (breaking) change.
+            if ((!oldClassSpec.IsAbstract && newClassSpec.IsAbstract) ||
+                (oldClassSpec.IsStatic != newClassSpec.IsStatic) ||
+                (!oldClassSpec.IsSealed && newClassSpec.IsSealed))
+            {
+                return UpversionType.Major;
+            }
+
+            return UpversionType.Patch;
         }
     }
 }

@@ -1,4 +1,10 @@
-﻿namespace Napack.Analyst.ApiSpec
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
+
+namespace Napack.Analyst.ApiSpec
 {
     /// <summary>
     /// Defines the specification of a field. Any changes here are breaking changes.
@@ -10,11 +16,31 @@
     public class FieldSpec
     {
         public DocumentedElement Name { get; set; }
+        
+        public string Type { get; set; }
 
         public bool IsConst { get; set; }
 
         public bool IsStatic { get; set; }
 
         public bool IsReadonly { get; set; }
+
+        [JsonIgnore]
+        public bool IsUserModifiable => !this.IsConst && !this.IsReadonly;
+
+        public static FieldSpec LoadFromSyntaxNode(FieldDeclarationSyntax node)
+        {
+            FieldSpec fieldSpec = new FieldSpec();
+            fieldSpec.IsConst = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ConstKeyword));
+            fieldSpec.IsStatic = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
+            fieldSpec.IsReadonly = node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ReadOnlyKeyword));
+
+            // Null access will throw and be caught in our overall analyzer handler.
+            VariableDeclarationSyntax variable = node.ChildNodes()
+                .FirstOrDefault(childNode => childNode.IsKind(SyntaxKind.VariableDeclaration)) as VariableDeclarationSyntax;
+            fieldSpec.Type = variable.Type.ToString();
+            fieldSpec.Name = DocumentedElement.LoadFromSyntaxNode(variable, node.GetLeadingTrivia());
+            return fieldSpec;
+        }
     }
 }

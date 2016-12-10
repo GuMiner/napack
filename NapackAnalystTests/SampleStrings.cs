@@ -43,6 +43,13 @@ namespace Test
     /// </summary>
     public class First
     {
+        private string NotReadField;
+
+        /// <summary>
+        /// Field summary goes here.
+        /// </summary>
+        public const string ConstField = 22;
+        
         /// <summary>
         /// Constructor summary goes here.
         /// </summary>" +
@@ -52,6 +59,13 @@ namespace Test
         {
             // Random stuff exists here.
         }
+
+        private PrivateProperty Test { get; set; }
+
+        /// <summary>
+        /// Property documentation goes here.
+        /// </summary>
+        public DocumentedElement Name { get; set; }
 
         /// <summary>
         /// Method summary goes here.

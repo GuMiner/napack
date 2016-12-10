@@ -34,6 +34,20 @@ namespace Napack.Analyst.ApiSpec
             return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, node.GetLeadingTrivia());
         }
 
+        internal static DocumentedElement LoadFromSyntaxNode(PropertyDeclarationSyntax node)
+        {
+            SyntaxToken syntaxToken = node.ChildTokens().First(token => token.IsKind(SyntaxKind.IdentifierToken));
+            return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, node.GetLeadingTrivia());
+        }
+
+        internal static DocumentedElement LoadFromSyntaxNode(VariableDeclarationSyntax variable, SyntaxTriviaList syntaxTriviaList)
+        {
+            SyntaxToken syntaxToken = variable
+                .ChildNodes().First(token => token.IsKind(SyntaxKind.VariableDeclarator))
+                .ChildTokens().First(token => token.IsKind(SyntaxKind.IdentifierToken));
+            return DocumentedElement.LoadFromSyntaxTokenAndTrivia(syntaxToken, syntaxTriviaList);
+        }
+
         private static DocumentedElement LoadFromSyntaxTokenAndTrivia(SyntaxToken token, SyntaxTriviaList triviaList)
         {
             DocumentedElement element = new DocumentedElement();

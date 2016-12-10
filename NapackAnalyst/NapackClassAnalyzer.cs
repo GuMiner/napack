@@ -60,7 +60,7 @@ namespace Napack.Analyst
 
             // Switch to the namespace as the root and verify (CASE SENSITIVE)
             root = root.ChildNodes().SingleOrDefault(node => node.IsKind(SyntaxKind.NamespaceDeclaration));
-            if (!(root as NamespaceDeclarationSyntax).Name.ToFullString().Trim().Equals(napackName, StringComparison.InvariantCulture))
+            if (!(root as NamespaceDeclarationSyntax).Name.ToString().Equals(napackName, StringComparison.InvariantCulture))
             {
                 throw new InvalidNapackFileException(filename, "Namespace name is not " + napackName);
             }
@@ -85,7 +85,7 @@ namespace Napack.Analyst
             classSpec.IsStatic = classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword));
             classSpec.IsSealed = classSpec.IsStatic || classNode.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.SealedKeyword));
 
-            // Parse classes
+            // Parse classes recursively
             foreach (ClassDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.ClassDeclaration)))
             {
                 if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
@@ -113,6 +113,26 @@ namespace Napack.Analyst
                     (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
                 {
                     classSpec.PublicConstructors.Add(ConstructorSpec.LoadFromSyntaxNode(node));
+                }
+            }
+
+            // Parse fields
+            foreach (FieldDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.FieldDeclaration)))
+            {
+                if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                {
+                    classSpec.PublicFields.Add(FieldSpec.LoadFromSyntaxNode(node));
+                }
+            }
+
+            // Parse properties
+            foreach (PropertyDeclarationSyntax node in classNode.ChildNodes().Where(node => node.IsKind(SyntaxKind.PropertyDeclaration)))
+            {
+                if (node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)) ||
+                    (classSpec.ProtectedItemsConsideredPublic && node.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword))))
+                {
+                    classSpec.PublicProperties.Add(PropertySpec.LoadFromSyntaxNode(node));
                 }
             }
 

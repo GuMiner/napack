@@ -58,5 +58,7 @@ namespace Napack.Analyst.ApiSpec
         /// </summary>
         [JsonIgnore]
         public bool ProtectedItemsConsideredPublic => !this.IsStatic && this.IsSealed;
+
+        
     }
 }
