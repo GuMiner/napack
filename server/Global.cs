@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Microsoft.Owin.Hosting;
 using Napack.Analyst;
+using Napack.Common;
 
 namespace Napack.Server
 {
@@ -44,6 +45,7 @@ namespace Napack.Server
                 Global.ShutdownEvent = new ManualResetEvent(false);
 
                 // Setup the analyzers from config.
+                Serializer.Setup();
                 NapackAnalyst.Initialize();
                 NapackNameValidator.Initialize();
 

@@ -50,6 +50,9 @@ namespace Napack.Common
         public string GetFullName()
             => this.NapackName + "." + this.Major + "." + this.Minor + "." + this.Patch;
 
+        public string GenerateTargetName()
+             => this.NapackName + "_" + this.Major + "_" + this.Minor + "_" + this.Patch;
+
         public override bool Equals(object obj)
         {
             if (obj == null)

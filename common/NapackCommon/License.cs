@@ -10,11 +10,6 @@ namespace Napack.Common
         public LicenseManagement.LicenseType LicenseType { get; set; }
 
         /// <summary>
-        /// Returns true if this is a supported license.
-        /// </summary>
-        public bool IsSupportedLicense { get; set; }
-
-        /// <summary>
         /// Returns true if this is a copy-left license.
         /// </summary>
         public bool IsCopyLeft { get; set; }
@@ -30,8 +25,8 @@ namespace Napack.Common
         public bool IsCustomLicense { get; set; }
 
         /// <summary>
-        /// If this is a custom license, returns the license text.
-        /// If not, returns a user-friendly reference to retrieving the text.
+        /// If this is a copyleft/commercial/custom license, returns the license text.
+        /// If not, *this field is unused*
         /// </summary>
         public string LicenseText { get; set; }
 
@@ -40,7 +35,6 @@ namespace Napack.Common
             return new
             {
                 Type = this.LicenseType,
-                this.IsSupportedLicense,
                 this.IsCopyLeft,
                 this.IsCommercial,
                 this.IsCustomLicense,
@@ -49,7 +43,7 @@ namespace Napack.Common
 
         public void VerifyCompatibility(string napackName, int version, License license)
         {
-            if (license.IsSupportedLicense && (this.IsSupportedLicense || this.IsCopyLeft))
+            if (license.LicenseType != LicenseManagement.LicenseType.Other && (this.LicenseType != LicenseManagement.LicenseType.Other || this.IsCopyLeft))
             {
                 // This is a supported license or a copy-left license.
                 return;
@@ -72,7 +66,6 @@ namespace Napack.Common
         public bool NeedsMajorUpversioning(License license)
         {
             return (this.LicenseType != license.LicenseType ||
-                    this.IsSupportedLicense != license.IsSupportedLicense ||
                     this.IsCopyLeft != license.IsCopyLeft ||
                     this.IsCommercial != license.IsCommercial ||
                     this.IsCustomLicense != license.IsCommercial ||

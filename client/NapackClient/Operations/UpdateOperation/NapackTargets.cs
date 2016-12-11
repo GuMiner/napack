@@ -10,7 +10,7 @@ namespace Napack.Client
     /// </summary>
     public class NapackTargets
     {
-        private const string napackFilename = "napack.targets";
+        private const string NapackTargetsFilename = "napack.targets";
         
         public static void SaveNapackTargetsFile(string napackDirectory, List<NapackVersionIdentifier> currentNapacks)
         {
@@ -24,7 +24,7 @@ namespace Napack.Client
                     napack.NapackName + "_" + napack.Major + "_" + napack.Minor + "_" + napack.Patch + ".targets\">");
             }
 
-            File.WriteAllText(Path.Combine(napackDirectory, napackFilename), fileBuilder.ToString());
+            File.WriteAllText(Path.Combine(napackDirectory, NapackTargets.NapackTargetsFilename), fileBuilder.ToString());
         }
     }
 }

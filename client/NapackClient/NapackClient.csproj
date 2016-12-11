@@ -52,11 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UpdateOperation\UpdateOperationArguments.cs" />
+    <Compile Include="Operations\INapackOperation.cs" />
+    <Compile Include="Operations\NapackOperationFinder.cs" />
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />
-    <Compile Include="UpdateOperation\UpdateOperation.cs" />
-    <Compile Include="UpdateOperation\NapackTargets.cs" />
+    <Compile Include="Operations\UpdateOperation\NapackAttributions.cs" />
+    <Compile Include="Operations\UpdateOperation\UpdateOperation.cs" />
+    <Compile Include="Operations\UpdateOperation\NapackTargets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
