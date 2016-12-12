@@ -1,22 +1,34 @@
 # Nano API Creation
 -------------------
 
-1. Copy the .NET class source files containing the public classes and methods part of your API to a **PackageName** folder. [Note 1] (#PermittedFiles)
-2. Add a **PackageName.json** file inside that folder.
-3. Fill in the **PackageName.json** file as follows:
+1. Create a folder containing the the .NET class source files. Set the namespace of all the classes to **PackageName**. [Note 1] (#PermittedFiles)
+2. Add a package configuration JSON file inside that folder.
+3. Fill in the package configuration JSON file as follows:
 ```json
 {
 "name":"PackageName",
-"version":"1.2.3",
+"description":"Put a short / medium length description here. Public API docs are auto-generated from the source code and do not belong here.",
+"moreInformation":"URL for additional information, source code repository, etc",
+"tags":["tag1", "tag2", "tag3"],
+"authorizedUserHashes":["hash1", "hash2", "hash3"],
 "authors":["Note 3", "author 2"],
-"license":"Note 4",
-"description":"Put a short description here. API docs are auto-generated and do not belong here.",
-"moreinfo":"URL for additional information, source code repository, etc"
-"tags":["tag1", "tag2", "tag3"]
+"license":
+{
+    "type":"See Note 4"
+    "licenseText":"Only if the type specified is not a supported license"
+},
+"dependencies":
+{
+    "DependentPackageNameFollowedByMajorVersion":5,
+    "OtherDependentPackage":2,
+}
 }
 ```
 
-4. Visit the Napack Framework Server to upload the Napack. **TODO write a cmd and GUI version.**
+4. Upload the Napack by using one of the possible upload mechanisms:
+ - Visit the Napack Framework Server to upload the Napack. 
+ - Use the [Napack Client](./NapackClient.md) to upload the Napack.
+ - **TODO integrate with Visual Studio**
 5. The Napack Framework Server will automatically:
  - Add the user uploading the Napack to the publishers of the Napack.
  - (Update only) Verify the current user has permissions to update the specified Napack.
@@ -34,6 +46,6 @@
 
 3 The listing of authors who will be added to the license file. If a custom license is used, this field can be ignored.
 
-4 One of the [Supported Licenses](./SupportedLicenses.md), or the filename of a file containing custom license information. A word of warning: packages with custom licenses require explicit authorization by consumers to be used and are **not recommended.**
+4 One of the [Valid License Values](./SupportedLicenses.md),=. A word of warning: packages with copy-left, commercial, or custom licenses require explicit authorization by consumers to be used and are **not recommended.**
 
 5 Valid Napack names match the following Regex ```[a-zA-Z0-9\.-]*```, don't start with a number, are within [10, 100] characters (inclusive), and don't contain any prohibited subphrases. Packages with non-professional names (obscene (not 'E' rated), derrogatory, racist, etc) are subject to removal.

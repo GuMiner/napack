@@ -8,7 +8,8 @@ namespace Napack.Client
     {
         private static readonly IEnumerable<Type> KnownOperations = new List<Type>
         {
-            typeof(UpdateOperation)
+            typeof(UpdateOperation),
+            typeof(UploadOperation)
         };
 
         public static INapackOperation FindOperation(string[] args)

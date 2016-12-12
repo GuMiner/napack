@@ -59,6 +59,9 @@
     <Compile Include="Operations\UpdateOperation\NapackAttributions.cs" />
     <Compile Include="Operations\UpdateOperation\UpdateOperation.cs" />
     <Compile Include="Operations\UpdateOperation\NapackTargets.cs" />
+    <Compile Include="Operations\UploadOperation\LicenseLocalDescriptor.cs" />
+    <Compile Include="Operations\UploadOperation\NapackLocalDescriptor.cs" />
+    <Compile Include="Operations\UploadOperation\UploadOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,7 +20,7 @@ namespace Napack.Client
     {
         private const string LockFileSuffix = ".lock";
 
-        [CommandLineArgument(Position = 1, IsRequired = true)]
+        [CommandLineArgument(Position = 0, IsRequired = true)]
         [Description("The operation being performed.")]
         public string Operation { get; set; }
 
@@ -36,7 +36,7 @@ namespace Napack.Client
         [Description("The directory storing downloaded Napacks")]
         public string NapackDirectory { get; set; }
 
-        public bool IsValidOperation() => this.Operation.Equals("Update", StringComparison.InvariantCultureIgnoreCase);
+        public bool IsValidOperation() => !string.IsNullOrWhiteSpace(this.Operation) && this.Operation.Equals("Update", StringComparison.InvariantCultureIgnoreCase);
 
         public void PerformOperation()
         {

@@ -10,21 +10,6 @@ namespace Napack.Common
         public LicenseManagement.LicenseType LicenseType { get; set; }
 
         /// <summary>
-        /// Returns true if this is a copy-left license.
-        /// </summary>
-        public bool IsCopyLeft { get; set; }
-
-        /// <summary>
-        /// Returns true if this is a commercial license.
-        /// </summary>
-        public bool IsCommercial { get; set; }
-
-        /// <summary>
-        /// Returns true if this is a custom license.
-        /// </summary>
-        public bool IsCustomLicense { get; set; }
-
-        /// <summary>
         /// If this is a copyleft/commercial/custom license, returns the license text.
         /// If not, *this field is unused*
         /// </summary>
@@ -35,27 +20,28 @@ namespace Napack.Common
             return new
             {
                 Type = this.LicenseType,
-                this.IsCopyLeft,
-                this.IsCommercial,
-                this.IsCustomLicense,
+                CustomText = this.LicenseText
             };
         }
 
         public void VerifyCompatibility(string napackName, int version, License license)
         {
-            if (license.LicenseType != LicenseManagement.LicenseType.Other && (this.LicenseType != LicenseManagement.LicenseType.Other || this.IsCopyLeft))
+            if (LicenseManagement.IsSupportedLicense(license.LicenseType) && 
+                (LicenseManagement.IsSupportedLicense(this.LicenseType) || this.LicenseType == LicenseManagement.LicenseType.CopyLeft))
             {
-                // This is a supported license or a copy-left license.
+                // Supported or copy-left licenses can consume supported licenses.
                 return;
             }
-            else if (license.IsCopyLeft && this.IsCopyLeft)
+            else if (license.LicenseType == LicenseManagement.LicenseType.CopyLeft && this.LicenseType == LicenseManagement.LicenseType.CopyLeft)
             {
-                // Both are copy-left, likely ok.
+                // A copy-left license can *likely* consume another copy-left license.
+                // You're not in the supported zone, so minor inconsistencies here are up to tthe end-user to verify.
                 return;
             }
-            else if ((license.IsCommercial || license.IsCustomLicense) && (this.IsCommercial || this.IsCustomLicense))
+            else if ((license.LicenseType == LicenseManagement.LicenseType.Commercial || license.LicenseType == LicenseManagement.LicenseType.Other) &&
+                (this.LicenseType == LicenseManagement.LicenseType.Commercial || this.LicenseType == LicenseManagement.LicenseType.Other))
             {
-                // Both are commercial/custom, likely ok.
+                // A commercial / other license is compatible with a commerical / other license -- with the end-user performing final validaiton.
                 return;
             }
 
@@ -65,11 +51,8 @@ namespace Napack.Common
 
         public bool NeedsMajorUpversioning(License license)
         {
-            return (this.LicenseType != license.LicenseType ||
-                    this.IsCopyLeft != license.IsCopyLeft ||
-                    this.IsCommercial != license.IsCommercial ||
-                    this.IsCustomLicense != license.IsCommercial ||
-                    !this.LicenseText.Equals(license.LicenseText, StringComparison.InvariantCultureIgnoreCase));
+            // Any license type or text changes require upversioning.
+            return (this.LicenseType != license.LicenseType || !this.LicenseText.Equals(license.LicenseText, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

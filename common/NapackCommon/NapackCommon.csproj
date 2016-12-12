@@ -62,7 +62,7 @@
     <Compile Include="NapackVersionIdentifier.cs" />
     <Compile Include="Exceptions\InvalidNapackVersionException.cs" />
     <Compile Include="License.cs" />
-    <Compile Include="LicenseType.cs" />
+    <Compile Include="LicenseManagement.cs" />
     <Compile Include="NapackMajorVersion.cs" />
     <Compile Include="NapackVersion.cs" />
     <Compile Include="Exceptions\NapackVersionNotFoundException.cs" />

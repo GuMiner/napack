@@ -1,6 +1,23 @@
 # Supported Licenses
 --------------------
 
+### Valid License Values
+------------------------
+
+#### Supported
+- MIT
+- SimplifiedBSD
+- zLibLibPng
+- ISC
+- WTFPLv2
+- FreePL
+- PublicDomain
+
+#### Unsupported
+- CopyLeft
+- Commercial
+- Other
+
 ###How Napack Licensing Works
 --------------------------
 By default, Napack will create a **Napack.attributions** file for each consumed Napack in your code. Users can then append the **Napack.attributions** file to the end of their license file to correctly attribute Napacks.
@@ -14,13 +31,13 @@ In the spirit of promoting interoperability and freedom *of Napacks*, the defaul
 
 This list only covers the attribution-only open-source licenses that Napack supports. For all other license types, see the license file provided with the Napack.
 
-* MIT License
-* Simplified BSD License
-* zlib/libpng License
-* ISC License
-* WTFPL License Version 2
-* Free Public License 1.0.0
-* Public Domain
+* MIT License (MIT)
+* Simplified BSD License (SimplifiedBSD)
+* zlib/libpng License (zLibLibPng)
+* ISC License (ISC)
+* WTFPL License Version 2 (WTFPLv2)
+* Free Public License 1.0.0 (FreePL)
+* Public Domain (PublicDomain)
 
 If you feel that this list is missing a permissive license you would like to include, please email the Napack administrators.
 
