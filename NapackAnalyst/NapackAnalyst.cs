@@ -44,7 +44,9 @@ namespace Napack.Analyst
         public static void Initialize()
         {
             string configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PackageValidation.json");
-            NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(configFilePath);
+            Console.WriteLine(configFilePath);
+
+            NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(File.ReadAllText(configFilePath));
         }
 
         /// <summary>

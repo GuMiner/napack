@@ -1,0 +1,21 @@
+server
+{
+    listen       80;
+    server_name  napack.net;
+    root /home/napackstar/drop/;
+
+    location /Content/ {
+        alias /home/napackstar/drop/Content/;
+    }
+    
+     location /.well-known/ {
+        alias /home/napackstar/drop/Content/.well-known/;
+   }
+
+    location / {
+        proxy_pass http://127.0.0.1:9876;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

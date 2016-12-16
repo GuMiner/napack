@@ -41,14 +41,19 @@ namespace Napack.Server
             }
             else
             {
-                Log("Napack Server Startup.");
+                Log("Napack Server Startup...");
                 Global.ShutdownEvent = new ManualResetEvent(false);
 
-                // Setup the analyzers from config.
+                Log("Serializer Setup...");
                 Serializer.Setup();
+
+                Log("Analyst Setup...");
                 NapackAnalyst.Initialize();
+
+                Log("Name validator setup...");
                 NapackNameValidator.Initialize();
 
+                Log("Starting web server...");
                 using (WebApp.Start<Startup>(args[0]))
                 {
                     Global.ShutdownEvent.WaitOne();
