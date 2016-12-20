@@ -114,7 +114,8 @@ namespace Napack.Server
             JsonResponse response = new JsonResponse(new
             {
                 Type = exception.GetType(),
-                Message = exception.Message
+                Message = exception.Message,
+                StackTrace = exception.StackTrace
             }, new DefaultJsonSerializer());
 
             response.StatusCode = code;
