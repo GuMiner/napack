@@ -30,7 +30,7 @@ namespace Napack.Server
         /// <summary>
         /// The hashes of users authorized to modify this package.
         /// </summary>
-        public List<string> AuthorizedUserHashes { get; set; }
+        public List<string> AuthorizedUserIds { get; set; }
 
         /// <summary>
         /// Mapping of the available major
@@ -59,7 +59,7 @@ namespace Napack.Server
                 Description = newNapack.Description,
                 MoreInformation = newNapack.MoreInformation,
                 Tags = newNapack.Tags ?? new List<string>(),
-                AuthorizedUserHashes = newNapack.AuthorizedUserHashes,
+                AuthorizedUserIds = newNapack.AuthorizedUserIds,
                 Versions = new Dictionary<int, NapackMajorVersionMetadata>()
             };
 

@@ -18,7 +18,12 @@ namespace Napack.Server
         private readonly Dictionary<string, List<NapackVersionIdentifier>> authorPackageStore;
 
         /// <summary>
-        /// The listing of user hash => authorized napack name.
+        /// The listing of user id => user.
+        /// </summary>
+        private readonly Dictionary<string, UserIdentifier> users;
+
+        /// <summary>
+        /// The listing of user id => authorized napack name.
         /// </summary>
         private readonly Dictionary<string, HashSet<string>> authorizedPackages;
 
@@ -45,7 +50,8 @@ namespace Napack.Server
         public InMemoryNapackStorageManager()
         {
             this.authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase); // Author names are case insensitive
-            this.authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // Hashes and package names are case-sensitive.
+            this.users = new Dictionary<string, UserIdentifier>(StringComparer.InvariantCulture);
+            this.authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // User names are case sensitive.
             this.consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCulture);
             this.packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCulture);
             this.packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCulture);
@@ -61,15 +67,30 @@ namespace Napack.Server
         {
             throw new NotImplementedException();
         }
+        
+        public void AddUser(UserIdentifier user)
+        {
+            if (this.users.ContainsKey(user.Email))
+            {
+                throw new ExistingUserException(user.Email);
+            }
+
+            this.users.Add(user.Email, user);
+        }
+
+        public UserIdentifier GetUser(string userId)
+        {
+            return this.users[userId];
+        }
 
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
             return this.authorPackageStore[authorName];
         }
 
-        public IEnumerable<string> GetAuthorizedPackages(string userHash)
+        public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
-            return this.authorizedPackages[userHash];
+            return this.authorizedPackages[userId];
         }
 
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
@@ -109,9 +130,9 @@ namespace Napack.Server
                 AddAuthorConsumption(author, version);
             }
             
-            foreach (string userHash in newNapack.AuthorizedUserHashes)
+            foreach (string userId in newNapack.AuthorizedUserIds)
             {
-                AddUserAuthorization(userHash, napackName);
+                AddUserAuthorization(userId, napackName);
             }
 
             foreach (NapackMajorVersion consumedPackage in newNapack.NewNapackVersion.Dependencies)
@@ -193,14 +214,14 @@ namespace Napack.Server
             this.consumingPackages[consumedPackage.ToString()].Add(version);
         }
 
-        private void AddUserAuthorization(string userHash, string napackName)
+        private void AddUserAuthorization(string userId, string napackName)
         {
-            if (!this.authorizedPackages.ContainsKey(userHash))
+            if (!this.authorizedPackages.ContainsKey(userId))
             {
-                this.authorizedPackages.Add(userHash, new HashSet<string>());
+                this.authorizedPackages.Add(userId, new HashSet<string>());
             }
             
-            this.authorizedPackages[userHash].Add(napackName);
+            this.authorizedPackages[userId].Add(napackName);
         }
 
         private void AddAuthorConsumption(string author, NapackVersionIdentifier version)

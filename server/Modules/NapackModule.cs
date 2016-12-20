@@ -82,7 +82,7 @@ namespace Napack.Server.Modules
                 NewNapack newNapack = this.Bind<NewNapack>();
                 newNapack.Validate();
 
-                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), newNapack.AuthorizedUserHashes);
+                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, newNapack.AuthorizedUserIds);
                 NapackNameValidator.Validate(packageName);
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
                 NapackModule.ValidateDependentPackages(napackManager, newNapack.NewNapackVersion);
@@ -103,7 +103,7 @@ namespace Napack.Server.Modules
 
                 string packageName = parameters.packageName;
                 NapackMetadata package = napackManager.GetPackageMetadata(packageName);
-                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), package.AuthorizedUserHashes);
+                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, package.AuthorizedUserIds);
                 
                 // Validate and create a spec for this new version.
                 NapackSpec newVersionSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapackVersion.Files);

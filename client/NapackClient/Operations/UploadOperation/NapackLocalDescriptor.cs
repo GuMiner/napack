@@ -18,7 +18,7 @@ namespace Napack.Client
 
         public List<string> Tags { get; set; }
 
-        public List<string> AuthorizedUserHashes { get; set; }
+        public List<string> AuthorizedUserIds { get; set; }
 
         public List<string> Authors { get; set; }
 
@@ -42,7 +42,7 @@ namespace Napack.Client
                 throw new InvalidNapackException("The more information URI and authors list must be present, even if one or both are not populated.");
             }
 
-            if (!this.Tags.Any(tag => !string.IsNullOrWhiteSpace(tag)) || !this.AuthorizedUserHashes.Any(user => !string.IsNullOrWhiteSpace(user)))
+            if (!this.Tags.Any(tag => !string.IsNullOrWhiteSpace(tag)) || !this.AuthorizedUserIds.Any(user => !string.IsNullOrWhiteSpace(user)))
             {
                 throw new InvalidNapackException("The tags and authorized user hashes fields must both contain at least one populated value.");
             }

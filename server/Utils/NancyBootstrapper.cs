@@ -97,7 +97,7 @@ namespace Napack.Server
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
             base.ConfigureRequestContainer(container, context);
-            container.Register<INapackStorageManager, NapackStorageManager>();
+            container.Register<INapackStorageManager, InMemoryNapackStorageManager>();
         }
 
 

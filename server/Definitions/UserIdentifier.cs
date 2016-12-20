@@ -9,49 +9,29 @@ namespace Napack.Server
     public class UserIdentifier
     {
         /// <summary>
-        /// Creates a new user identifier for the specified email, leaving the user's hash blank.
+        /// The email the user has provided; used as the user's ID.
         /// </summary>
-        /// <param name="userEmail">The email to associated with the hash. Not used in hash generation.</param>
-        public UserIdentifier(string userEmail)
-        {
-            this.UserEmail = userEmail;
-            this.UserHash = null;
-        }
-
+        public string Email { get; set; }
+        
         /// <summary>
-        /// The email the user has provided.
+        /// THe computed hash used to authenticate the user.
         /// </summary>
-        public string UserEmail { get; set; }
-
-        /// <summary>
-        /// The SHA512 hash of the user's access keys.
-        /// </summary>
-        public string UserHash { get; set; }
-
-        /// <summary>
-        /// Assigns the user hash and returns the identifiers used in calculating that has.
-        /// </summary>
-        public List<Guid> AssignUserHash()
-        {
-            Guid first = Guid.NewGuid();
-            Guid second = Guid.NewGuid();
-            Guid third = Guid.NewGuid();
-            this.UserHash = UserIdentifier.GetHashedIdentifiers(first, second, third);
-            return new[] { first, second, third }.ToList();
-        }
+        public string Hash { get; set; }
 
         /// <summary>
         /// Hashes the provided identifiers into a Base64 string using SHA512.
         /// </summary>
-        public static string GetHashedIdentifiers(Guid first, Guid second, Guid third)
+        public static string ComputeUserHash(List<Guid> secrets)
         {
-            byte[] firstGuid = first.ToByteArray();
-            byte[] secondGuid = second.ToByteArray();
-            byte[] thirdGuid = third.ToByteArray();
-            byte[] input = new byte[firstGuid.Length + secondGuid.Length + thirdGuid.Length];
-            firstGuid.CopyTo(input, 0);
-            secondGuid.CopyTo(input, firstGuid.Length);
-            thirdGuid.CopyTo(input, firstGuid.Length + secondGuid.Length);
+            List<byte[]> secretsAsBytes = secrets.Select(secret => secret.ToByteArray()).ToList();
+            byte[] input = new byte[secretsAsBytes.Sum(secret => secret.Length)];
+
+            int currentLength = 0;
+            foreach (byte[] secret in secretsAsBytes)
+            {
+                secret.CopyTo(input, currentLength);
+                currentLength += secret.Length;
+            }
 
             // As we're using this as the authentication validation for the end user, we want to avoid
             //  hash collisions, so we need a collision-resistent cryptographically-secure hash function, *not* MD5.
@@ -62,30 +42,36 @@ namespace Napack.Server
             }
         }
 
-        internal static void Validate(Dictionary<string, IEnumerable<string>> dictionary, List<string> authorizedUserHashes)
+        internal static void Validate(Dictionary<string, IEnumerable<string>> headers, INapackStorageManager storageManager, List<string> authorizedUserIds)
         {
-            if (!dictionary.ContainsKey(CommonHeaders.UserKeys))
+            // Check that valid inputs were provided.
+            if (!headers.ContainsKey(CommonHeaders.UserKeys) || !headers.ContainsKey(CommonHeaders.UserId))
             {
                 throw new UnauthorizedUserException();
             }
 
-            List<Guid> keys;
+            UserSecret secret;
+            string userId;
             try
             {
-                keys = dictionary[CommonHeaders.UserKeys].Select(item => Guid.Parse(item)).ToList();
+                secret = Serializer.Deserialize<UserSecret>(string.Join(string.Empty, headers[CommonHeaders.UserKeys]));
+                userId = string.Join(string.Empty, headers[CommonHeaders.UserId]);
             }
             catch (Exception)
             {
                 throw new UnauthorizedUserException();
             }
 
-            if (keys.Count != 3)
+            // Check that the user is authorized to perform this operation.
+            if (!authorizedUserIds.Contains(userId, StringComparer.InvariantCulture))
             {
                 throw new UnauthorizedUserException();
             }
 
-            string hash = UserIdentifier.GetHashedIdentifiers(keys[0], keys[1], keys[2]);
-            if (!authorizedUserHashes.Contains(hash, StringComparer.InvariantCulture))
+            // Check that the user is who they say they are.
+            UserIdentifier user = storageManager.GetUser(userId);
+            string hash = UserIdentifier.ComputeUserHash(secret.Secrets);
+            if (!user.Hash.Equals(hash, StringComparison.InvariantCulture))
             {
                 throw new UnauthorizedUserException();
             }

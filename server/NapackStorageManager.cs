@@ -11,6 +11,11 @@ namespace Napack.Server
     /// </summary>
     public class NapackStorageManager : INapackStorageManager
     {
+        public void AddUser(UserIdentifier user)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ContainsNapack(string packageName)
         {
             throw new NotImplementedException();
@@ -26,7 +31,7 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
-        public IEnumerable<string> GetAuthorizedPackages(string userHash)
+        public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
             throw new NotImplementedException();
         }
@@ -47,6 +52,11 @@ namespace Napack.Server
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UserIdentifier GetUser(string userId)
         {
             throw new NotImplementedException();
         }

@@ -29,7 +29,7 @@ namespace Napack.Common
         /// <summary>
         /// The hashes of users authorized to modify this package.
         /// </summary>
-        public List<string> AuthorizedUserHashes { get; set; }
+        public List<string> AuthorizedUserIds { get; set; }
         
         /// <summary>
         /// The new napack to use to create version 1.0.0 of this package.
@@ -43,9 +43,9 @@ namespace Napack.Common
                 throw new InvalidNapackException("The description must be specified.");
             }
 
-            if (this.AuthorizedUserHashes == null || this.AuthorizedUserHashes.Count == 0)
+            if (this.AuthorizedUserIds == null || this.AuthorizedUserIds.Count == 0)
             {
-                throw new InvalidNapackException("At least one authorized user hash must be provided.");
+                throw new InvalidNapackException("At least one authorized user ID must be provided.");
             }
 
             if (this.NewNapackVersion == null)

@@ -37,11 +37,21 @@ namespace Napack.Server
         /// The reverse of this operation can be done by reading the dependencies specified in the metadata.
         /// </remarks>
         IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion);
+        
+        /// <summary>
+        /// Adds a user for future security validation.
+        /// </summary>
+        void AddUser(UserIdentifier user);
+
+        /// <summary>
+        /// Gets the statistics, hash, and other information stored for the given user.
+        /// </summary>
+        UserIdentifier GetUser(string userId);
 
         /// <summary>
         /// Gets all package names the user is authorized to edit.
         /// </summary>
-        IEnumerable<string> GetAuthorizedPackages(string userHash);
+        IEnumerable<string> GetAuthorizedPackages(string userId);
 
         /// <summary>
         /// Gets all package version for which the given author is listed in the authors list.

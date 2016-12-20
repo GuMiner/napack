@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="CommonHeaders.cs" />
     <Compile Include="Exceptions\InvalidNapackException.cs" />
+    <Compile Include="Exceptions\ExistingUserException.cs" />
     <Compile Include="Exceptions\UnsupportedNapackFileException.cs" />
     <Compile Include="Exceptions\InvalidNapackFileExtensionException.cs" />
     <Compile Include="Exceptions\InvalidNapackFileException.cs" />
