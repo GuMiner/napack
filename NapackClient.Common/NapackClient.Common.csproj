@@ -44,6 +44,7 @@
     <Compile Include="NapackFrameworkServerUnavailable.cs" />
     <Compile Include="NapackServerClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VersionDescriptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\NapackCommon\NapackCommon.csproj">

@@ -5,6 +5,7 @@
     /// </summary>
     public class NapackFile
     {
+        public const string BuildTypeHeader = "// MSBuildType = ";
         public const string ContentType = "Content";
 
         /// <summary>

@@ -77,6 +77,76 @@ namespace Napack.Client.Common
             }
         }
 
+        public async Task<string> CreatePackageAsync(string packageName, NewNapack newNapack)
+        {
+            using (StringContent content = new StringContent(Serializer.Serialize(newNapack), Encoding.UTF8, NapackServerClient.JsonMediaType))
+            {
+                HttpResponseMessage response = null;
+                string responseContent = null;
+                try
+                {
+                    response = await client.PostAsync("/napacks/" + packageName, content);
+                    responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                }
+                catch (Exception ex)
+                {
+                    throw new NapackFrameworkServerUnavailable(ex.Message);
+                }
+
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    throw new DuplicateNapackException();
+                }
+                else if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    throw new InvalidNapackException("The napack contents were invalid: " + responseContent);
+                }
+                else if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
+                }
+
+                response?.Dispose();
+                return responseContent;
+            }
+        }
+
+        public async Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion)
+        {
+            using (StringContent content = new StringContent(Serializer.Serialize(newNapackVersion), Encoding.UTF8, NapackServerClient.JsonMediaType))
+            {
+                using (HttpRequestMessage requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), "/napacks/" + packageName)
+                {
+                    Content = content
+                })
+                {
+                    HttpResponseMessage response = null;
+                    string responseContent = null;
+                    try
+                    {
+                        response = await client.SendAsync(requestMessage);
+                        responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new NapackFrameworkServerUnavailable(ex.Message);
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        throw new InvalidNapackException("The napack contents were invalid: " + responseContent);
+                    }
+                    else if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
+                    }
+
+                    response?.Dispose();
+                    return Serializer.Deserialize<VersionDescriptor>(responseContent);
+                }
+            }
+        }
+
         /// <summary>
         /// Retrieves the most recent minor/patch version of a major version'd <see cref="NapackVersion"/> from the Napack Framework Server.
         /// </summary>

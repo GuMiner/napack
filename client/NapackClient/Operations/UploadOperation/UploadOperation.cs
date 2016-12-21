@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Napack.Client.Common;
 using Napack.Common;
 using Ookii.CommandLine;
@@ -42,17 +45,107 @@ namespace Napack.Client
 
         public void PerformOperation()
         {
+            string packageName = Path.GetFileNameWithoutExtension(this.PackageJsonFile);
             NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageJsonFile));
-            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
+            napackDescriptor.Validate();
 
+            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
-                // TODO:
-                // Get the package. If it doesn't exist, this is a create.
-                // If the package exists and UpdateMetadata is false, this is a new version update.
-                // If the package exists and UpdateMetadata is true, this is a metadata update.
-                // If the package doesn't exist and UpdateMetadata is true, this is an invalid operation.
+                bool packageExists = false;
+                if (!packageExists && this.UpdateMetadata)
+                {
+                    throw new InvalidOperationException("Cannot create a new package and only perform metadata updates.");
+                }
+                else if (packageExists)
+                {
+                    Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
+                    this.CreateNapackPackage(packageName, napackDescriptor, files, client);
+                }
+                else if (this.UpdateMetadata)
+                {
+                    // TODO determine how to perform a metadata update only.
+                }
+                else
+                {
+                    // This is a new version creation operation.
+                    Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
+                    VersionDescriptor version = client.UpdatePackageAsync(packageName, this.CreateNapackVersion(napackDescriptor, files)).GetAwaiter().GetResult();
+                    Console.WriteLine($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
+                }
             }
+        }
+
+        private void CreateNapackPackage(string packageName, NapackLocalDescriptor napackDescriptor, Dictionary<string, NapackFile> files, NapackServerClient client)
+        {
+            NewNapack newNapack = new NewNapack()
+            {
+                Description = napackDescriptor.Description,
+                MoreInformation = napackDescriptor.MoreInformation,
+                AuthorizedUserIds = napackDescriptor.AuthorizedUserIds,
+                Tags = napackDescriptor.Tags,
+                NewNapackVersion = this.CreateNapackVersion(napackDescriptor, files)
+            };
+
+            string response = client.CreatePackageAsync(packageName, newNapack).GetAwaiter().GetResult();
+            Console.WriteLine($"Package creation result: {response}");
+        }
+
+        private NewNapackVersion CreateNapackVersion(NapackLocalDescriptor napackDescriptor, Dictionary<string, NapackFile> files)
+        {
+            return new NewNapackVersion()
+            {
+                Files = files,
+                Dependencies = napackDescriptor.Dependencies.Select(dependency => new NapackMajorVersion(dependency.Key, dependency.Value)).ToList(),
+                Authors = napackDescriptor.Authors,
+                ForceMajorUpversioning = this.ForceMajorUpversioning,
+                ForceMinorUpversioning = this.ForceMinorUpversioning,
+                License = new Napack.Common.License()
+                {
+                    LicenseText = napackDescriptor.License.LicenseText,
+                    LicenseType = napackDescriptor.License.Type
+                }
+            };
+        }
+
+        private static Dictionary<string, NapackFile> ParseNapackFiles(string directory)
+        {
+            Dictionary<string, NapackFile> filesFound = new Dictionary<string, NapackFile>();
+            foreach (string subdirectory in Directory.GetDirectories(directory))
+            {
+                foreach(KeyValuePair<string, NapackFile> file in UploadOperation.ParseNapackFiles(subdirectory))
+                {
+                    filesFound.Add(file.Key, file.Value);
+                }
+            }
+
+            // Read all the files in a directory level asynchronously.
+            Dictionary<string, Task<string>> fileReadTasks = new Dictionary<string, Task<string>>();
+            foreach (string file in Directory.GetFiles(directory))
+            {
+                fileReadTasks.Add(file, Task.Run(() => File.ReadAllText(file)));
+            }
+
+            Task.WhenAll(fileReadTasks.Select(kvp => kvp.Value)).GetAwaiter().GetResult();
+
+            foreach (KeyValuePair<string, string> pathAndContents in fileReadTasks.ToDictionary(task => task.Key, task => task.Value.Result))
+            {
+                // If the file starts with '// MSBuildType = TYPE', use TYPE instead. TODO this is kinda hacky and should be improved.
+                string contentType = NapackFile.ContentType;
+                if (pathAndContents.Value.StartsWith(NapackFile.BuildTypeHeader))
+                {
+                    int firstNewline = pathAndContents.Value.IndexOf("\n");
+                    contentType = pathAndContents.Value.Substring(NapackFile.BuildTypeHeader.Length, firstNewline - NapackFile.BuildTypeHeader.Length);
+                }
+
+                filesFound.Add(pathAndContents.Key, new NapackFile()
+                {
+                    MsbuildType = contentType,
+                    Contents = pathAndContents.Value
+                });
+            }
+
+            return filesFound;
         }
     }
 }

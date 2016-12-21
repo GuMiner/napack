@@ -36,5 +36,21 @@ namespace Napack.Client.Common
         /// <param name="userEmail">The email to register.</param>
         /// <returns>The secrets that have been assigned to the user.</returns>
         Task<UserSecret> RegisterUserAsync(string userEmail);
+
+        /// <summary>
+        /// Creates a new Napack package.
+        /// </summary>
+        /// <param name="packageName">The name of the package to create.</param>
+        /// <param name="newNapack">The new napack to create.</param>
+        /// <returns>The operational results (success).</returns>
+        Task<string> CreatePackageAsync(string packageName, NewNapack newNapack);
+
+        /// <summary>
+        /// Updates an existing Napack package.
+        /// </summary>
+        /// <param name="packageName">The name of the package to update.</param>
+        /// <param name="newNapackVersion">The package data from which to use to create a new napack.</param>
+        /// <returns>The new Napack version created.</returns>
+        Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion);
     }
 }

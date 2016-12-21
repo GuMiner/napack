@@ -141,7 +141,7 @@ namespace Napack.Server.Modules
 
                 return this.Response.AsJson(new
                 {
-                    Message = "Update package " + packageName,
+                    Message = "Updated package " + packageName,
                     Major = majorVersion,
                     Minor = minorVersion,
                     Patch = patchVersion

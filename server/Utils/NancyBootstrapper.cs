@@ -18,7 +18,6 @@ namespace Napack.Server
             {
                 // 400 -- Bad Request
                 [typeof(InvalidNapackException)] = HttpStatusCode.BadRequest,
-                [typeof(DuplicateNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNapackVersionException)] = HttpStatusCode.BadRequest,
                 [typeof(ExcessiveNapackException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNapackNameException)] = HttpStatusCode.BadRequest,
@@ -35,6 +34,7 @@ namespace Napack.Server
                 [typeof(NapackVersionNotFoundException)] = HttpStatusCode.NotFound,
 
                 // 409 -- Conflict
+                [typeof(DuplicateNapackException)] = HttpStatusCode.Conflict,
                 [typeof(ExistingUserException)] = HttpStatusCode.Conflict,
 
                 // 410 -- Gone

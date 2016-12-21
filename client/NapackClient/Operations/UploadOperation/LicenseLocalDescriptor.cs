@@ -2,11 +2,11 @@
 
 namespace Napack.Client
 {
-    internal class LicenseLocalDescriptor
+    public class LicenseLocalDescriptor
     {
-        LicenseManagement.LicenseType Type { get; set; }
+        public LicenseManagement.LicenseType Type { get; set; }
         
-        string LicenseText { get; set; }
+        public string LicenseText { get; set; }
 
         public void Validate()
         {
