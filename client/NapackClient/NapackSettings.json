@@ -1,0 +1,11 @@
+{
+  "napackFrameworkServer": "https://napack.net",
+  "allowCommercial": false,
+  "allowCopyLeft": false,
+  "allowCustomLicenses": false,
+  "autoUpdatePatch": true,
+  "autoUpdateMinor": true,
+  "warnMajorUpdates": false,
+  "lastUpdateTime": "2016-12-21T01:14:03.8053187Z",
+  "autoUpdateInterval":  "0.01:00:00"
+}
