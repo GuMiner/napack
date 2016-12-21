@@ -9,7 +9,8 @@ namespace Napack.Client
         private static readonly IEnumerable<Type> KnownOperations = new List<Type>
         {
             typeof(UpdateOperation),
-            typeof(UploadOperation)
+            typeof(UploadOperation),
+            typeof(RegisterOperation)
         };
 
         public static INapackOperation FindOperation(string[] args)
@@ -34,11 +35,14 @@ namespace Napack.Client
 
         public static void WriteGeneralUsageToConsole()
         {
+            const string separator = "******";
             Console.WriteLine("Operations: ");
             foreach (Type operationType in NapackOperationFinder.KnownOperations)
             {
+                Console.WriteLine(separator + operationType.Name + separator);
                 CommandLineParser parser = new CommandLineParser(operationType);
                 parser.WriteUsageToConsole();
+                Console.WriteLine(separator + new string('*', operationType.Name.Length) + separator);
             }
         }
     }

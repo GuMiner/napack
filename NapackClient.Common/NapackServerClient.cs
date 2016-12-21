@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Napack.Common;
 
@@ -8,6 +9,7 @@ namespace Napack.Client.Common
 {
     public class NapackServerClient : INapackServerClient, IDisposable
     {
+        private const string JsonMediaType = "application/json";
         private HttpClient client;
 
         public NapackServerClient(Uri napackFrameworkServer)
@@ -38,6 +40,41 @@ namespace Napack.Client.Common
             string responseContent = await this.GetWithCommonExceptionHandlingAsync("/napackDownload/" + napackVersionDefinition.GetFullName(),
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);
             return DeserializeNapack(responseContent);
+        }
+
+        public async Task<UserSecret> RegisterUserAsync(string userEmail)
+        {
+            string serializedEmail = Serializer.Serialize(new
+            {
+                Email = userEmail
+            });
+
+            using (StringContent content = new StringContent(serializedEmail, Encoding.UTF8, NapackServerClient.JsonMediaType))
+            {
+                HttpResponseMessage response = null;
+                string responseContent = null;
+                try
+                {
+                    response = await client.PostAsync("/users", content);
+                    responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
+                }
+                catch (Exception ex)
+                {
+                    throw new NapackFrameworkServerUnavailable(ex.Message);
+                }
+
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    throw new ExistingUserException(userEmail);
+                }
+                else if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
+                }
+
+                response?.Dispose();
+                return Serializer.Deserialize<UserSecret>(responseContent);
+            }
         }
 
         /// <summary>

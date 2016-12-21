@@ -121,7 +121,7 @@
     <Compile Include="Definitions\UserSecret.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="INapackStorageManager.cs" />
-    <Compile Include="Modules\UserIdentifierModule.cs" />
+    <Compile Include="Modules\UsersModule.cs" />
     <Compile Include="Modules\NapackDownloadModule.cs" />
     <Compile Include="Modules\NapackModule.cs" />
     <Compile Include="InMemoryNapackStorageManager.cs" />

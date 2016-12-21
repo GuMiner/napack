@@ -29,5 +29,12 @@ namespace Napack.Client.Common
         /// <exception cref="NapackVersionNotFoundException">If the specified Napack version was not found.</exception>
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
         Task<NapackVersion> GetMostRecentMajorVersionAsync(NapackMajorVersion partialNapackVersionDefinition);
+
+        /// <summary>
+        /// Registers a user with the Napack Framework System.
+        /// </summary>
+        /// <param name="userEmail">The email to register.</param>
+        /// <returns>The secrets that have been assigned to the user.</returns>
+        Task<UserSecret> RegisterUserAsync(string userEmail);
     }
 }
