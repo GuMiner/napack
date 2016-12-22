@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Napack.Server;
 
 namespace NapackSystemTests
 {
@@ -8,9 +10,14 @@ namespace NapackSystemTests
     public class ServerValidationTests
     {
         [TestMethod]
-        public void UserRegistrationRejectsNullEmail()
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task UserRegistrationRejectsNullEmailAsync()
         {
             string content = "{\"email\":null}";
+            await SystemSetup.RestClient.PostAsync<string, string>("/users", content, new Dictionary<HttpStatusCode, System.Exception>
+            {
+                [HttpStatusCode.BadRequest] = new ArgumentException("Expected")
+            });
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Nancy;
 using Napack.Common;
-using Nancy.ModelBinding;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
+using Napack.Server.Utils;
 
 namespace Napack.Server.Modules
 {
@@ -79,10 +79,10 @@ namespace Napack.Server.Modules
                 }
 
                 // Validate user, name and API.
-                NewNapack newNapack = this.Bind<NewNapack>();
+                NewNapack newNapack = SerializerExtensions.Deserialize<NewNapack>(this.Context);
                 newNapack.Validate();
 
-                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, newNapack.AuthorizedUserIds);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, newNapack.AuthorizedUserIds);
                 NapackNameValidator.Validate(packageName);
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
                 NapackModule.ValidateDependentPackages(napackManager, newNapack.NewNapackVersion);
@@ -99,12 +99,12 @@ namespace Napack.Server.Modules
             // Updates an existing Napack package.
             Patch["/{packageName}"] = parameters =>
             {
-                NewNapackVersion newNapackVersion = this.Bind<NewNapackVersion>();
+                NewNapackVersion newNapackVersion = SerializerExtensions.Deserialize<NewNapackVersion>(this.Context);
                 newNapackVersion.Validate();
 
                 string packageName = parameters.packageName;
                 NapackMetadata package = napackManager.GetPackageMetadata(packageName);
-                UserIdentifier.Validate(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, package.AuthorizedUserIds);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, package.AuthorizedUserIds);
                 
                 // Validate and create a spec for this new version.
                 NapackSpec newVersionSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapackVersion.Files);

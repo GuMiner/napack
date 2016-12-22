@@ -131,6 +131,7 @@
     <Compile Include="Modules\IndexModule.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\SerializerExtensions.cs" />
     <Compile Include="Utils\Startup.cs" />
   </ItemGroup>
   <ItemGroup>

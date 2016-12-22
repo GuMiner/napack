@@ -45,7 +45,7 @@ namespace Napack.Server
             }
         }
 
-        internal static void Validate(Dictionary<string, IEnumerable<string>> headers, INapackStorageManager storageManager, List<string> authorizedUserIds)
+        public static void VerifyAuthorization(Dictionary<string, IEnumerable<string>> headers, INapackStorageManager storageManager, List<string> authorizedUserIds)
         {
             // Check that valid inputs were provided.
             if (!headers.ContainsKey(CommonHeaders.UserKeys) || !headers.ContainsKey(CommonHeaders.UserId))

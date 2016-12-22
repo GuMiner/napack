@@ -23,7 +23,7 @@ namespace Napack.Common
         public static T Deserialize<T>(string @object)
         {
             return JsonConvert.DeserializeObject<T>(@object);
-        }
+        }        
 
         public static string Serialize<T>(T @object)
         {

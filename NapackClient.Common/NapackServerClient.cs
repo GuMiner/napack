@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -7,23 +8,42 @@ using Napack.Common;
 
 namespace Napack.Client.Common
 {
-    public class NapackServerClient : INapackServerClient, IDisposable
+    public class NapackServerClient : RestClient, INapackServerClient
     {
-        private const string JsonMediaType = "application/json";
-        private HttpClient client;
-
         public NapackServerClient(Uri napackFrameworkServer)
+            : base(napackFrameworkServer)
+        { }
+
+
+        public Task<UserSecret> RegisterUserAsync(string userEmail)
         {
-            client = new HttpClient()
-            {
-                BaseAddress = napackFrameworkServer
-            };
+            return this.PostAsync<UserSecret, object>("/users", new
+                {
+                    Email = userEmail
+                },
+                new Dictionary<HttpStatusCode, Exception>
+                {
+                    [HttpStatusCode.Conflict] = new ExistingUserException(userEmail)
+                });
         }
 
-        public void Dispose()
+        public Task<string> CreatePackageAsync(string packageName, NewNapack newNapack)
         {
-            client?.Dispose();
-            client = null;
+            return this.PostAsync<string, NewNapack>("/napacks", newNapack,
+                new Dictionary<HttpStatusCode, Exception>
+                {
+                    [HttpStatusCode.Conflict] = new DuplicateNapackException(),
+                    [HttpStatusCode.BadRequest] = new InvalidNapackException("The napack contents were invalid!")
+                });
+        }
+
+        public Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion)
+        {
+            return this.PatchAsync<VersionDescriptor, NewNapackVersion>("/napacks" + packageName, newNapackVersion,
+                new Dictionary<HttpStatusCode, Exception>
+                {
+                    [HttpStatusCode.BadRequest] = new InvalidNapackException("The napack contents were invalid!")
+                });
         }
 
         /// <summary>
@@ -35,116 +55,10 @@ namespace Napack.Client.Common
         /// <exception cref="NapackRecalledException">If the Napack was found, but is no longer available for download.</exception>
         /// <exception cref="NapackVersionNotFoundException">If the specified Napack version was not found.</exception>
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
-        public async Task<NapackVersion> GetNapackVersionAsync(NapackVersionIdentifier napackVersionDefinition)
+        public Task<NapackVersion> GetNapackVersionAsync(NapackVersionIdentifier napackVersionDefinition)
         {
-            string responseContent = await this.GetWithCommonExceptionHandlingAsync("/napackDownload/" + napackVersionDefinition.GetFullName(),
+            return this.GetWithCommonExceptionHandlingAsync<NapackVersion>("/napackDownload/" + napackVersionDefinition.GetFullName(),
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);
-            return DeserializeNapack(responseContent);
-        }
-
-        public async Task<UserSecret> RegisterUserAsync(string userEmail)
-        {
-            string serializedEmail = Serializer.Serialize(new
-            {
-                Email = userEmail
-            });
-
-            using (StringContent content = new StringContent(serializedEmail, Encoding.UTF8, NapackServerClient.JsonMediaType))
-            {
-                HttpResponseMessage response = null;
-                string responseContent = null;
-                try
-                {
-                    response = await client.PostAsync("/users", content);
-                    responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
-                }
-                catch (Exception ex)
-                {
-                    throw new NapackFrameworkServerUnavailable(ex.Message);
-                }
-
-                if (response.StatusCode == HttpStatusCode.Conflict)
-                {
-                    throw new ExistingUserException(userEmail);
-                }
-                else if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
-                }
-
-                response?.Dispose();
-                return Serializer.Deserialize<UserSecret>(responseContent);
-            }
-        }
-
-        public async Task<string> CreatePackageAsync(string packageName, NewNapack newNapack)
-        {
-            using (StringContent content = new StringContent(Serializer.Serialize(newNapack), Encoding.UTF8, NapackServerClient.JsonMediaType))
-            {
-                HttpResponseMessage response = null;
-                string responseContent = null;
-                try
-                {
-                    response = await client.PostAsync("/napacks/" + packageName, content);
-                    responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
-                }
-                catch (Exception ex)
-                {
-                    throw new NapackFrameworkServerUnavailable(ex.Message);
-                }
-
-                if (response.StatusCode == HttpStatusCode.Conflict)
-                {
-                    throw new DuplicateNapackException();
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    throw new InvalidNapackException("The napack contents were invalid: " + responseContent);
-                }
-                else if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
-                }
-
-                response?.Dispose();
-                return responseContent;
-            }
-        }
-
-        public async Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion)
-        {
-            using (StringContent content = new StringContent(Serializer.Serialize(newNapackVersion), Encoding.UTF8, NapackServerClient.JsonMediaType))
-            {
-                using (HttpRequestMessage requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), "/napacks/" + packageName)
-                {
-                    Content = content
-                })
-                {
-                    HttpResponseMessage response = null;
-                    string responseContent = null;
-                    try
-                    {
-                        response = await client.SendAsync(requestMessage);
-                        responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new NapackFrameworkServerUnavailable(ex.Message);
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        throw new InvalidNapackException("The napack contents were invalid: " + responseContent);
-                    }
-                    else if (response.StatusCode != HttpStatusCode.OK)
-                    {
-                        throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
-                    }
-
-                    response?.Dispose();
-                    return Serializer.Deserialize<VersionDescriptor>(responseContent);
-                }
-            }
         }
 
         /// <summary>
@@ -156,60 +70,20 @@ namespace Napack.Client.Common
         /// <exception cref="NapackRecalledException">If the Napack was found, but is no longer available for download.</exception>
         /// <exception cref="NapackVersionNotFoundException">If the specified Napack version was not found.</exception>
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
-        public async Task<NapackVersion> GetMostRecentMajorVersionAsync(NapackMajorVersion partialNapackVersionDefinition)
+        public Task<NapackVersion> GetMostRecentMajorVersionAsync(NapackMajorVersion partialNapackVersionDefinition)
         {
-            string responseContent = await this.GetWithCommonExceptionHandlingAsync("/dependency/" + partialNapackVersionDefinition.Name + "." + partialNapackVersionDefinition.Major,
+            return this.GetWithCommonExceptionHandlingAsync<NapackVersion>("/dependency/" + partialNapackVersionDefinition.Name + "." + partialNapackVersionDefinition.Major,
                 partialNapackVersionDefinition.Name, partialNapackVersionDefinition.Major);
-            return DeserializeNapack(responseContent);
         }
 
-        private async Task<string> GetWithCommonExceptionHandlingAsync(string uriSuffix, string napackName, int major, int? minor = null, int? patch = null)
+        private Task<T> GetWithCommonExceptionHandlingAsync<T>(string uriSuffix, string napackName, int major, int? minor = null, int? patch = null)
+            where T: class
         {
-            HttpResponseMessage response = null;
-            string responseContent = null;
-            try
+            return this.GetAsync<T>(uriSuffix, new Dictionary<HttpStatusCode, Exception>
             {
-                response = await client.GetAsync(uriSuffix);
-                responseContent = response.Content != null ? await response.Content.ReadAsStringAsync() : null;
-            }
-            catch (Exception ex)
-            {
-                throw new NapackFrameworkServerUnavailable(ex.Message);
-            }
-
-            if (response.StatusCode == HttpStatusCode.Gone)
-            {
-                throw new NapackRecalledException(napackName, major);
-            }
-            else if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                throw new NapackVersionNotFoundException(major, minor, patch);
-            }
-            else if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new NapackFrameworkServerUnavailable("Did not understand the response code from the server: " + response.StatusCode + ": " + responseContent);
-            }
-
-            response?.Dispose();
-            return responseContent;
-        }
-
-        private NapackVersion DeserializeNapack(string responseContent)
-        {
-            try
-            {
-                NapackVersion napack = Serializer.Deserialize<NapackVersion>(responseContent);
-                if (napack == null)
-                {
-                    throw new InvalidNapackException();
-                }
-
-                return napack;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidNapackException(ex.Message);
-            }
+                [HttpStatusCode.Gone] = new NapackRecalledException(napackName, major),
+                [HttpStatusCode.NotFound] = new NapackVersionNotFoundException(major, minor, patch)
+            });
         }
     }
 }

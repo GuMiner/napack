@@ -80,6 +80,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\common\NapackCommon\NapackCommon.csproj">
+      <Project>{7B703C18-18CD-4849-B486-4583C30C4D67}</Project>
+      <Name>NapackCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\server\NapackServer.csproj">
       <Project>{7AD6DDEF-65DC-42A4-A2B9-2B7BAEBC3191}</Project>
       <Name>NapackServer</Name>

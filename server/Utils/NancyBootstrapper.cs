@@ -8,6 +8,7 @@ using Nancy.Responses;
 using Nancy.Security;
 using Nancy.TinyIoc;
 using Napack.Common;
+using Newtonsoft.Json;
 
 namespace Napack.Server
 {
@@ -25,6 +26,7 @@ namespace Napack.Server
                 [typeof(InvalidNapackFileExtensionException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNamespaceException)] = HttpStatusCode.BadRequest,
                 [typeof(UnsupportedNapackFileException)] = HttpStatusCode.BadRequest,
+                [typeof(JsonSerializationException)] = HttpStatusCode.BadRequest,
 
                 // 401 -- Unauthorized
                 [typeof(UnauthorizedUserException)] = HttpStatusCode.Unauthorized,
@@ -83,7 +85,10 @@ namespace Napack.Server
                 Exception parsedException = exception as Exception;
                 if (parsedException != null)
                 {
-                    exceptionStatusCodeMapping.TryGetValue(parsedException.GetType(), out code);
+                    if (!exceptionStatusCodeMapping.TryGetValue(parsedException.GetType(), out code))
+                    {
+                        code = HttpStatusCode.InternalServerError;
+                    }
                 }
                 else
                 {
@@ -100,6 +105,7 @@ namespace Napack.Server
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
             base.ConfigureRequestContainer(container, context);
+            
             container.Register<INapackStorageManager, InMemoryNapackStorageManager>();
         }
 

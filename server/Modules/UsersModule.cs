@@ -1,5 +1,5 @@
 ﻿using Nancy;
-using Nancy.ModelBinding;
+using Napack.Server.Utils;
 
 namespace Napack.Server
 {
@@ -14,7 +14,7 @@ namespace Napack.Server
             // Generates a random series of user identifiers, returning them to the user.
             Post["/"] = parameters =>
             {
-                UserIdentifier user = this.Bind<UserIdentifier>();
+                UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
                 UserSecret secret = UserSecret.CreateNewSecret();
                 user.Hash = UserIdentifier.ComputeUserHash(secret.Secrets);
 
