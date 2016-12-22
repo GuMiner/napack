@@ -72,7 +72,7 @@
     </Content>
     <Compile Include="ServerValidationTests.cs" />
     <Compile Include="SystemSetup.cs" />
-    <Compile Include="NapackCreationTests.cs" />
+    <Compile Include="NapackOperationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="PackageValidation.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -80,6 +80,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\client\NapackClient\NapackClient.csproj">
+      <Project>{3a5273d0-2bf4-481e-b0ed-81d93322d5cc}</Project>
+      <Name>NapackClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\common\NapackCommon\NapackCommon.csproj">
       <Project>{7B703C18-18CD-4849-B486-4583C30C4D67}</Project>
       <Name>NapackCommon</Name>

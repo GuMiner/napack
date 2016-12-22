@@ -22,7 +22,11 @@ namespace Napack.Server
                 napackManager.AddUser(user);
 
                 Global.Log("Assigned user " + user.Email + " a hash and secrets.");
-                return this.Response.AsJson(new { UserId = user.Email, Secret = secret });
+                return this.Response.AsJson(new Common.UserSecret()
+                {
+                    UserId = user.Email,
+                    Secrets = secret.Secrets
+                });
             };
         }
     }

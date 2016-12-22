@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("NapackClient")]
@@ -12,3 +13,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: Guid("3a5273d0-2bf4-481e-b0ed-81d93322d5cc")]
 [assembly: AssemblyVersion("0.1.0")]
+[assembly: InternalsVisibleTo("NapackSystemTests")]

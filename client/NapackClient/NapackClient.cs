@@ -3,10 +3,10 @@ using Napack.Common;
 
 namespace Napack.Client
 {
-    class NapackClient
+    public class NapackClient
     {
-        private const int ERROR = 1;
-        private const int SUCCESS = 0;
+        public const int ERROR = 1;
+        public const int SUCCESS = 0;
 
         public static int Main(string[] args)
         {
