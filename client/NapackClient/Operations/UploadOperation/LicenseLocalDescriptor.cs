@@ -1,11 +1,14 @@
 ﻿using Napack.Common;
+using Newtonsoft.Json;
 
 namespace Napack.Client
 {
     public class LicenseLocalDescriptor
     {
+        [JsonProperty(Required = Required.Always)]
         public LicenseManagement.LicenseType Type { get; set; }
-        
+
+        [JsonProperty(Required = Required.AllowNull)]
         public string LicenseText { get; set; }
 
         public void Validate()

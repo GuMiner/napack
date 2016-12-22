@@ -7,7 +7,7 @@ namespace NapackSystemTests
     public class NapackCreationTests
     {
         [TestMethod]
-        public void TODO()
+        public void NapackServer()
         {
         }
     }

@@ -1,0 +1,8 @@
+﻿{
+  "prohibitedExtensions": {
+  "executable": [ "exe", "dll", "obj", "com", "bat" ],
+  "compression": [ "zip", "lz", "tar", "7z", "gz" ],
+  "image": [ "png", "gif", "jpeg", "jpg", "bmp", "tga", "ico" ],
+  "document": [ "pdf", "doc", "docx", "xls", "xlsx" ]
+  }
+}

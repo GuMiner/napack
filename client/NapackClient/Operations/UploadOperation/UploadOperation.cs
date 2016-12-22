@@ -45,11 +45,12 @@ namespace Napack.Client
 
         public void PerformOperation()
         {
+            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
+
             string packageName = Path.GetFileNameWithoutExtension(this.PackageJsonFile);
             NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageJsonFile));
-            napackDescriptor.Validate();
+            napackDescriptor.Validate(settings.DefaultUserId);
 
-            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
                 bool packageExists = false;

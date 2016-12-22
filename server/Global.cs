@@ -20,6 +20,11 @@ namespace Napack.Server
         public static Action<string> Log => (input) => Console.WriteLine(input);
 
         /// <summary>
+        /// Returns true once initialization has completed, false otherwise.
+        /// </summary>
+        public static bool Initialized { get; private set; } = false;
+
+        /// <summary>
         /// Event we wait on to not shutdown the system.
         /// </summary>
         public static ManualResetEvent ShutdownEvent { get; private set; }
@@ -56,6 +61,7 @@ namespace Napack.Server
                 Log("Starting web server...");
                 using (WebApp.Start<Startup>(args[0]))
                 {
+                    Global.Initialized = true;
                     Global.ShutdownEvent.WaitOne();
                     Global.Log("Napack Server Shutdown.");
                 }

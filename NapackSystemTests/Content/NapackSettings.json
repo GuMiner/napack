@@ -1,5 +1,5 @@
 {
-  "napackFrameworkServer": "https://napack.net",
+  "napackFrameworkServer": "http://localhost:9876",
   "allowCommercial": false,
   "allowCopyLeft": false,
   "allowCustomLicenses": false,

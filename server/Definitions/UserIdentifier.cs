@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using Napack.Common;
+using Newtonsoft.Json;
 
 namespace Napack.Server
 {
@@ -11,11 +12,13 @@ namespace Napack.Server
         /// <summary>
         /// The email the user has provided; used as the user's ID.
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public string Email { get; set; }
         
         /// <summary>
         /// THe computed hash used to authenticate the user.
         /// </summary>
+        [JsonProperty(Required = Required.Default)]
         public string Hash { get; set; }
 
         /// <summary>

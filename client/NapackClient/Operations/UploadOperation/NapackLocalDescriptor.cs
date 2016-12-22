@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Napack.Common;
+using Newtonsoft.Json;
 
 namespace Napack.Client
 {
@@ -10,18 +11,22 @@ namespace Napack.Client
     /// </summary>
     internal class NapackLocalDescriptor
     {
-        public string Name { get; set; }
-
+        [JsonProperty(Required = Required.Always)]
         public string Description { get; set; }
 
+        [JsonProperty(Required = Required.Always)]
         public Uri MoreInformation { get; set; }
 
+        [JsonProperty(Required = Required.Always)]
         public List<string> Tags { get; set; }
 
+        [JsonProperty(Required = Required.Always)]
         public List<string> AuthorizedUserIds { get; set; }
 
+        [JsonProperty(Required = Required.Always)]
         public List<string> Authors { get; set; }
 
+        [JsonProperty(Required = Required.Always)]
         public LicenseLocalDescriptor License { get; set; }
 
         /// <summary>
@@ -30,21 +35,26 @@ namespace Napack.Client
         /// </summary>
         public Dictionary<string, int> Dependencies { get; set; }
 
-        public void Validate()
+        public void Validate(string defaultUserId)
         {
-            if (string.IsNullOrWhiteSpace(this.Name) || string.IsNullOrWhiteSpace(this.Description))
+            if (string.IsNullOrWhiteSpace(this.Description))
             {
-                throw new InvalidNapackException("The name and description fields must be populated.");
+                throw new InvalidNapackException("The description field must be populated.");
             }
 
-            if (this.MoreInformation == null || this.Authors == null)
+            if (!this.Tags.Any(tag => !string.IsNullOrWhiteSpace(tag)))
             {
-                throw new InvalidNapackException("The more information URI and authors list must be present, even if one or both are not populated.");
+                throw new InvalidNapackException("The tags must contain at least one populated value.");
             }
 
-            if (!this.Tags.Any(tag => !string.IsNullOrWhiteSpace(tag)) || !this.AuthorizedUserIds.Any(user => !string.IsNullOrWhiteSpace(user)))
+            if (!this.AuthorizedUserIds.Any() && string.IsNullOrWhiteSpace(defaultUserId))
             {
-                throw new InvalidNapackException("The tags and authorized user hashes fields must both contain at least one populated value.");
+                throw new InvalidOperationException("Cannot upload a Napack without authorized users when the default user is not specified in the settings file.");
+            }
+            else if (!this.AuthorizedUserIds.Any())
+            {
+                // If no authorized users were provided, we add the current user as an authorized user.
+                this.AuthorizedUserIds.Add(defaultUserId);
             }
 
             this.License.Validate();

@@ -87,6 +87,7 @@ namespace Napack.Server.Modules
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
                 NapackModule.ValidateDependentPackages(napackManager, newNapack.NewNapackVersion);
 
+                newNapack.NewNapackVersion.UpdateNamespaceOfFiles(packageName, 1);
                 napackManager.SaveNewNapack(packageName, newNapack, generatedApiSpec);
 
                 return this.Response.AsJson(new
@@ -136,7 +137,8 @@ namespace Napack.Server.Modules
                 {
                     upversionType = NapackAnalyst.UpversionType.Minor;
                 }
-                
+
+                newNapackVersion.UpdateNamespaceOfFiles(packageName, majorVersion);
                 napackManager.SaveNewNapackVersion(package, new NapackVersionIdentifier(packageName, majorVersion, minorVersion, patchVersion), upversionType, newNapackVersion, newVersionSpec);
 
                 return this.Response.AsJson(new

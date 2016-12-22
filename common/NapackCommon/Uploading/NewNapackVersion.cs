@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Napack.Common
 {
@@ -54,6 +56,17 @@ namespace Napack.Common
             if (this.License == null)
             {
                 throw new InvalidNapackException("The license must be specified");
+            }
+        }
+            
+        public void UpdateNamespaceOfFiles(string napackName, int majorVersion)
+        {
+            string regex = $"namespace\\s+{napackName}";
+            string replacement = $"namespace {napackName}.{majorVersion}";
+            foreach (NapackFile file in this.Files.Values)
+            {
+                file.Contents = Regex.Replace(file.Contents, regex, replacement, 
+                    RegexOptions.Singleline | RegexOptions.Compiled);
             }
         }
     }
