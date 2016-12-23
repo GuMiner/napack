@@ -74,6 +74,10 @@ namespace Napack.Client
 
         private async Task CreateOrUpdateNapackAsync(string packageName, NapackLocalDescriptor napackDescriptor, UserSecret userSecret, NapackServerClient client)
         {
+            string rootDirectory = Path.GetFullPath(Path.GetDirectoryName(this.PackageJsonFile));
+            Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(rootDirectory, rootDirectory);
+            files.Remove(Path.GetFileName(this.PackageJsonFile));
+
             bool packageExists = await client.ContainsNapack(packageName).ConfigureAwait(false);
             if (!packageExists && this.UpdateMetadata)
             {
@@ -81,7 +85,6 @@ namespace Napack.Client
             }
             else if (!packageExists)
             {
-                Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
                 await this.CreateNapackPackageAsync(packageName, napackDescriptor, files, userSecret, client).ConfigureAwait(false);
             }
             else if (this.UpdateMetadata)
@@ -91,7 +94,6 @@ namespace Napack.Client
             else
             {
                 // This is a new version creation operation.
-                Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
                 VersionDescriptor version = await client.UpdatePackageAsync(packageName, this.CreateNapackVersion(napackDescriptor, files), userSecret).ConfigureAwait(false);
                 Console.WriteLine($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
             }
@@ -129,12 +131,12 @@ namespace Napack.Client
             };
         }
 
-        private static Dictionary<string, NapackFile> ParseNapackFiles(string directory)
+        private static Dictionary<string, NapackFile> ParseNapackFiles(string rootDirectory, string directory)
         {
             Dictionary<string, NapackFile> filesFound = new Dictionary<string, NapackFile>();
             foreach (string subdirectory in Directory.GetDirectories(directory))
             {
-                foreach(KeyValuePair<string, NapackFile> file in UploadOperation.ParseNapackFiles(subdirectory))
+                foreach(KeyValuePair<string, NapackFile> file in UploadOperation.ParseNapackFiles(rootDirectory, subdirectory))
                 {
                     filesFound.Add(file.Key, file.Value);
                 }
@@ -144,7 +146,7 @@ namespace Napack.Client
             Dictionary<string, Task<string>> fileReadTasks = new Dictionary<string, Task<string>>();
             foreach (string file in Directory.GetFiles(directory))
             {
-                fileReadTasks.Add(file, Task.Run(() => File.ReadAllText(file)));
+                fileReadTasks.Add(UploadOperation.GetRelativePath(rootDirectory, file), Task.Run(() => File.ReadAllText(file)));
             }
 
             Task.WhenAll(fileReadTasks.Select(kvp => kvp.Value)).GetAwaiter().GetResult();
@@ -167,6 +169,17 @@ namespace Napack.Client
             }
 
             return filesFound;
+        }
+
+        private static string GetRelativePath(string rootDirectory, string file)
+        {
+            Uri filePathUri = new Uri(file);
+            if (!rootDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                rootDirectory += Path.DirectorySeparatorChar;
+            }
+
+            return Uri.UnescapeDataString(new Uri(rootDirectory).MakeRelativeUri(filePathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
     }
 }
