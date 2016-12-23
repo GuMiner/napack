@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Napack.Common;
 
@@ -27,9 +25,9 @@ namespace Napack.Client.Common
                 });
         }
 
-        public Task<string> CreatePackageAsync(string packageName, NewNapack newNapack)
+        public Task<string> CreatePackageAsync(string packageName, NewNapack newNapack, UserSecret userSecret)
         {
-            return this.PostAsync<string, NewNapack>("/napacks", newNapack,
+            return this.PostAsync<string, NewNapack>("/napacks/" + packageName, newNapack, userSecret,
                 new Dictionary<HttpStatusCode, Exception>
                 {
                     [HttpStatusCode.Conflict] = new DuplicateNapackException(),
@@ -37,9 +35,9 @@ namespace Napack.Client.Common
                 });
         }
 
-        public Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion)
+        public Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion, UserSecret userSecret)
         {
-            return this.PatchAsync<VersionDescriptor, NewNapackVersion>("/napacks" + packageName, newNapackVersion,
+            return this.PatchAsync<VersionDescriptor, NewNapackVersion>("/napacks/" + packageName, newNapackVersion, userSecret,
                 new Dictionary<HttpStatusCode, Exception>
                 {
                     [HttpStatusCode.BadRequest] = new InvalidNapackException("The napack contents were invalid!")
@@ -59,6 +57,25 @@ namespace Napack.Client.Common
         {
             return this.GetWithCommonExceptionHandlingAsync<NapackVersion>("/napackDownload/" + napackVersionDefinition.GetFullName(),
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);
+        }
+
+        /// <summary>
+        /// Returns true if the specified Napack exists, false otherwise.
+        /// </summary>
+        public async Task<bool> ContainsNapack(string packageName)
+        {
+            try
+            {
+                await this.GetAsync<string>("/napacks/" + packageName, new Dictionary<HttpStatusCode, Exception>
+                {
+                    [HttpStatusCode.NotFound] = new NapackNotFoundException(packageName)
+                }).ConfigureAwait(false);
+                return true;
+            }
+            catch (NapackNotFoundException)
+            {
+                return false;
+            }
         }
 
         /// <summary>

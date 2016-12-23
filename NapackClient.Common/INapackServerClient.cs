@@ -31,6 +31,11 @@ namespace Napack.Client.Common
         Task<NapackVersion> GetMostRecentMajorVersionAsync(NapackMajorVersion partialNapackVersionDefinition);
 
         /// <summary>
+        /// Returns true if the specified Napack exists, false otherwise.
+        /// </summary>
+        Task<bool> ContainsNapack(string packageName);
+
+        /// <summary>
         /// Registers a user with the Napack Framework System.
         /// </summary>
         /// <param name="userEmail">The email to register.</param>
@@ -43,7 +48,7 @@ namespace Napack.Client.Common
         /// <param name="packageName">The name of the package to create.</param>
         /// <param name="newNapack">The new napack to create.</param>
         /// <returns>The operational results (success).</returns>
-        Task<string> CreatePackageAsync(string packageName, NewNapack newNapack);
+        Task<string> CreatePackageAsync(string packageName, NewNapack newNapack, UserSecret secret);
 
         /// <summary>
         /// Updates an existing Napack package.
@@ -51,6 +56,6 @@ namespace Napack.Client.Common
         /// <param name="packageName">The name of the package to update.</param>
         /// <param name="newNapackVersion">The package data from which to use to create a new napack.</param>
         /// <returns>The new Napack version created.</returns>
-        Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion);
+        Task<VersionDescriptor> UpdatePackageAsync(string packageName, NewNapackVersion newNapackVersion, UserSecret secret);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using Napack.Common;
 using Newtonsoft.Json;
 
@@ -53,11 +54,12 @@ namespace Napack.Server
                 throw new UnauthorizedUserException();
             }
 
-            UserSecret secret;
+            List<Guid> userSecrets;
             string userId;
             try
             {
-                secret = Serializer.Deserialize<UserSecret>(string.Join(string.Empty, headers[CommonHeaders.UserKeys]));
+                userSecrets = Serializer.Deserialize<List<Guid>>(
+                    Encoding.UTF8.GetString(Convert.FromBase64String(string.Join(string.Empty, headers[CommonHeaders.UserKeys]))));
                 userId = string.Join(string.Empty, headers[CommonHeaders.UserId]);
             }
             catch (Exception)
@@ -73,7 +75,7 @@ namespace Napack.Server
 
             // Check that the user is who they say they are.
             UserIdentifier user = storageManager.GetUser(userId);
-            string hash = UserIdentifier.ComputeUserHash(secret.Secrets);
+            string hash = UserIdentifier.ComputeUserHash(userSecrets);
             if (!user.Hash.Equals(hash, StringComparison.InvariantCulture))
             {
                 throw new UnauthorizedUserException();

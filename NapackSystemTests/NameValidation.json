@@ -1,0 +1,11 @@
+﻿{
+  "nameValidationRegex": "[a-zA-Z0-9\\.-]*",
+  "nameLengthMinLimit": 8,
+  "nameLengthMaxLimit": 200,
+  "prohibitedSubstrings": [
+    "ZXJvdGlj",
+    "c2hpdA==",
+    "ZnVjaw==",
+    "cGVuaXM="
+  ]
+}

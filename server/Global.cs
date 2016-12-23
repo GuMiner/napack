@@ -55,9 +55,6 @@ namespace Napack.Server
                 Log("Analyst Setup...");
                 NapackAnalyst.Initialize();
 
-                Log("Name validator setup...");
-                NapackNameValidator.Initialize();
-
                 Log("Starting web server...");
                 using (WebApp.Start<Startup>(args[0]))
                 {

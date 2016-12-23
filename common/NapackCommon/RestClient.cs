@@ -38,6 +38,36 @@ namespace Napack.Common
             }
         }
 
+        public async Task<TResponse> PatchAsync<TResponse, TBody>(string uriSuffix, TBody body, UserSecret userSecret, Dictionary<HttpStatusCode, Exception> exceptionMap = null)
+            where TResponse : class
+        {
+            string serializedContent = typeof(TBody) == typeof(string) ? body as string : Serializer.Serialize(body);
+            using (StringContent content = new StringContent(serializedContent, Encoding.UTF8, RestClient.JsonMediaType))
+            {
+                content.Headers.Add(CommonHeaders.UserId, userSecret.UserId);
+                content.Headers.Add(CommonHeaders.UserKeys, Convert.ToBase64String(Encoding.UTF8.GetBytes(Serializer.Serialize(userSecret.Secrets))));
+                using (HttpRequestMessage requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), uriSuffix)
+                {
+                    Content = content
+                })
+                {
+                    return await this.SendWithExceptionHandlingAndSerialization<TResponse>(() => client.SendAsync(requestMessage), exceptionMap);
+                }
+            }
+        }
+
+        public async Task<TResponse> PostAsync<TResponse, TBody>(string uriSuffix, TBody body, UserSecret userSecret, Dictionary<HttpStatusCode, Exception> exceptionMap = null)
+            where TResponse : class
+        {
+            string serializedContent = typeof(TBody) == typeof(string) ? body as string : Serializer.Serialize(body);
+            using (StringContent content = new StringContent(serializedContent, Encoding.UTF8, RestClient.JsonMediaType))
+            {
+                content.Headers.Add(CommonHeaders.UserId, userSecret.UserId);
+                content.Headers.Add(CommonHeaders.UserKeys, Convert.ToBase64String(Encoding.UTF8.GetBytes(Serializer.Serialize(userSecret.Secrets))));
+                return await this.SendWithExceptionHandlingAndSerialization<TResponse>(() => client.PostAsync(uriSuffix, content), exceptionMap);
+            }
+        }
+
         public async Task<TResponse> PostAsync<TResponse, TBody>(string uriSuffix, TBody body, Dictionary<HttpStatusCode, Exception> exceptionMap = null)
             where TResponse: class
         {

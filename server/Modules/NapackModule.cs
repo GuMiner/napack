@@ -83,7 +83,6 @@ namespace Napack.Server.Modules
                 newNapack.Validate();
 
                 UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, newNapack.AuthorizedUserIds);
-                NapackNameValidator.Validate(packageName);
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
                 NapackModule.ValidateDependentPackages(napackManager, newNapack.NewNapackVersion);
 

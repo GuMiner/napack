@@ -43,11 +43,15 @@ namespace Napack.Analyst
         /// </summary>
         public static void Initialize()
         {
-            string configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PackageValidation.json");
-            Console.WriteLine(configFilePath);
+            string packageConfigFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PackageValidation.json");
+            string nameConfigFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "NameValidation.json");
+            Console.WriteLine(packageConfigFilePath);
 
-            NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(File.ReadAllText(configFilePath));
+            NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(File.ReadAllText(packageConfigFilePath));
+            NapackAnalyst.NameValidationConfig = Serializer.Deserialize<NameValidationConfig>(File.ReadAllText(nameConfigFilePath));
         }
+
+        public static NameValidationConfig NameValidationConfig { get; private set; }
 
         /// <summary>
         /// Creates a Napack spec for the defined napack files.
@@ -67,6 +71,8 @@ namespace Napack.Analyst
         /// <exception cref="UnsupportedNapackFileException">If a Napack file uses C# functionality or syntax that the Napack system explicitly prohibits.</exception>
         public static NapackSpec CreateNapackSpec(string napackName, IDictionary<string, NapackFile> napackFiles)
         {
+            NapackAnalyst.NameValidationConfig.Validate(napackName);
+
             NapackSpec spec = new NapackSpec();
             foreach (KeyValuePair<string, NapackFile> fileEntry in napackFiles)
             {

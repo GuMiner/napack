@@ -15,52 +15,56 @@ namespace Napack.Server
         /// <summary>
         /// The listing of author => authored package identifiers
         /// </summary>
-        private readonly Dictionary<string, List<NapackVersionIdentifier>> authorPackageStore;
+        private static readonly Dictionary<string, List<NapackVersionIdentifier>> authorPackageStore;
 
         /// <summary>
         /// The listing of user id => user.
         /// </summary>
-        private readonly Dictionary<string, UserIdentifier> users;
+        private static readonly Dictionary<string, UserIdentifier> users;
 
         /// <summary>
         /// The listing of user id => authorized napack name.
         /// </summary>
-        private readonly Dictionary<string, HashSet<string>> authorizedPackages;
+        private static readonly Dictionary<string, HashSet<string>> authorizedPackages;
 
         /// <summary>
         /// The listing of package major version => napacks on this server consuming said package.
         /// </summary>
-        private readonly Dictionary<string, List<NapackVersionIdentifier>> consumingPackages;
+        private static readonly Dictionary<string, List<NapackVersionIdentifier>> consumingPackages;
 
         /// <summary>
         /// The listing of package name => package metadata
         /// </summary>
-        private readonly Dictionary<string, NapackMetadata> packageMetadataStore;
+        private static readonly Dictionary<string, NapackMetadata> packageMetadataStore;
 
         /// <summary>
         /// The listing of package identifier => package
         /// </summary>
-        private readonly Dictionary<string, NapackVersion> packageStore;
+        private static readonly Dictionary<string, NapackVersion> packageStore;
 
         /// <summary>
         /// The listing of package identifier => package specification
         /// </summary>
-        private readonly Dictionary<string, NapackSpec> specStore;
+        private static readonly Dictionary<string, NapackSpec> specStore;
+
+        static InMemoryNapackStorageManager()
+        {
+            authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase); // Author names are case insensitive
+            users = new Dictionary<string, UserIdentifier>(StringComparer.InvariantCulture);
+            authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // User names are case sensitive.
+            consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCulture);
+            packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCulture);
+            packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCulture);
+            specStore = new Dictionary<string, NapackSpec>(StringComparer.InvariantCulture);
+        }
 
         public InMemoryNapackStorageManager()
         {
-            this.authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase); // Author names are case insensitive
-            this.users = new Dictionary<string, UserIdentifier>(StringComparer.InvariantCulture);
-            this.authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // User names are case sensitive.
-            this.consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCulture);
-            this.packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCulture);
-            this.packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCulture);
-            this.specStore = new Dictionary<string, NapackSpec>(StringComparer.InvariantCulture);
         }
 
         public bool ContainsNapack(string packageName)
         {
-            return this.packageStore.ContainsKey(packageName);
+            return packageStore.ContainsKey(packageName);
         }
 
         public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
@@ -70,47 +74,47 @@ namespace Napack.Server
         
         public void AddUser(UserIdentifier user)
         {
-            if (this.users.ContainsKey(user.Email))
+            if (users.ContainsKey(user.Email))
             {
                 throw new ExistingUserException(user.Email);
             }
 
-            this.users.Add(user.Email, user);
+            users.Add(user.Email, user);
         }
 
         public UserIdentifier GetUser(string userId)
         {
-            return this.users[userId];
+            return users[userId];
         }
 
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
-            return this.authorPackageStore[authorName];
+            return authorPackageStore[authorName];
         }
 
         public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
-            return this.authorizedPackages[userId];
+            return authorizedPackages[userId];
         }
 
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
-            return this.consumingPackages[packageMajorVersion.ToString()];
+            return consumingPackages[packageMajorVersion.ToString()];
         }
 
         public NapackMetadata GetPackageMetadata(string packageName)
         {
-            return this.packageMetadataStore[packageName];
+            return packageMetadataStore[packageName];
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
-            return this.packageStore[packageVersion.GetFullName()];
+            return packageStore[packageVersion.GetFullName()];
         }
 
         public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
         {
-            return this.specStore[packageVersion.GetFullName()];
+            return specStore[packageVersion.GetFullName()];
         }
 
         /// <summary>
@@ -171,7 +175,7 @@ namespace Napack.Server
                 AddConsumingPackage(consumedPackage, nextVersion);
             }
 
-            this.UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
+            UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
             packageStore.Add(nextVersion.GetFullName(), packageVersion);
             specStore.Add(nextVersion.GetFullName(), newVersionSpec);
         }
@@ -206,32 +210,32 @@ namespace Napack.Server
 
         private void AddConsumingPackage(NapackMajorVersion consumedPackage, NapackVersionIdentifier version)
         {
-            if (!this.consumingPackages.ContainsKey(consumedPackage.ToString()))
+            if (!consumingPackages.ContainsKey(consumedPackage.ToString()))
             {
-                this.consumingPackages.Add(consumedPackage.ToString(), new List<NapackVersionIdentifier>());
+                consumingPackages.Add(consumedPackage.ToString(), new List<NapackVersionIdentifier>());
             }
 
-            this.consumingPackages[consumedPackage.ToString()].Add(version);
+            consumingPackages[consumedPackage.ToString()].Add(version);
         }
 
         private void AddUserAuthorization(string userId, string napackName)
         {
-            if (!this.authorizedPackages.ContainsKey(userId))
+            if (!authorizedPackages.ContainsKey(userId))
             {
-                this.authorizedPackages.Add(userId, new HashSet<string>());
+                authorizedPackages.Add(userId, new HashSet<string>());
             }
             
-            this.authorizedPackages[userId].Add(napackName);
+            authorizedPackages[userId].Add(napackName);
         }
 
         private void AddAuthorConsumption(string author, NapackVersionIdentifier version)
         {
-            if (!this.authorPackageStore.ContainsKey(author))
+            if (!authorPackageStore.ContainsKey(author))
             {
-                this.authorPackageStore.Add(author, new List<NapackVersionIdentifier>());
+                authorPackageStore.Add(author, new List<NapackVersionIdentifier>());
             }
 
-            this.authorPackageStore[author].Add(version);
+            authorPackageStore[author].Add(version);
         }
     }
 }

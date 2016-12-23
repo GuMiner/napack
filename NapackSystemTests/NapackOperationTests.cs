@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Napack.Client;
+using Napack.Common;
 
 namespace NapackSystemTests
 {
@@ -12,6 +14,18 @@ namespace NapackSystemTests
     {
         private const string SettingsFileLocation = "../../Content/NapackSettings.json";
         private const string PackageJsonFileLocation = "../../Content/Napack/PointInSphere.json";
+        private const string ModifierSuffix = ".mod";
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(NapackOperationTests.SettingsFileLocation));
+            settings.DefaultUserId = SystemSetup.AuthorizedUser.UserId;
+            settings.DefaultUserAuthenticationKeys = SystemSetup.AuthorizedUser.Secrets;
+
+            string settingsWithDefaultUserFileLocation = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix;
+            File.WriteAllText(settingsWithDefaultUserFileLocation, Serializer.Serialize(settings));
+        }
 
         [TestMethod]
         public void NapackClientRegistersNewUser()
@@ -50,6 +64,22 @@ namespace NapackSystemTests
                 UpdateMetadata = false,
                 PackageJsonFile = NapackOperationTests.PackageJsonFileLocation,
                 NapackSettings = NapackOperationTests.SettingsFileLocation
+            };
+
+            uploadOperation.PerformOperation();
+        }
+
+        [TestMethod]
+        public void NapackUploadOperationSuccess()
+        {
+            UploadOperation uploadOperation = new UploadOperation()
+            {
+                Operation = "Upload",
+                ForceMajorUpversioning = false,
+                ForceMinorUpversioning = false,
+                UpdateMetadata = false,
+                PackageJsonFile = NapackOperationTests.PackageJsonFileLocation,
+                NapackSettings = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix
             };
 
             uploadOperation.PerformOperation();

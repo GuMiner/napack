@@ -142,7 +142,6 @@
     <Compile Include="PackageValidationConfig.cs" />
     <Compile Include="NapackAnalyst.cs" />
     <Compile Include="NameValidationConfig.cs" />
-    <Compile Include="NapackNameValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

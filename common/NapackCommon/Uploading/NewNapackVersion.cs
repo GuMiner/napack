@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Napack.Common
 {
@@ -20,17 +21,20 @@ namespace Napack.Common
         public bool ForceMajorUpversioning { get; set; }
 
         public bool ForceMinorUpversioning { get; set; }
-        
+
+        [JsonProperty(Required = Required.Always)]
         public List<string> Authors { get; set; }
-        
+
         /// <summary>
         /// The files associated with the package.
         /// </summary>
         /// <remarks>
         /// The keys are the path of the file within the napack, the values are the files themselves
         /// </remarks>
+        [JsonProperty(Required = Required.Always)]
         public Dictionary<string, NapackFile> Files { get; set; }
         
+        [JsonProperty(Required = Required.Always)]
         public License License { get; set; }
 
         /// <summary>
@@ -43,19 +47,14 @@ namespace Napack.Common
         /// </summary>
         public void Validate()
         {
-            if (this.Authors == null || this.Authors.Count == 0)
+            if (this.Authors.Count == 0)
             {
                 throw new InvalidNapackException("At least one author must be specified per version.");
             }
 
-            if (this.Files == null || this.Files.Count == 0 || !this.Files.Any(file => file.Value.MsbuildType == NapackFile.ContentType))
+            if (this.Files.Count == 0 || !this.Files.Any(file => file.Value.MsbuildType == NapackFile.ContentType))
             {
                 throw new InvalidNapackException("At least one file must be present of type Content.");
-            }
-
-            if (this.License == null)
-            {
-                throw new InvalidNapackException("The license must be specified");
             }
         }
             

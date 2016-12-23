@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Napack.Client
@@ -62,7 +63,13 @@ namespace Napack.Client
         [JsonProperty(Required = Required.Always)]
         public TimeSpan AutoUpdateInterval { get; set; }
 
+        /// <summary>
+        /// TODO these belong in a separate default location.
+        /// </summary>
         [JsonProperty(Required = Required.AllowNull)]
         public string DefaultUserId { get; set; }
+
+        [JsonProperty(Required = Required.AllowNull)]
+        public List<Guid> DefaultUserAuthenticationKeys { get; set; }
     }
 }

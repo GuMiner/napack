@@ -34,7 +34,7 @@ namespace Napack.Client
         /// [Key: Napack name] -> [Value: Napack major version]
         /// </summary>
         public Dictionary<string, int> Dependencies { get; set; }
-
+        
         public void Validate(string defaultUserId)
         {
             if (string.IsNullOrWhiteSpace(this.Description))
@@ -51,9 +51,9 @@ namespace Napack.Client
             {
                 throw new InvalidOperationException("Cannot upload a Napack without authorized users when the default user is not specified in the settings file.");
             }
-            else if (!this.AuthorizedUserIds.Any())
+            else if (!this.AuthorizedUserIds.Contains(defaultUserId))
             {
-                // If no authorized users were provided, we add the current user as an authorized user.
+                // If the current user isn't on the authorization list, we add them there.
                 this.AuthorizedUserIds.Add(defaultUserId);
             }
 

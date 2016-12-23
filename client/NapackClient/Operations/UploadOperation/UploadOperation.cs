@@ -41,11 +41,26 @@ namespace Napack.Client
         [Description("Forces any upversioning of this package to at a minimum increment the minor version.")]
         public bool ForceMinorUpversioning { get; set; }
 
+        [CommandLineArgument(Position = 6, IsRequired = false)]
+        [Description("The ID of the user that will create the Napack / is authorized to update the Napack. If not present, the default user will be used.")]
+        public string UserId { get; set; }
+
+        [CommandLineArgument(Position = 7, IsRequired = false)]
+        [Description("The semicolon-deliminated keys authorizing the user to update this Napack. If not present, the default keys will be used.")]
+        public string AuthorizationKeys { get; set; }
+
         public bool IsValidOperation() => !string.IsNullOrWhiteSpace(this.Operation) && this.Operation.Equals("Upload", StringComparison.InvariantCultureIgnoreCase);
 
         public void PerformOperation()
         {
             NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
+            string userId = string.IsNullOrWhiteSpace(this.UserId) ? settings.DefaultUserId : this.UserId;
+            List<Guid> accessKeys = this.AuthorizationKeys?.Split(';').Select(key => Guid.Parse(key)).ToList() ?? settings.DefaultUserAuthenticationKeys;
+            UserSecret userSecret = new UserSecret()
+            {
+                UserId = userId,
+                Secrets = accessKeys
+            };
 
             string packageName = Path.GetFileNameWithoutExtension(this.PackageJsonFile);
             NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageJsonFile));
@@ -53,31 +68,36 @@ namespace Napack.Client
 
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
-                bool packageExists = false;
-                if (!packageExists && this.UpdateMetadata)
-                {
-                    throw new InvalidOperationException("Cannot create a new package and only perform metadata updates.");
-                }
-                else if (packageExists)
-                {
-                    Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
-                    this.CreateNapackPackage(packageName, napackDescriptor, files, client);
-                }
-                else if (this.UpdateMetadata)
-                {
-                    // TODO determine how to perform a metadata update only.
-                }
-                else
-                {
-                    // This is a new version creation operation.
-                    Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
-                    VersionDescriptor version = client.UpdatePackageAsync(packageName, this.CreateNapackVersion(napackDescriptor, files)).GetAwaiter().GetResult();
-                    Console.WriteLine($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
-                }
+                CreateOrUpdateNapackAsync(packageName, napackDescriptor, userSecret, client).GetAwaiter().GetResult();
             }
         }
 
-        private void CreateNapackPackage(string packageName, NapackLocalDescriptor napackDescriptor, Dictionary<string, NapackFile> files, NapackServerClient client)
+        private async Task CreateOrUpdateNapackAsync(string packageName, NapackLocalDescriptor napackDescriptor, UserSecret userSecret, NapackServerClient client)
+        {
+            bool packageExists = await client.ContainsNapack(packageName).ConfigureAwait(false);
+            if (!packageExists && this.UpdateMetadata)
+            {
+                throw new InvalidOperationException("Cannot create a new package and only perform metadata updates.");
+            }
+            else if (!packageExists)
+            {
+                Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
+                await this.CreateNapackPackageAsync(packageName, napackDescriptor, files, userSecret, client).ConfigureAwait(false);
+            }
+            else if (this.UpdateMetadata)
+            {
+                // TODO determine how to perform a metadata update only.
+            }
+            else
+            {
+                // This is a new version creation operation.
+                Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(Path.GetDirectoryName(this.PackageJsonFile));
+                VersionDescriptor version = await client.UpdatePackageAsync(packageName, this.CreateNapackVersion(napackDescriptor, files), userSecret).ConfigureAwait(false);
+                Console.WriteLine($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
+            }
+        }
+
+        private async Task CreateNapackPackageAsync(string packageName, NapackLocalDescriptor napackDescriptor, Dictionary<string, NapackFile> files, UserSecret secret, NapackServerClient client)
         {
             NewNapack newNapack = new NewNapack()
             {
@@ -88,7 +108,7 @@ namespace Napack.Client
                 NewNapackVersion = this.CreateNapackVersion(napackDescriptor, files)
             };
 
-            string response = client.CreatePackageAsync(packageName, newNapack).GetAwaiter().GetResult();
+            string response = await client.CreatePackageAsync(packageName, newNapack, secret).ConfigureAwait(false);
             Console.WriteLine($"Package creation result: {response}");
         }
 
@@ -97,7 +117,7 @@ namespace Napack.Client
             return new NewNapackVersion()
             {
                 Files = files,
-                Dependencies = napackDescriptor.Dependencies.Select(dependency => new NapackMajorVersion(dependency.Key, dependency.Value)).ToList(),
+                Dependencies = napackDescriptor.Dependencies?.Select(dependency => new NapackMajorVersion(dependency.Key, dependency.Value)).ToList() ?? new List<NapackMajorVersion>(),
                 Authors = napackDescriptor.Authors,
                 ForceMajorUpversioning = this.ForceMajorUpversioning,
                 ForceMinorUpversioning = this.ForceMinorUpversioning,
