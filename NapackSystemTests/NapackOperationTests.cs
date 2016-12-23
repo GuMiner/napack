@@ -10,12 +10,15 @@ namespace NapackSystemTests
     [TestClass]
     public class NapackOperationTests
     {
+        private const string SettingsFileLocation = "../../Content/NapackSettings.json";
+        private const string PackageJsonFileLocation = "../../Content/Napack/PointInSphere.json";
+
         [TestMethod]
         public void NapackClientRegistersNewUser()
         {
             int returnCode = NapackClient.Main(new string[]
             {
-                "Register", "test.user@invalid.com", "../../Content/NapackSettings.json"
+                "Register", "test.user@invalid.com", NapackOperationTests.SettingsFileLocation
             });
 
             // TODO validate output is logical.
@@ -29,10 +32,27 @@ namespace NapackSystemTests
             {
                 Operation = "Register",
                 UserEmail = "test2.user@invalid.com",
-                NapackSettings = "../../Content/NapackSettings.json"
+                NapackSettings = NapackOperationTests.SettingsFileLocation
             };
 
             registerOperation.PerformOperation();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void NapackUploadOperationFailsWhenNoAuthorizedUser()
+        {
+            UploadOperation uploadOperation = new UploadOperation()
+            {
+                Operation = "Upload",
+                ForceMajorUpversioning = false,
+                ForceMinorUpversioning = false,
+                UpdateMetadata = false,
+                PackageJsonFile = NapackOperationTests.PackageJsonFileLocation,
+                NapackSettings = NapackOperationTests.SettingsFileLocation
+            };
+
+            uploadOperation.PerformOperation();
         }
     }
 }

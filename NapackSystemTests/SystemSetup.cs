@@ -2,33 +2,46 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Napack.Client.Common;
 using Napack.Common;
 using Napack.Server;
 
 namespace NapackSystemTests
 {
+    /// <summary>
+    /// TODO I'll likely need to break apart functional tests, functional tests not needing authorization, and unit tests ... but that's for after I have sufficient testing to move onto more deployment.
+    /// </summary>
     [TestClass]
     public class SystemSetup
     {
+        public const string LocalServer = "http://localhost:9876";
+        
         private static Task napackServerTask;
 
         public static RestClient RestClient;
+        public static Napack.Common.UserSecret AuthorizedUser;
 
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext testContent)
         {
-            string localServer = "http://localhost:9876";
-
+            // Setup server
             napackServerTask = Task.Factory.StartNew(() =>
             {
-                Global.Main(new[] { localServer });
+                Global.Main(new[] { SystemSetup.LocalServer });
             }, TaskCreationOptions.LongRunning);
 
-            SystemSetup.RestClient = new RestClient(new Uri(localServer));
+            // Setup the REST client for that server.
+            SystemSetup.RestClient = new RestClient(new Uri(SystemSetup.LocalServer));
 
             while (!Global.Initialized)
             {
                 Thread.Sleep(100);
+            }
+
+            // Create a user to perform authenticated requests.
+            using (NapackServerClient client = new NapackServerClient(new Uri(SystemSetup.LocalServer)))
+            {
+                SystemSetup.AuthorizedUser = client.RegisterUserAsync("authorizeduser.id@fake.com").GetAwaiter().GetResult();
             }
         }
 

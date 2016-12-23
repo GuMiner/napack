@@ -18,7 +18,7 @@ namespace Napack.Server
                 UserSecret secret = UserSecret.CreateNewSecret();
                 user.Hash = UserIdentifier.ComputeUserHash(secret.Secrets);
 
-                // TODO identifier validation (email). Also scan for case sensitive / insensitive errors.
+                // TODO identifier validation (email). Also scan for case sensitive / insensitive errors throughout the codebase.
                 napackManager.AddUser(user);
 
                 Global.Log("Assigned user " + user.Email + " a hash and secrets.");
