@@ -1,0 +1,47 @@
+Napack Framework Server Terms of Use
+------------------------------------
+
+The use of the Napack Framework Server is subject to the following Terms of Use.
+These Terms of Use may be updated at any time, without any notice.
+The most recent Terms of Use may be found by visiting the Napack Framework Server website and clicking the 'Terms of Use' hyperlink.
+
+Usage Limitations
+-----------------
+
+Nano Package Metadata
+=====================
+Napack metadata consists of system-generated metadata (such as the number of times a Napack has been downloaded) and user-provided metadata (such as the Napack description).
+All authors of Napacks grant the Napack Framework Server the authorization to generate, retain, and redistribute publically the system-generated metadata and user-provided metadata.
+Unless you are the author of a Napack, you are not authorized to duplicate Napack Metadata on a separate Napack Framework Server.
+
+Nano Packages
+=====================
+Users of Napacks are authorized to distribute the contents of Napacks according to the Napack license restrictions.
+All Nano Packages ('Napacks') are provided subject to the license limitations applied to the contents of each Napack. 
+You are not licensed to consume a Napack if you do not abide by the license limitations for that Napack.
+All authors of Napacks are responsible for the contents and metadata of the Napacks created.
+The Napack Framework Server is not responsible for the metadata or contents of all Napacks.
+
+All authors of Napacks retain the license to the content and user-provided metadata of the Napack.
+All authors of Napacks grant the Napack Framework Server permission to publically list all contents, user-provided metadata, and system-generated metadata from the Napack.
+
+Privacy
+-------
+See the 'Privacy Policy' disclosing the use of your information.
+
+Client Software
+---------------
+All software provided by the Napack Framework Server -- if not covered by another License, are covered under the MIT license as follows:
+
+===
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+===

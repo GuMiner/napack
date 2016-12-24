@@ -14,7 +14,7 @@
         <div class="menuMain">
             <ul id="menu">
                 <li><a href="/">Home</a></li>
-                <li><a href="https://github.com/GuMiner/napack/blob/master/docs/Readme.md">Documentation</a></li>
+                <li><a href="/Documentation">Documentation</a></li>
                 <li><a href="/Search">Search</a></li>
             </ul>
         </div>
@@ -23,8 +23,9 @@
     <!--Main Page-->
     @RenderBody()
     <footer>
-        TODO Terms of use, TODO privacy policy.
-        <a href="https://github.com/GuMiner/napack/blob/master/LICENSE">Napack Framework Server License</a>
+        <a href="~/Content/TermsOfUse.txt">Terms of Use</a> <a href="~/Content/PrivacyPolicy.txt">Privacy Policy</a>
+        <br />
+        Copyright © Gustave Granroth, @(DateTime.UtcNow.Year). <a href="https://github.com/GuMiner/napack/blob/master/LICENSE">License</a>
     </footer>
 
     <!--Scripts!-->
