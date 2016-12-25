@@ -21,7 +21,7 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
-        public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
+        public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
         {
             throw new NotImplementedException();
         }
@@ -47,6 +47,11 @@ namespace Napack.Server
         }
 
         public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NapackStats GetPackageStatistics(string packageName)
         {
             throw new NotImplementedException();
         }

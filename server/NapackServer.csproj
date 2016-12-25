@@ -121,11 +121,14 @@
   <ItemGroup>
     <Compile Include="Definitions\NapackMetadata.cs" />
     <Compile Include="Definitions\NapackMajorVersionMetadata.cs" />
+    <Compile Include="Definitions\NapackSearchIndex.cs" />
+    <Compile Include="Definitions\NapackStats.cs" />
     <Compile Include="Definitions\NapackVersion.cs" />
     <Compile Include="Definitions\UserSecret.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="INapackStorageManager.cs" />
-    <Compile Include="Modules\DocumentationModel.cs" />
+    <Compile Include="Definitions\DocumentationModel.cs" />
+    <Compile Include="Modules\SearchModule.cs" />
     <Compile Include="Modules\DocumentationModule.cs" />
     <Compile Include="Modules\UsersModule.cs" />
     <Compile Include="Modules\NapackDownloadModule.cs" />
@@ -156,6 +159,7 @@
     <None Include="Scripts\jquery-3.1.1.min.map" />
     <None Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Views\Documentation.cshtml" />
+    <Content Include="Views\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

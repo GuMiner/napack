@@ -1,10 +1,8 @@
-# Supported Licenses
---------------------
-
-### Valid License Values
+#Supported Licenses
+Valid License Values
 ------------------------
 
-#### Supported
+####Supported
 - MIT
 - SimplifiedBSD
 - zLibLibPng
@@ -13,12 +11,12 @@
 - FreePL
 - PublicDomain
 
-#### Unsupported
+####Unsupported
 - CopyLeft
 - Commercial
 - Other
 
-###How Napack Licensing Works
+How Napack Licensing Works
 --------------------------
 By default, Napack will create a **Napack.attributions** file for each consumed Napack in your code. Users can then append the **Napack.attributions** file to the end of their license file to correctly attribute Napacks.
 
@@ -26,7 +24,7 @@ Unfortuantely, this ideal scenario only works if Napacks are created using permi
 
 In the spirit of promoting interoperability and freedom *of Napacks*, the default Napack settings will not permit consumption of copy-left, commercial, or custom licenses. However, in the spirit of promoting *freedom*, these settings can be changed by the end user at their own risk and discretion. 
 
-### Supported Licenses 
+Supported Licenses 
 ----------------------
 
 This list only covers the attribution-only open-source licenses that Napack supports. For all other license types, see the license file provided with the Napack.
@@ -41,7 +39,7 @@ This list only covers the attribution-only open-source licenses that Napack supp
 
 If you feel that this list is missing a permissive license you would like to include, please email the Napack administrators.
 
-### Licenses Under Review
+Licenses Under Review
 -------------------------
 These licenses are under review for consideration under the Napack listing of supported licences.
 

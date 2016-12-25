@@ -28,7 +28,7 @@ namespace Napack.Server
         public List<string> Tags { get; set; }
 
         /// <summary>
-        /// The hashes of users authorized to modify this package.
+        /// The IDs of users authorized to modify this package.
         /// </summary>
         public List<string> AuthorizedUserIds { get; set; }
 

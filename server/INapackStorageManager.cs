@@ -42,6 +42,11 @@ namespace Napack.Server
         /// Adds a user for future security validation.
         /// </summary>
         void AddUser(UserIdentifier user);
+        
+        /// <summary>
+        /// Gets the statistics for a Napack package.
+        /// </summary>
+        NapackStats GetPackageStatistics(string packageName);
 
         /// <summary>
         /// Gets the statistics, hash, and other information stored for the given user.
@@ -66,7 +71,7 @@ namespace Napack.Server
         /// <param name="skip">The number of results to skip.</param>
         /// <param name="top">The maximum number of results to return.</param>
         /// <returns>Relevant package -> match percentage</returns>
-        IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top);
+        List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top);
 
         /// <summary>
         /// Creates and saves a new napack.

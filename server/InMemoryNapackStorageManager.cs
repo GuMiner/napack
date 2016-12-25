@@ -67,7 +67,7 @@ namespace Napack.Server
             return packageStore.ContainsKey(packageName);
         }
 
-        public IDictionary<string, float> FindPackages(string searchPhrase, int skip, int top)
+        public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
         {
             throw new NotImplementedException();
         }
@@ -100,6 +100,11 @@ namespace Napack.Server
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
             return consumingPackages[packageMajorVersion.ToString()];
+        }
+        
+        public NapackStats GetPackageStatistics(string packageName)
+        {
+            throw new NotImplementedException();
         }
 
         public NapackMetadata GetPackageMetadata(string packageName)

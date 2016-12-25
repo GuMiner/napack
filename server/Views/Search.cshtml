@@ -1,17 +1,12 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.DocumentationModel>
-@model Napack.Server.DocumentationModel
-
-@{
+﻿@{
     Layout = "RootLayout.cshtml";
-    string pageName = "Documentation";
+    string pageName = "Search";
 }
 
 @section Title {@pageName}
 
 <div id="body">
     <h1>@pageName</h1>
-    <h2>@Model.Name</h2>
-    @Html.Raw(@Model.Html).
 </div>
 
 @section Scripts{
