@@ -38,13 +38,16 @@ namespace Napack.Analyst
             Patch = 2
         }
 
+        public static string RootDirectory { get; set; }
+
         /// <summary>
         /// Initializes the static configuration for this analyzer.
         /// </summary>
         public static void Initialize()
         {
-            string packageConfigFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PackageValidation.json");
-            string nameConfigFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "NameValidation.json");
+            NapackAnalyst.RootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string packageConfigFilePath = Path.Combine(NapackAnalyst.RootDirectory, "PackageValidation.json");
+            string nameConfigFilePath = Path.Combine(NapackAnalyst.RootDirectory, "NameValidation.json");
             Console.WriteLine(packageConfigFilePath);
 
             NapackAnalyst.PackageValidationConfig = Serializer.Deserialize<PackageValidationConfig>(File.ReadAllText(packageConfigFilePath));

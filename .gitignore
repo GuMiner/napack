@@ -4,6 +4,10 @@
 # Ignore testing .mod files
 *.mod
 
+# Ignore personal deployment files
+server/drop/*
+server/drop.zip
+
 # User-specific files
 *.suo
 *.user
