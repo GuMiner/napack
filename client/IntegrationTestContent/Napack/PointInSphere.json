@@ -1,0 +1,11 @@
+{
+  "description": "Computes if a point is within a sphere, on a sphere, or outside of a sphere.",
+  "moreInformation": "http://napack.net/PointInSphere",
+  "tags": [ "point", "sphere", "algorithm", "geometry", "math" ],
+  "authorizedUserIds": [],
+  "authors": [ "Gustave Granroth" ],
+  "license": {
+    "type": "MIT",
+    "licenseText": null
+  }
+}

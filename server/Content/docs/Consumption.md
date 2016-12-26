@@ -1,12 +1,12 @@
 # Consuming Nano APIs
 ---------------------
 
-1. [Download] (./Download.md) the Napack Framework and add it to your project.
+1. [Download](./Download.md) the Napack Framework and add it to your project.
  - Your project will now include a **Napack.json**, **Napack.attributions**, and **Napack.settings** file.
  - **Napack.json**: Defines the Napacks your project uses.
  - **Napack.attributions**: Lists attributions auto-generated from the Napacks you use.
  - **Napack.settings**: Declares settings customizing the behavior of the Napack Framework.
-2. [Search] (./Search.md) for a [Napack] (./Creation.md) that provides the functionality you want. For example, you can search for "Point within Sphere" to find an API that tests if a point is within a sphere.
+2. [Search](./Search.md) for a [Napack](./Creation.md) that provides the functionality you want. For example, you can search for "Point within Sphere" to find an API that tests if a point is within a sphere.
 3. Add the Napack name and version to the **Napack.json** file. 
  - For example, if you add the "PointSphere" package, version 2.1.2, your **Napack.json** file will look like:
  -  ```{ "PointSphere": "2.1.2" }```
@@ -17,4 +17,4 @@
 
 The default Napack settings will prevent you from automatically including Napacks that force your code to be open-sourced or require a commercial license -- simply add the **Napack.attributions** file to your license file. The default settings will also periodically check for non-breaking MINOR or PATCH changes to your Napacks and update them automatically. 
 
-For more information on how to change these settings, see the [Napack.settings] (./NapackSettings.md) page.
+For more information on how to change these settings, see the [Napack.settings](./NapackSettings.md) page.

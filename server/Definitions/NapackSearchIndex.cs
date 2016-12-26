@@ -38,5 +38,19 @@ namespace Napack.Server
                 LastUpdateTime = stats.LastUpdateTime,
             };
         }
+
+        internal dynamic ToAnonymousType()
+        {
+            return new
+            {
+                Relevance = this.Relevance,
+                Name = this.Name,
+                Description = this.Description,
+                Downloads = this.Downloads,
+                Views = this.Views,
+                LastUpdateTime = this.LastUpdateTime.ToString("U"),
+                LicenseType = LicenseManagement.GetLicenseName(this.LastUsedLicense.LicenseType)
+            };
+        }
     }
 }

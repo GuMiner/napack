@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Nancy;
 
 namespace Napack.Server
@@ -22,16 +23,16 @@ namespace Napack.Server
             };
 
             // Retrieves a sequence of search results.
-            Get["/query/{query}"] = parameters =>
+            Get["/query"] = parameters =>
             {
-                string query = parameters.query;
+                string query = (string)this.Request.Query["search"];
                 int skip = int.Parse(this.Request.Query["$skip"]);
                 int top = Math.Min(int.Parse(this.Request.Query["$top"]), SearchModule.MaxResultsPerPage);
 
                 List<NapackSearchIndex> packagesFound = napackManager.FindPackages(query, skip, top);
                 return this.Response.AsJson(new
                 {
-                    Results = packagesFound,
+                    Results = packagesFound.Select(package => package.ToAnonymousType()),
                     CanContinue = packagesFound.Count == top
                 });
             };

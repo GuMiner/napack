@@ -55,11 +55,14 @@ namespace Napack.Server.Modules
                     {
                         NapackMetadata package = napackManager.GetPackageMetadata(packageName);
                         NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(components[0]);
+
                         return this.Response.AsJson(majorVersion.AsSummaryJson());
                     }
                     else if (components.Count == 3)
                     {
                         NapackVersion specificVersion = napackManager.GetPackageVersion(new NapackVersionIdentifier(packageName, components[0], components[1], components[2]));
+                        napackManager.IncrementPackageDownload(packageName);
+
                         return this.Response.AsJson(specificVersion.AsSummaryJson());
                     }
                     else

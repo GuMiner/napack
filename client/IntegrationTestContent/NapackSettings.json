@@ -1,0 +1,16 @@
+{
+  "napackFrameworkServer": "https://napack.net",
+  "allowCommercial": false,
+  "allowCopyLeft": false,
+  "allowCustomLicenses": false,
+  "autoUpdatePatch": true,
+  "autoUpdateMinor": true,
+  "warnMajorUpdates": false,
+  "lastUpdateTime": "2016-12-26T01:14:03.8053187Z",
+  "autoUpdateInterval": "0.01:00:00",
+  "defaultUserId": "gus.gran@gmail.com",
+  "defaultUserAuthenticationKeys": [
+	"63e90664-4cb5-4b4c-beeb-7eae6d468cd9",
+	"f64a5237-fa90-42c2-bc50-08bc367fdafc",
+	"71dce8ed-0ae9-45d3-ad81-9177cf4d23ef"]
+}

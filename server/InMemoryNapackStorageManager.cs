@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
@@ -36,6 +37,11 @@ namespace Napack.Server
         /// The listing of package name => package metadata
         /// </summary>
         private static readonly Dictionary<string, NapackMetadata> packageMetadataStore;
+        
+        /// <summary>
+        /// The listing of package name => package statistics.
+        /// </summary>
+        private static readonly Dictionary<string, NapackStats> statsStore;
 
         /// <summary>
         /// The listing of package identifier => package
@@ -47,6 +53,11 @@ namespace Napack.Server
         /// </summary>
         private static readonly Dictionary<string, NapackSpec> specStore;
 
+        /// <summary>
+        /// The listing of search indicies for package searching, mapping package name -> search index.
+        /// </summary>
+        private static readonly Dictionary<string, NapackSearchIndex> searchIndices;
+
         static InMemoryNapackStorageManager()
         {
             authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase); // Author names are case insensitive
@@ -54,8 +65,10 @@ namespace Napack.Server
             authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // User names are case sensitive.
             consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCulture);
             packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCulture);
+            statsStore = new Dictionary<string, NapackStats>(StringComparer.InvariantCulture);
             packageStore = new Dictionary<string, NapackVersion>(StringComparer.InvariantCulture);
             specStore = new Dictionary<string, NapackSpec>(StringComparer.InvariantCulture);
+            searchIndices = new Dictionary<string, NapackSearchIndex>(StringComparer.InvariantCulture);
         }
 
         public InMemoryNapackStorageManager()
@@ -69,7 +82,15 @@ namespace Napack.Server
 
         public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
         {
-            throw new NotImplementedException();
+            // Implement the in-memory search by exact token-matching (all results have a relevance of 1, which isn't filled in).
+            // TODO don't ignore tags.
+            IEnumerable<NapackSearchIndex> results = searchIndices.Values;
+            foreach (string phrase in searchPhrase.Split(' '))
+            {
+                results = results.Where(result => result.Description.Contains(phrase));
+            }
+
+            return results.Skip(skip).Take(top).ToList();
         }
         
         public void AddUser(UserIdentifier user)
@@ -104,7 +125,13 @@ namespace Napack.Server
         
         public NapackStats GetPackageStatistics(string packageName)
         {
-            throw new NotImplementedException();
+            return statsStore[packageName];
+        }
+
+        public void IncrementPackageDownload(string packageName)
+        {
+            statsStore[packageName].Downloads++;
+            searchIndices[packageName].Downloads++;
         }
 
         public NapackMetadata GetPackageMetadata(string packageName)
@@ -150,6 +177,12 @@ namespace Napack.Server
             }
 
             // Add the new napack to all the various stores.
+            NapackStats stats = new NapackStats();
+            stats.AddVersion(newNapack.NewNapackVersion);
+
+            searchIndices.Add(version.NapackName, NapackSearchIndex.CreateFromMetadataAndStats(metadata, stats));
+            
+            statsStore.Add(version.NapackName, stats);
             packageMetadataStore.Add(version.NapackName, metadata);
             packageStore.Add(version.GetFullName(), packageVersion);
             specStore.Add(version.GetFullName(), napackSpec);
@@ -209,6 +242,10 @@ namespace Napack.Server
             {
                 package.Versions[nextVersion.Major].Versions[nextVersion.Minor].Add(nextVersion.Patch);
             }
+
+            statsStore[nextVersion.NapackName].AddVersion(newNapackVersion);
+            searchIndices[nextVersion.NapackName].LastUpdateTime = statsStore[nextVersion.NapackName].LastUpdateTime;
+            searchIndices[nextVersion.NapackName].LastUsedLicense = newNapackVersion.License;
 
             packageMetadataStore[nextVersion.NapackName] = package;
         }

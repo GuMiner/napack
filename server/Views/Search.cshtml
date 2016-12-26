@@ -1,16 +1,91 @@
 ﻿@{
     Layout = "RootLayout.cshtml";
     string pageName = "Search";
+
+    string searchTextBox = "searchTextBox";
+    string searchButton = "searchButton";
+
+    string loadMoreSearchButton = "loadMoreSearchButton";
+    string resultsHolder = "resultsHolder";
+
+    string errorsText = "errorsText";
+
+    string urlSearchQuery = "/search/query";
+    int resultsToGet = 20;
 }
 
 @section Title {@pageName}
 
 <div id="body">
     <h1>@pageName</h1>
+    Query:
+    <input id="@searchTextBox" type="text" value="" />
+    <button id="@searchButton">Search</button>
+    <br />
+    <span class="errorSubbox" id="@errorsText"></span>
+    <h2>Results</h2>
+    <ul id="@resultsHolder">
+    </ul>
+    <br />
+    <button id="@loadMoreSearchButton" hidden>Load More</button>
 </div>
 
 @section Scripts{
+    <script type="text/javascript" src="~/Content/Scripts/jquery-3.1.1.js"></script>
     <script type="text/javascript">
+        var currentSkipAmount = 0;
+
+        function loadResults(data) {
+            var prefix = "<li><div class=\"napack\">";
+            var postfix = "</div></li>";
+            for (var i = 0; i < data.results.length; i++) {
+                var top = data.results[i].name + ". Downloads: " + data.results[i].downloads + ". Relevance: " + data.results[i].relevance + ".";
+                var middle = "Description: " + data.results[i].description + ". Last Update Time: " + data.results[i].lastUpdateTime + ".";
+                var bottom = "License: " + data.results[i].licenseType + ". Views: " + data.results[i].views + ".";
+
+                $("#@resultsHolder").append(prefix + top + middle + bottom + postfix);
+            }
+
+            // Update the load more button to allow for incremental searches.
+            currentSkipAmount += data.results.length;
+            if (data.canContinue) {
+                $("#@loadMoreSearchButton").show();
+            } else {
+                $("#@loadMoreSearchButton").hide();
+            }
+        }
+
+        function formSearchUri() {
+            return "@urlSearchQuery" + "?$skip=" + currentSkipAmount + "&$top=" + @resultsToGet + "&search=" + $("#@searchTextBox").val();
+        }
+
+        function performSearch() {
+            $.ajax({
+                url: formSearchUri(),
+                type: 'GET',
+                success: function (data) {
+                    loadResults(data);
+                },
+                error: function (data) {
+                    $("#@errorsText").text(data.responseText);
+                }
+            });
+        }
+
+        $("#@loadMoreSearchButton").click(function () {
+            performSearch();
+        });
+
+
+        $("#@searchButton").click(function () {
+            // Clicking search again clears all existing search results.
+            $("#@resultsHolder").empty();
+            currentSkipAmount = 0;
+
+            performSearch();
+        });
+
+
         // Run the scripts.
         $(document).ready(function () {
         });

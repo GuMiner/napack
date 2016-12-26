@@ -66,6 +66,11 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
+        public void IncrementPackageDownload(string packageName)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
             throw new NotImplementedException();

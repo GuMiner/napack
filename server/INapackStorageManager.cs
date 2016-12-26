@@ -49,6 +49,11 @@ namespace Napack.Server
         NapackStats GetPackageStatistics(string packageName);
 
         /// <summary>
+        /// Adds a download to the download count for this Napack package
+        /// </summary>
+        void IncrementPackageDownload(string packageName);
+
+        /// <summary>
         /// Gets the statistics, hash, and other information stored for the given user.
         /// </summary>
         UserIdentifier GetUser(string userId);
