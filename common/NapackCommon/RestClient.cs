@@ -113,6 +113,7 @@ namespace Napack.Common
                 Exception error = null;
                 if (exceptionMap.TryGetValue(response.StatusCode, out error))
                 {
+                    Console.WriteLine(responseContent); // TODO we should be passing in a function instead of a dictionary to avoid creating the errors unless we need them, and so we can include this text.
                     throw error;
                 }
                 else

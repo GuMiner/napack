@@ -7,5 +7,9 @@
   "license": {
     "type": "MIT",
     "licenseText": null
+  },
+  "dependencies": {
+	"BasicVector": 1,
+	"BasicVector.Core": 1,
   }
 }

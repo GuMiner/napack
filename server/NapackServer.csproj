@@ -128,6 +128,7 @@
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Definitions\DocumentationModel.cs" />
+    <Compile Include="Modules\ApiModule.cs" />
     <Compile Include="Modules\SearchModule.cs" />
     <Compile Include="Modules\DocumentationModule.cs" />
     <Compile Include="Modules\UsersModule.cs" />

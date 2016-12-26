@@ -1,0 +1,11 @@
+{
+  "description": "Defines a basic 3D vector.",
+  "moreInformation": "http://napack.net/api/Vector",
+  "tags": [ "vector", "geometry", "math" ],
+  "authorizedUserIds": [],
+  "authors": [ "Gustave Granroth" ],
+  "license": {
+    "type": "MIT",
+    "licenseText": null
+  }
+}

@@ -12,14 +12,23 @@ namespace Napack.Common
         public NapackVersionIdentifier(string fullNapackName)
         {
             List<string> components = fullNapackName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (components.Count != 4)
+            if (components.Count < 4)
             {
                 throw new InvalidNapackVersionException();
             }
 
-            this.NapackName = components[0];
-            components.RemoveAt(0);
+            this.NapackName = string.Empty;
+            while (components.Count != 3)
+            {
+                this.NapackName += components[0];
+                components.RemoveAt(0);
 
+                if (components.Count != 3)
+                {
+                    this.NapackName += ".";
+                }
+            }
+            
             List<int> versionComponents = components.Select(item => int.Parse(item)).ToList();
             if (components.Count != 3 || versionComponents.Any(item => item < 0))
             {
