@@ -57,7 +57,7 @@ namespace Napack.Server
                     NapackSpec spec = napackManager.GetPackageSpecification(versionId);
 
                     // TODO formulate a view with the passed-in specification.
-                    return this.Response.AsJson(spec);
+                    return View["NapackApi", new ApiModel(versionId.GetFullName(), spec)];
                 }
             };
         }

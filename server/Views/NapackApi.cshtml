@@ -1,0 +1,95 @@
+﻿@using Napack.Common
+@using Napack.Analyst.ApiSpec
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.ApiModel>
+@model Napack.Server.ApiModel
+
+@{
+    Layout = "RootLayout.cshtml";
+    string pageName = "Napack API -- ";
+}
+
+@section Title {@pageName + @Model.NapackFullName}
+
+
+@helper RenderClass(ClassSpec classSpec)
+{
+@: <h3>@classSpec.Name.Name</h3>
+@: <i>@(classSpec.IsStatic ? "Static" : string.Empty) @(classSpec.IsAbstract ? "Abstract" : string.Empty) @(classSpec.IsSealed ? "Sealed" : string.Empty) </i><br />
+@: <b>Description: </b>@classSpec.Name.Documentation <br />
+
+if (classSpec.PublicClasses.Count != 0)
+{
+    foreach (ClassSpec downlevelClass in classSpec.PublicClasses)
+    {
+        RenderClass(classSpec);
+    }
+}
+
+if (classSpec.PublicConstructors.Count != 0)
+{
+    @: <h4>Constructors</h4>
+    foreach (ConstructorSpec constructorSpec in classSpec.PublicConstructors)
+    {
+        @: <div class="constructor">@constructorSpec.Name.Name ( 
+        int count = constructorSpec.Parameters.Count;
+        foreach (ParameterSpec parameter in constructorSpec.Parameters)
+        {
+            @: @parameter.Modifier @parameter.Type @parameter.Name
+            if (parameter.Default != string.Empty)
+            {
+                @: = @parameter.Default
+            }
+
+            --count;
+            if (count != 0)
+            {
+                @: , 
+            }
+        }
+
+        @: )</div>
+    }
+}
+
+if (classSpec.PublicFields.Count != 0)
+{
+    @: <h4>Fields</h4>
+    foreach (FieldSpec fieldSpec in classSpec.PublicFields)
+    {
+        @: <div class="field">
+        @: @(fieldSpec.IsStatic ? "static " : string.Empty) @(fieldSpec.IsConst ? "const " : string.Empty) @(fieldSpec.IsReadonly ? "readonly " : string.Empty) 
+        @: @fieldSpec.Type @fieldSpec.Name
+        @:</div>
+    }
+}
+
+if (classSpec.PublicProperties.Count != 0)
+{
+    @: <h4>Properties</h4>
+    foreach (PropertySpec propertySpec in classSpec.PublicProperties)
+    {
+        @: <div class="property">
+        @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name
+        @: </div>
+    }
+}
+
+    // TODO public methods.
+}
+
+<div id="body">
+    <h1>@Model.NapackFullName API</h1>
+    <h2>Classes</h2>
+    @foreach (ClassSpec classSpec in Model.Spec.Classes) {
+        RenderClass(classSpec);
+    }
+    <h2>Unrecognized Files: @Model.Spec.UnknownFiles.Count</h2>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        // Run the scripts.
+        $(document).ready(function () {
+        });
+    </script>
+}
