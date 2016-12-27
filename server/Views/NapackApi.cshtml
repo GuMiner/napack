@@ -15,7 +15,7 @@
 {
 @: <h3>@classSpec.Name.Name</h3>
 @: <i>@(classSpec.IsStatic ? "Static" : string.Empty) @(classSpec.IsAbstract ? "Abstract" : string.Empty) @(classSpec.IsSealed ? "Sealed" : string.Empty) </i><br />
-@: <b>Description: </b>@classSpec.Name.Documentation <br />
+@: @(classSpec.Name.Documentation.Count == 0 ? string.Empty : "<b>" + String.Join("<br />", classSpec.Name.Documentation) + "</b> <br />")
 
 if (classSpec.PublicClasses.Count != 0)
 {
@@ -31,7 +31,7 @@ if (classSpec.PublicConstructors.Count != 0)
     foreach (ConstructorSpec constructorSpec in classSpec.PublicConstructors)
     {
         @: <div class="constructor">
-        @: <b>Documentation:</b> @constructorSpec.Name.Documentation <br />
+        @: @(constructorSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", constructorSpec.Name.Documentation) + "</i> <br />")
         @: @constructorSpec.Name.Name ( 
         int count = constructorSpec.Parameters.Count;
         foreach (ParameterSpec parameter in constructorSpec.Parameters)
@@ -59,9 +59,9 @@ if (classSpec.PublicFields.Count != 0)
     foreach (FieldSpec fieldSpec in classSpec.PublicFields)
     {
         @: <div class="field">
-        @: <b>Documentation:</b> @fieldSpec.Name.Documentation <br />
+        @: @(fieldSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", fieldSpec.Name.Documentation) + "</i> <br />")
         @: @(fieldSpec.IsStatic ? "static " : string.Empty) @(fieldSpec.IsConst ? "const " : string.Empty) @(fieldSpec.IsReadonly ? "readonly " : string.Empty) 
-        @: @fieldSpec.Type @fieldSpec.Name
+        @: @fieldSpec.Type @fieldSpec.Name.Name
         @:</div>
     }
 }
@@ -72,8 +72,8 @@ if (classSpec.PublicProperties.Count != 0)
     foreach (PropertySpec propertySpec in classSpec.PublicProperties)
     {
         @: <div class="property">
-        @: <b>Documentation:</b> @propertySpec.Name.Documentation <br />
-        @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name
+        @: @(propertySpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", propertySpec.Name.Documentation) + "</i> <br />")
+        @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name.Name
         @: </div>
     }
 }
@@ -84,8 +84,8 @@ if (classSpec.PublicMethods.Count != 0)
     foreach (MethodSpec methodSpec in classSpec.PublicMethods)
     {
         @: <div class="method">
-        @: <b>Documentation:</b> @methodSpec.Name.Documentation <br />
-        @: @methodSpec.ReturnType @methodSpec.Name (
+        @: @(methodSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", methodSpec.Name.Documentation) + "</i> <br />")
+        @: @methodSpec.ReturnType @methodSpec.Name.Name (
         int count = methodSpec.Parameters.Count;
         foreach (ParameterSpec parameter in methodSpec.Parameters)
         {
@@ -110,7 +110,7 @@ if (classSpec.PublicMethods.Count != 0)
     <h1>@Model.NapackFullName API</h1>
     <h2>Classes</h2>
     @foreach (ClassSpec classSpec in Model.Spec.Classes) {
-        RenderClass(classSpec);
+        @: @RenderClass(classSpec)
     }
     <h2>Unrecognized Files: @Model.Spec.UnknownFiles.Count</h2>
 </div>
