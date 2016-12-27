@@ -2,15 +2,12 @@
 
 Nuget Package
 ----------------
-The [Napack NuGet Package](https://www.nuget.org/packages/Napack/) is the recommended way to add Napack functionality to your project.
-TODO create and upload
-
-From Visual Studio
-----------------------
-TODO write basic NuGet package installation instructions.
+The [Napack Client NuGet Package](https://www.nuget.org/packages/Napack/) is the recommended way to add Napack functionality to your project.
+Installing the Client via NuGet within Visual Studio will automatically setup a package folder, a **Napack.json** package listing file, and a **Napack.settings** settings file.
 
 Direct Download
 ---------------
+The client can also be directly downloaded from [here](https://napack.net/Content/NapackClient.zip)
 
 Source Code (Client and Framework)
 --------------
