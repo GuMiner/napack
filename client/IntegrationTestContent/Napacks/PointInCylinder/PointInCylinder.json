@@ -1,0 +1,15 @@
+{
+  "description": "Computes if a point is within or outside of a z-aligned cylinder.",
+  "moreInformation": "http://napack.net/api/PointInCylinder",
+  "tags": [ "point", "cylinder", "algorithm", "geometry", "math" ],
+  "authorizedUserIds": [],
+  "authors": [ "Gustave Granroth" ],
+  "license": {
+    "type": "MIT",
+    "licenseText": null
+  },
+  "dependencies": {
+	"BasicVector": 1,
+	"BasicVector.Core": 1,
+  }
+}
