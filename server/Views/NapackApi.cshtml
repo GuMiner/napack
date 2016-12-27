@@ -30,7 +30,9 @@ if (classSpec.PublicConstructors.Count != 0)
     @: <h4>Constructors</h4>
     foreach (ConstructorSpec constructorSpec in classSpec.PublicConstructors)
     {
-        @: <div class="constructor">@constructorSpec.Name.Name ( 
+        @: <div class="constructor">
+        @: <b>Documentation:</b> @constructorSpec.Name.Documentation <br />
+        @: @constructorSpec.Name.Name ( 
         int count = constructorSpec.Parameters.Count;
         foreach (ParameterSpec parameter in constructorSpec.Parameters)
         {
@@ -57,6 +59,7 @@ if (classSpec.PublicFields.Count != 0)
     foreach (FieldSpec fieldSpec in classSpec.PublicFields)
     {
         @: <div class="field">
+        @: <b>Documentation:</b> @fieldSpec.Name.Documentation <br />
         @: @(fieldSpec.IsStatic ? "static " : string.Empty) @(fieldSpec.IsConst ? "const " : string.Empty) @(fieldSpec.IsReadonly ? "readonly " : string.Empty) 
         @: @fieldSpec.Type @fieldSpec.Name
         @:</div>
@@ -69,12 +72,38 @@ if (classSpec.PublicProperties.Count != 0)
     foreach (PropertySpec propertySpec in classSpec.PublicProperties)
     {
         @: <div class="property">
+        @: <b>Documentation:</b> @propertySpec.Name.Documentation <br />
         @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name
         @: </div>
     }
 }
 
-    // TODO public methods.
+if (classSpec.PublicMethods.Count != 0)
+{
+    @: <h4>Methods</h4>
+    foreach (MethodSpec methodSpec in classSpec.PublicMethods)
+    {
+        @: <div class="method">
+        @: <b>Documentation:</b> @methodSpec.Name.Documentation <br />
+        @: @methodSpec.ReturnType @methodSpec.Name (
+        int count = methodSpec.Parameters.Count;
+        foreach (ParameterSpec parameter in methodSpec.Parameters)
+        {
+            @: @parameter.Modifier @parameter.Type @parameter.Name
+            if (parameter.Default != string.Empty)
+            {
+                    @: = @parameter.Default
+            }
+
+            --count;
+            if (count != 0)
+            {
+                    @: ,
+            }
+        }
+        @: ) </div>
+    }
+}
 }
 
 <div id="body">
