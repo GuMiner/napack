@@ -112,6 +112,13 @@ if (classSpec.PublicMethods.Count != 0)
     @foreach (ClassSpec classSpec in Model.Spec.Classes) {
         @: @RenderClass(classSpec)
     }
+
+    <h2>Dependent Napacks</h2>
+    @foreach(NapackMajorVersion majorVersion in Model.Dependencies) {
+        string uri = "https://napack.net/api/" + majorVersion.Name;
+        string name = majorVersion.Name + "." + majorVersion.Major;
+        @: <h3><a href="@uri">@name</a></h3>
+    }
     <h2>Unrecognized Files: @Model.Spec.UnknownFiles.Count</h2>
 </div>
 

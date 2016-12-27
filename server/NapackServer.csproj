@@ -119,6 +119,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Definitions\VersionsModel.cs" />
     <Compile Include="Definitions\ApiModel.cs" />
     <Compile Include="Definitions\NapackMetadata.cs" />
     <Compile Include="Definitions\NapackMajorVersionMetadata.cs" />
@@ -156,6 +157,7 @@
     <Content Include="Views\Documentation.cshtml" />
     <Content Include="Views\Search.cshtml" />
     <Content Include="Views\NapackApi.cshtml" />
+    <Content Include="Views\NapackVersions.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

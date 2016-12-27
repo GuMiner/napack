@@ -32,9 +32,7 @@ namespace Napack.Server
                 if (version == null)
                 {
                     NapackMetadata metadata = napackManager.GetPackageMetadata(packageName);
-
-                    // TODO formulate a view with the passed-in metadata.
-                    return this.Response.AsJson(metadata);
+                    return View["NapackVersions", new VersionsModel(metadata)];
                 }
                 else
                 {
@@ -55,9 +53,9 @@ namespace Napack.Server
 
                     NapackVersionIdentifier versionId = new NapackVersionIdentifier(packageName, components[0], components[1], components[2]);
                     NapackSpec spec = napackManager.GetPackageSpecification(versionId);
+                    NapackVersion packageVersion = napackManager.GetPackageVersion(versionId);
 
-                    // TODO formulate a view with the passed-in specification.
-                    return View["NapackApi", new ApiModel(versionId.GetFullName(), spec)];
+                    return View["NapackApi", new ApiModel(versionId.GetFullName(), spec, packageVersion.Dependencies)];
                 }
             };
         }

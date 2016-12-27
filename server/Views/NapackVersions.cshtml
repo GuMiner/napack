@@ -1,0 +1,40 @@
+﻿@using Napack.Server
+@using Napack.Common
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.VersionsModel>
+@model Napack.Server.VersionsModel
+
+@{
+    Layout = "RootLayout.cshtml";
+    string pageName = "Napack Versions -- ";
+}
+
+@section Title {@pageName + @Model.Metadata.Name}
+
+<div id="body">
+    <h1>@Model.Metadata.Name Versions</h1>
+    <h2>Description</h2>
+    @: <p>@Model.Metadata.Description</p>
+    <h2>More Information</h2>
+    @: <p>@Model.Metadata.MoreInformation</p>
+    <h2>Versions</h2>
+    @foreach (KeyValuePair<int, NapackMajorVersionMetadata> version in Model.Metadata.Versions) { 
+        @: <h3>@version.Key</h3>
+        @: <i>License: @LicenseManagement.GetLicenseName(version.Value.License.LicenseType). Recalled: @version.Value.Recalled</i>
+        foreach (KeyValuePair<int, List<int>> minorVersions in version.Value.Versions) {
+            foreach(int patchVersion in minorVersions.Value)
+            {
+                string uri = "https://napack.net/api/" + Model.Metadata.Name + "/" + version.Key + "." + minorVersions.Key + "." + patchVersion;
+                string text = version.Key + "." + minorVersions.Key + "." + patchVersion; 
+                @: <h4><a href="@uri">@text</a></h4>
+            }
+        }
+    }
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        // Run the scripts.
+        $(document).ready(function () {
+        });
+    </script>
+}
