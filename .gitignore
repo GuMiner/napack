@@ -3,6 +3,7 @@
 
 # Ignore testing .mod files
 *.mod
+client/NapackClient/NugetPackage/lib/*
 
 # Ignore personal deployment files
 server/drop/*

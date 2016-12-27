@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Napack</id>
+    <version>0.1.0</version>
+    
+    <authors>Gustave Granroth</authors>
+    <owners>guminer</owners>
+
+    <licenseUrl>https://github.com/GuMiner/napack/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/GuMiner/napack/tree/master/client/NapackClient</projectUrl>
+    <iconUrl>http://napack.net/favicon.ico</iconUrl>
+
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    
+    <releaseNotes>Initial Version of the Napack Client. Usable, but without many core VS integration features.</releaseNotes>
+    <description>Contains the Napack Framework Client to create and update nano-scale packages. See https://napack.net for a full description.</description>
+
+    <copyright>Copyright © 2016 Gustave Granroth</copyright>
+    <tags>nano package api napack componentization manager framework system</tags>
+  </metadata>
+  
+  <!-- TODO need to add in .targets and .props to modify the build setup to call the Napack Client and setup a basic Napack package storage folder.-->
+</package>
