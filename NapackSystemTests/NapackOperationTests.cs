@@ -46,7 +46,7 @@ namespace NapackSystemTests
             {
                 Operation = "Register",
                 UserEmail = "test2.user@invalid.com",
-                NapackSettings = NapackOperationTests.SettingsFileLocation
+                NapackSettingsFile = NapackOperationTests.SettingsFileLocation
             };
 
             registerOperation.PerformOperation();
@@ -62,8 +62,8 @@ namespace NapackSystemTests
                 ForceMajorUpversioning = false,
                 ForceMinorUpversioning = false,
                 UpdateMetadata = false,
-                PackageJsonFile = NapackOperationTests.PackageJsonFileLocation,
-                NapackSettings = NapackOperationTests.SettingsFileLocation
+                PackageFile = NapackOperationTests.PackageJsonFileLocation,
+                NapackSettingsFile = NapackOperationTests.SettingsFileLocation
             };
 
             uploadOperation.PerformOperation();
@@ -78,8 +78,8 @@ namespace NapackSystemTests
                 ForceMajorUpversioning = false,
                 ForceMinorUpversioning = false,
                 UpdateMetadata = false,
-                PackageJsonFile = NapackOperationTests.PackageJsonFileLocation,
-                NapackSettings = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix
+                PackageFile = NapackOperationTests.PackageJsonFileLocation,
+                NapackSettingsFile = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix
             };
 
             uploadOperation.PerformOperation();

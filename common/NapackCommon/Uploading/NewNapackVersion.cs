@@ -52,7 +52,7 @@ namespace Napack.Common
                 throw new InvalidNapackException("At least one author must be specified per version.");
             }
 
-            if (this.Files.Count == 0 || !this.Files.Any(file => file.Value.MsbuildType == NapackFile.ContentType))
+            if (this.Files.Count == 0 || !this.Files.Any(file => file.Value.MsbuildType == NapackFile.CompileType))
             {
                 throw new InvalidNapackException("At least one file must be present of type Content.");
             }
@@ -61,7 +61,7 @@ namespace Napack.Common
         public void UpdateNamespaceOfFiles(string napackName, int majorVersion)
         {
             string regex = $"namespace\\s+{napackName}";
-            string replacement = $"namespace {napackName}.{majorVersion}";
+            string replacement = $"namespace {napackName}_{majorVersion}";
             foreach (NapackFile file in this.Files.Values)
             {
                 file.Contents = Regex.Replace(file.Contents, regex, replacement, 

@@ -17,7 +17,7 @@ namespace Napack.Client
         /// <summary>
         /// Saves the napack attributions file by parsing all the licenses of the specified napacks.
         /// </summary>
-        internal static void SaveNapackAttributionsFile(string napackDirectory, Dictionary<string, NapackVersion> allNapackVersions)
+        internal static void SaveNapackAttributionsFile(string projectDirectory, Dictionary<string, NapackVersion> allNapackVersions)
         {
             const int lineLength = 70;
 
@@ -43,7 +43,7 @@ namespace Napack.Client
             }
 
             fileBuilder.AppendLine("=====================================================================");
-            File.WriteAllText(Path.Combine(napackDirectory, NapackAttributions.NapackAttributionsFileName), fileBuilder.ToString());
+            File.WriteAllText(Path.Combine(projectDirectory, NapackAttributions.NapackAttributionsFileName), fileBuilder.ToString());
         }
 
         private static void AppendNapackLicense(List<string> authors, License license, StringBuilder fileBuilder)
@@ -52,7 +52,7 @@ namespace Napack.Client
             if (license.LicenseType != LicenseManagement.LicenseType.Other)
             {
                 string licenseFormatString = LicenseManagement.GetLicenseFormatString(license.LicenseType);
-                fileBuilder.Append(string.Format(licenseFormatString, authorsString, DateTime.UtcNow.ToString("YYYY")));
+                fileBuilder.Append(string.Format(licenseFormatString, authorsString, DateTime.UtcNow.ToString("yyyy")));
             }
             else
             {

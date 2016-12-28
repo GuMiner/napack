@@ -18,7 +18,7 @@ namespace Napack.Analyst.ApiSpec
         /// Unknown files that are not compilable by the Roslyn API.
         /// </summary>
         /// <remarks>
-        /// This list is guaranteed to not have anything with the <see cref="NapackFile.ContentType"/> type, 
+        /// This list is guaranteed to not have anything with the <see cref="NapackFile.CompileType"/> type, 
         ///  as all those files must be parseable by the API.
         /// </remarks>
         public List<NapackFile> UnknownFiles { get; set; }

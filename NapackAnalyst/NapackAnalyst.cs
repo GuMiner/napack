@@ -63,14 +63,14 @@ namespace Napack.Analyst
         /// <param name="napackFiles">A mapping of file path + name -> file itself.</param>
         /// <remarks>
         /// Restrictions:
-        /// - All Napack files with MSBuild type <see cref="NapackFile.ContentType"/> must be able to be analyzed by this system.
+        /// - All Napack files with MSBuild type <see cref="NapackFile.CompileType"/> must be able to be analyzed by this system.
         /// - The namespace of all analyzable-files must be the specified napack name (CASE-SENSITIVE, as per C# spec).
         /// - Although C# allows multiple namespaces in a single file, as they all must be the specified napack name doing so is prohibited.
         /// - Partial classes are disallowed as any non-code files won't have their namespace updated. (This may be changed to better support UI elements, etc in the future).
         /// </remarks>
         /// <exception cref="InvalidNapackFileExtensionException">If a Napack file contains a prohibited extension.</exception>
         /// <exception cref="InvalidNamespaceException">If a compilable Napack file is in the wrong namespace.</exception>
-        /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.ContentType"/>, but could not be analyzed.</exception>
+        /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.CompileType"/>, but could not be analyzed.</exception>
         /// <exception cref="UnsupportedNapackFileException">If a Napack file uses C# functionality or syntax that the Napack system explicitly prohibits.</exception>
         public static NapackSpec CreateNapackSpec(string napackName, IDictionary<string, NapackFile> napackFiles)
         {
@@ -87,7 +87,7 @@ namespace Napack.Analyst
                     NapackAnalyst.PackageValidationConfig.ValidateExtension(filename, extension);
                 }
 
-                if (fileEntry.Value.MsbuildType.Equals(NapackFile.ContentType, StringComparison.InvariantCultureIgnoreCase))
+                if (fileEntry.Value.MsbuildType.Equals(NapackFile.CompileType, StringComparison.InvariantCultureIgnoreCase))
                 {
                     spec.Classes.AddRange(NapackClassAnalyzer.Analyze(napackName, filename, fileEntry.Value.Contents));
                 }

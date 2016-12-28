@@ -12,19 +12,20 @@ namespace Napack.Client
     {
         private const string NapackTargetsFilename = "napack.targets";
         
-        public static void SaveNapackTargetsFile(string napackDirectory, List<NapackVersionIdentifier> currentNapacks)
+        public static void SaveNapackTargetsFile(string projectDirectory, string napackDirectory, List<NapackVersionIdentifier> currentNapacks)
         {
             StringBuilder fileBuilder = new StringBuilder();
             fileBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            fileBuilder.AppendLine("<Project ToolsVersion=\"14.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">");
 
+            string directoryRelation = PathUtilities.GetRelativePath(projectDirectory, napackDirectory);
             foreach (NapackVersionIdentifier napack in currentNapacks)
             {
-                // TODO remove code duplication here.
-                fileBuilder.AppendLine("<Import Project=\"" + napack.GetFullName() + "\\" + 
-                    napack.NapackName + "_" + napack.Major + "_" + napack.Minor + "_" + napack.Patch + ".targets\">");
+                fileBuilder.AppendLine($"  <Import Project=\"{directoryRelation}\\{napack.GetFullName()}\\{napack.GenerateTargetName()}.targets\" />");
             }
 
-            File.WriteAllText(Path.Combine(napackDirectory, NapackTargets.NapackTargetsFilename), fileBuilder.ToString());
+            fileBuilder.AppendLine("</Project>");
+            File.WriteAllText(Path.Combine(projectDirectory, NapackTargets.NapackTargetsFilename), fileBuilder.ToString());
         }
     }
 }

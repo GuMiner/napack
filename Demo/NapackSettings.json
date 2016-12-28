@@ -1,0 +1,16 @@
+{
+  "napackFrameworkServer": "https://napack.net",
+  "allowCommercial": false,
+  "allowCopyLeft": false,
+  "allowCustomLicenses": false,
+  "autoUpdatePatch": true,
+  "autoUpdateMinor": true,
+  "warnMajorUpdates": false,
+  "lastUpdateTime": "2016-12-26T01:14:03.8053187Z",
+  "autoUpdateInterval": "0.01:00:00",
+  "defaultUserId": "email",
+  "defaultUserAuthenticationKeys": [
+  "cc0bb59b-6f5d-4374-9157-e1f4daed2c75",
+  "0fe24f94-4d3d-4f1e-905d-7d0fee9f3d7c",
+  "66c374cb-17e0-42c3-897e-6bfd74f123dc"]
+}

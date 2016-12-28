@@ -23,11 +23,11 @@ namespace Napack.Client
         // Todo version arguments, and arguments to determine if this is a create vs update.
         [CommandLineArgument(Position = 1, IsRequired = true)]
         [Description("The JSON file describing the package being uploaded")]
-        public string PackageJsonFile { get; set; }
+        public string PackageFile { get; set; }
 
         [CommandLineArgument(Position = 2, IsRequired = true)]
         [Description("The JSON settings file used to configure how this application runs.")]
-        public string NapackSettings { get; set; }
+        public string NapackSettingsFile { get; set; }
 
         [CommandLineArgument(Position = 3, IsRequired = false)]
         [Description("Updates the package metadata (description, more information, tags, and authorized users) instead of the package.")]
@@ -53,7 +53,7 @@ namespace Napack.Client
 
         public void PerformOperation()
         {
-            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
+            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettingsFile));
             string userId = string.IsNullOrWhiteSpace(this.UserId) ? settings.DefaultUserId : this.UserId;
             List<Guid> accessKeys = this.AuthorizationKeys?.Split(';').Select(key => Guid.Parse(key)).ToList() ?? settings.DefaultUserAuthenticationKeys;
             UserSecret userSecret = new UserSecret()
@@ -62,8 +62,8 @@ namespace Napack.Client
                 Secrets = accessKeys
             };
 
-            string packageName = Path.GetFileNameWithoutExtension(this.PackageJsonFile);
-            NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageJsonFile));
+            string packageName = Path.GetFileNameWithoutExtension(this.PackageFile);
+            NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageFile));
             napackDescriptor.Validate(settings.DefaultUserId);
 
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
@@ -74,9 +74,9 @@ namespace Napack.Client
 
         private async Task CreateOrUpdateNapackAsync(string packageName, NapackLocalDescriptor napackDescriptor, UserSecret userSecret, NapackServerClient client)
         {
-            string rootDirectory = Path.GetFullPath(Path.GetDirectoryName(this.PackageJsonFile));
+            string rootDirectory = Path.GetFullPath(Path.GetDirectoryName(this.PackageFile));
             Dictionary<string, NapackFile> files = UploadOperation.ParseNapackFiles(rootDirectory, rootDirectory);
-            files.Remove(Path.GetFileName(this.PackageJsonFile));
+            files.Remove(Path.GetFileName(this.PackageFile));
 
             bool packageExists = await client.ContainsNapack(packageName).ConfigureAwait(false);
             if (!packageExists && this.UpdateMetadata)
@@ -146,7 +146,7 @@ namespace Napack.Client
             Dictionary<string, Task<string>> fileReadTasks = new Dictionary<string, Task<string>>();
             foreach (string file in Directory.GetFiles(directory))
             {
-                fileReadTasks.Add(UploadOperation.GetRelativePath(rootDirectory, file), Task.Run(() => File.ReadAllText(file)));
+                fileReadTasks.Add(PathUtilities.GetRelativePath(rootDirectory, file), Task.Run(() => File.ReadAllText(file)));
             }
 
             Task.WhenAll(fileReadTasks.Select(kvp => kvp.Value)).GetAwaiter().GetResult();
@@ -154,7 +154,7 @@ namespace Napack.Client
             foreach (KeyValuePair<string, string> pathAndContents in fileReadTasks.ToDictionary(task => task.Key, task => task.Value.Result))
             {
                 // If the file starts with '// MSBuildType = TYPE', use TYPE instead. TODO this is kinda hacky and should be improved.
-                string contentType = NapackFile.ContentType;
+                string contentType = NapackFile.CompileType;
                 if (pathAndContents.Value.StartsWith(NapackFile.BuildTypeHeader))
                 {
                     int firstNewline = pathAndContents.Value.IndexOf("\n");
@@ -171,15 +171,6 @@ namespace Napack.Client
             return filesFound;
         }
 
-        private static string GetRelativePath(string rootDirectory, string file)
-        {
-            Uri filePathUri = new Uri(file);
-            if (!rootDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
-            {
-                rootDirectory += Path.DirectorySeparatorChar;
-            }
-
-            return Uri.UnescapeDataString(new Uri(rootDirectory).MakeRelativeUri(filePathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
-        }
+        
     }
 }

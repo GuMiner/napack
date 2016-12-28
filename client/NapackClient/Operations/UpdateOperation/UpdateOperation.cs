@@ -21,41 +21,47 @@ namespace Napack.Client
         private const string LockFileSuffix = ".lock";
 
         [CommandLineArgument(Position = 0, IsRequired = true)]
-        [Description("The operation being performed.")]
+        [Description("Set to 'Update' to call this operation.")]
         public string Operation { get; set; }
 
         [CommandLineArgument(Position = 1, IsRequired = true)]
         [Description("The JSON file listing the Napacks used by the current project.")]
-        public string NapackJson { get; set; }
+        public string NapacksFile { get; set; }
 
         [CommandLineArgument(Position = 2, IsRequired = true)]
         [Description("The JSON settings file used to configure how this application runs.")]
-        public string NapackSettings { get; set; }
+        public string NapackSettingsFile { get; set; }
 
         [CommandLineArgument(Position = 3, IsRequired = true)]
-        [Description("The directory storing downloaded Napacks")]
+        [Description("The directory storing downloaded Napacks.")]
         public string NapackDirectory { get; set; }
+
+        [CommandLineArgument(Position = 4, IsRequired = true)]
+        [Description("The directory containing the VS project.")]
+        public string ProjectDirectory { get; set; }
 
         public bool IsValidOperation() => !string.IsNullOrWhiteSpace(this.Operation) && this.Operation.Equals("Update", StringComparison.InvariantCultureIgnoreCase);
 
         public void PerformOperation()
         {
             // The specified napacks.
-            Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(this.NapackJson));
+            Console.WriteLine("Reading in the Napacks JSON file....");
+            Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(this.NapacksFile));
             List<NapackVersionIdentifier> listedNapacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key + "." + item.Value)).ToList();
 
             // The specified napacks, plus those dependencies. This doesn't have to exist -- we'll detect everything as unused if it doesn't and clear the napack folder.
             Dictionary<string, List<NapackVersion>> knownNapacks = new Dictionary<string, List<NapackVersion>>();
             try
             {
-                knownNapacks = Serializer.Deserialize<Dictionary<string, List<NapackVersion>>>(File.ReadAllText(this.NapackJson + UpdateOperation.LockFileSuffix));
+                knownNapacks = Serializer.Deserialize<Dictionary<string, List<NapackVersion>>>(File.ReadAllText(this.NapacksFile + UpdateOperation.LockFileSuffix));
             }
             catch (Exception)
             {
                 Console.WriteLine("Didn't find the napack lock file; packages may be redownloaded.");
             }
-            
-            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettings));
+
+            Console.WriteLine("Reading in the Napack Settings JSON file...");
+            NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettingsFile));
 
             // Now that we've read in everything, start processing.
             knownNapacks = this.RemoveUnusedNapacks(knownNapacks);
@@ -66,7 +72,12 @@ namespace Napack.Client
             }
             
             // Save the lock file now that we're in an updated state.
-            File.WriteAllText(this.NapackJson + UpdateOperation.LockFileSuffix, Serializer.Serialize(knownNapacks));
+            foreach(NapackVersion knownNapack in knownNapacks.Values.SelectMany(value => value))
+            {
+                // Clear the files so we aren't duplicating them in the lock file.
+                knownNapack.Files.Clear();
+            }
+            File.WriteAllText(this.NapacksFile + UpdateOperation.LockFileSuffix, Serializer.Serialize(knownNapacks));
 
             // Extract out our version identifiers
             List<NapackVersionIdentifier> napackVersionIdentifiers = new List<NapackVersionIdentifier>();
@@ -80,8 +91,8 @@ namespace Napack.Client
                 }
             }
 
-            NapackTargets.SaveNapackTargetsFile(this.NapackDirectory, napackVersionIdentifiers);
-            NapackAttributions.SaveNapackAttributionsFile(this.NapackDirectory, allNapackVersions);
+            NapackTargets.SaveNapackTargetsFile(this.ProjectDirectory, this.NapackDirectory, napackVersionIdentifiers);
+            NapackAttributions.SaveNapackAttributionsFile(this.ProjectDirectory, allNapackVersions);
         }
 
         /// <summary>
@@ -90,6 +101,11 @@ namespace Napack.Client
         /// <returns>The known napacks, with napacks that don't exist removed.</returns>
         private Dictionary<string, List<NapackVersion>> RemoveUnusedNapacks(IDictionary<string, List<NapackVersion>> knownNapacks)
         {
+            if (!Directory.Exists(this.NapackDirectory))
+            {
+                Directory.CreateDirectory(this.NapackDirectory);
+            }
+
             int unknownFolders = 0;
             int unusedNapacks = 0;
             List<NapackVersionIdentifier> versions = new List<NapackVersionIdentifier>();
@@ -252,10 +268,13 @@ namespace Napack.Client
 
         private async Task SaveNapackAsync(NapackVersionIdentifier versionId, NapackVersion version)
         {
-            List<Task> fileWriteTasks = new List<Task>();
+            string enclosingDirectory = Path.Combine(this.NapackDirectory, versionId.GetFullName());
+            Directory.CreateDirectory(enclosingDirectory);
+
+            List <Task> fileWriteTasks = new List<Task>();
             foreach (KeyValuePair<string, NapackFile> file in version.Files)
             {
-                fileWriteTasks.Add(this.SaveFileAsync(file.Key, file.Value.Contents));
+                fileWriteTasks.Add(this.SaveFileAsync(Path.Combine(enclosingDirectory, file.Key), file.Value.Contents));
             }
 
             fileWriteTasks.Add(GenerateTargetAsync(versionId, version.Files.ToDictionary(item => item.Key, item => item.Value.MsbuildType)));
@@ -277,19 +296,22 @@ namespace Napack.Client
 
             StringBuilder targetFileBuilder = new StringBuilder();
             targetFileBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            targetFileBuilder.AppendLine("<Target Name=\"");
-            targetFileBuilder.AppendLine(napackFilename + "\" BeforeTargets=\"Build\">");
-            targetFileBuilder.AppendLine("  <ItemGroup>");
-
+            targetFileBuilder.AppendLine("<Project ToolsVersion=\"14.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">");
+            targetFileBuilder.Append("  <Target Name=\"");
+            targetFileBuilder.AppendLine(napackFilename + "\" BeforeTargets=\"BeforeCompile\">");
+            targetFileBuilder.AppendLine("    <ItemGroup>");
+                
             foreach (KeyValuePair<string, string> file in targetFiles)
             {
-                targetFileBuilder.AppendLine("    <" + file.Value + " Include=\"" + file.Key + "\" />");
+                string filePath = $"{this.NapackDirectory}\\{versionId.GetFullName()}\\{file.Key}";
+                targetFileBuilder.AppendLine($"      <{file.Value} Include=\"{PathUtilities.GetRelativePath(this.ProjectDirectory, filePath)}\" />");
             }
 
-            targetFileBuilder.AppendLine("  </ItemGroup>");
-            targetFileBuilder.AppendLine("</Target>");
+            targetFileBuilder.AppendLine("    </ItemGroup>");
+            targetFileBuilder.AppendLine("  </Target>");
+            targetFileBuilder.AppendLine("</Project>");
 
-            string targetsFilename = Path.Combine(this.NapackDirectory, napackFilename, ".targets");
+            string targetsFilename = Path.Combine(this.NapackDirectory, Path.Combine(versionId.GetFullName(), napackFilename + ".targets"));
             return SaveFileAsync(targetsFilename, targetFileBuilder.ToString());
         }
 

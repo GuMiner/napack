@@ -13,7 +13,7 @@
 4. Build your project. 
  - In the example above, *PointSphere* and dependent Napacks will be automatically downloaded and placed in the *{Project Root}/napacks/PointSphere.2.1.2/* folder.
 5. For each source file you want to use the packages in, write ```using Package.Major``` in that file.
-  - To use *PointSphere*, you would write ```using PointSphere.2```
+  - To use *PointSphere*, you would write ```using PointSphere_2```
 
 The default Napack settings will prevent you from automatically including Napacks that force your code to be open-sourced or require a commercial license -- simply add the **Napack.attributions** file to your license file. The default settings will also periodically check for non-breaking MINOR or PATCH changes to your Napacks and update them automatically. 
 

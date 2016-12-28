@@ -25,7 +25,7 @@ namespace Napack.Analyst
         /// Analyzes a Napack class file to determine the class specification it contains.
         /// </summary>
         /// <exception cref="InvalidNamespaceException">If a compilable Napack file is in the wrong namespace.</exception>
-        /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.ContentType"/>, but could not be analyzed.</exception>
+        /// <exception cref="InvalidNapackFileException">If a Napack file is listed with MSBuild type <see cref="NapackFile.CompileType"/>, but could not be analyzed.</exception>
         /// <exception cref="UnsupportedNapackFileException">If a Napack file uses C# functionality or syntax that the Napack system explicitly prohibits.</exception>
         public static ICollection<ClassSpec> Analyze(string napackName, string filename, string contents)
         {

@@ -6,7 +6,7 @@
     public class NapackFile
     {
         public const string BuildTypeHeader = "// MSBuildType = ";
-        public const string ContentType = "Content";
+        public const string CompileType = "Compile";
 
         /// <summary>
         /// The type of item within MSBUILD.
