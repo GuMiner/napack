@@ -4,6 +4,8 @@ Napack Framework Server Privacy Policy
 The Napack Framework Server collects data that you directly provide when creating Napacks, and indirectly provide by visiting the Napack Framework Server.
 
 You can choose to provide whatever data you directly provide by not providing that data.
-Napacks are publically visible and immutable -- to remove a Napack, contact the Napack Framework Server administrator directly.
+Napacks are publically visible and immutable -- to remove a Napack, contact the Napack Framework Server administrator directly. 
+
+User registration requires you to provide the Napack Framework Server your email. This email will only be used to validate your email address, to contact you regarding your registration, and to contact you regarding Napacks that you have uploaded. This email will never be disclosed to third-parties.
 
 The data the Napack Framework Server indirectly collects is anonymized and only used to further enhance and improve the functionality of the Napack System.

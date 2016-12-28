@@ -1,21 +1,21 @@
 #Napack Client
 About
 ---------
-The Napack Client ("Napack.Client.exe") is a command-line executable that uploads new Napacks and downloads consumed Napacks.
+The Napack Client ("Napack.Client.exe") is a command-line executable that registers users, uploads new Napacks, and downloads consumed Napacks. This client is used by the Visual Studio extension and by the Napack build integration, but can also be called manually.
 
-Registration
-------------
-TODO fill in.
 
-Uploading Napacks
-----------------------
-TODO fill in.
+Operations
+----------
+TODO fill in more than just examples.
 
-Downloading Napacks
-------------------------
-*The Napack Download Process is integrated with MSBuild by the Visual Studio Extension. You should not need to call this function manually, however it is documented here for completeness.*
+###Registration
+Napack.Client.exe -Operation Register -UserEmail email -NapackSettings D:\napack\client\IntegrationTestContent\NapackSettings.json
 
-When run from within the **napack** folder
-"**Napack.Client.exe Update -NapackJson ..\napack.json -NapackSettings napack.settings -NapackDirectory .**"
+###Uploading Napacks
+Napack.Client.exe -Operation Upload -PackageJsonFile D:\napack\client\IntegrationTestContent\Napacks\BasicVector\BasicVector.json -NapackSettings D:\napack\client\IntegrationTestContent\NapackSettings.json
+Napack.Client.exe -Operation Upload -PackageJsonFile D:\napack\client\IntegrationTestContent\Napacks\BasicVector.Core\BasicVector.Core.json -NapackSettings D:\napack\client\IntegrationTestContent\NapackSettings.json
+Napack.Client.exe -Operation Upload -PackageJsonFile D:\napack\client\IntegrationTestContent\Napacks\PointInSphere\PointInSphere.json -NapackSettings D:\napack\client\IntegrationTestContent\NapackSettings.json
+Napack.Client.exe -Operation Upload -PackageJsonFile D:\napack\client\IntegrationTestContent\Napacks\PointInCylinder\PointInCylinder.json -NapackSettings D:\napack\client\IntegrationTestContent\NapackSettings.json
 
-The client will perform the following steps: TODO
+###Downloading Napacks
+Napack.Client.exe -Operation Update -NapackDirectory D:\napack\Demo\napacks -NapackSettingsFile D:\napack\Demo\NapackSettings.json -NapacksFile D:\napack\Demo\Napacks.json -ProjectDirectory D:\napack\Demo

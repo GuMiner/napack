@@ -6,11 +6,10 @@
     string pageName = "Documentation";
 }
 
-@section Title {@pageName}
+@section Title {@pageName -- @Model.Name}
 
 <div id="body">
-    <h1>@pageName</h1>
-    <h2>@Model.Name</h2>
+    <h1>@pageName -- <i>@Model.Name</i></h1>
     @Html.Raw(@Model.Html).
 </div>
 

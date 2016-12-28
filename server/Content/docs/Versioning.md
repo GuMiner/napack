@@ -1,21 +1,23 @@
 #Versioning
 Napacks follow a subset of [Semantic Versioning](http://semver.org/) with the basic MAJOR.MINOR.PATCH format.
-When packages are updated, the Napack framework will automatically detect API changes and perform the appropriate version increment.
+When packages are updated, the Napack framework will automatically scan the publically-facing API of the package code, detect API changes, and perform the appropriate version increment.
 
-Therefore:
+When the Napack Framewok detects API changes:
+* Publically-facing API edits or deletions will increment the MAJOR version.
+* API additions will increment the MINOR version.
+* Napack updates that don't impact the publically-facing API will increment the PATCH version.
 
-* Breaking API changes will increment the MAJOR version.
-* Capability additions will increment the MINOR version.
-* Changes that don't affect the API (ususally bug fixes) will increment the PATCH version.
-
-This "auto-upversioning" can't prevent all breaking changes, but provides the following benefits:
+While the Napack Framework's automatic versioning cannot prevent all breaking changes, this standardization provides:
 
 * A common understanding of what version changes represent.
 * An automated way of performing the version changes.
 * Automatic public API documentation
 
-##But what about prerelease/alpha/beta/rc packages?
+##What about prerelease/alpha/beta/rc packages?
 Napacks are intended to be small enough to not *need* a 'not for public consumption' tag. If you want to include such a tag in your Napack version, that usually indicates:
 
-* There are not sufficient unit tests associated with your Napack.
-* Your Napack is too large to be easily testable and verifiable.
+* Your Napack includes multiple pieces of functionality that should be broken apart into separate smaller Napacks.
+* Your Napack is too large to create a ready-for-release version in a short period of time.
+* Your Napack is too large to sufficiently test to validate you have created a ready-for-release version.
+
+As such, the Napack Framework does not support version tags.

@@ -1,7 +1,9 @@
 Napack Framework Server Terms of Use
 ------------------------------------
 
-The use of the Napack Framework Server is subject to the following Terms of Use.
+Last Updated December 28th, 2016.
+
+The use of the Napack Framework Server is subject to the following Terms of Use. IF YOU DO NOT AGREE TO ALL PROVISIONS OF THIS TERMS OF USE, YOU ARE NOT AUTHORIZED TO USE THE NAPACK FRAMEWORK SERVER.
 These Terms of Use may be updated at any time, without any notice.
 The most recent Terms of Use may be found by visiting the Napack Framework Server website and clicking the 'Terms of Use' hyperlink.
 
@@ -23,7 +25,13 @@ All authors of Napacks are responsible for the contents and metadata of the Napa
 The Napack Framework Server is not responsible for the metadata or contents of all Napacks.
 
 All authors of Napacks retain the license to the content and user-provided metadata of the Napack.
-All authors of Napacks grant the Napack Framework Server permission to publically list all contents, user-provided metadata, and system-generated metadata from the Napack.
+All authors of Napacks grant the Napack Framework Server permission to publicalyl retain, duplicate, provide, and list all contents, user-provided metadata, and system-generated metadata from the Napack.
+
+Napack Recalls and Deletions
+============================
+Napacks will be deleted if their content contains any illegal material. User registrations will also be revoked if illegal material is found in any provided Napacks.
+Napacks will be deleted if their name violates the usage restrictions listed on https://napack.net/Documentation/Creation.md
+
 
 Privacy
 -------
@@ -40,8 +48,25 @@ and/or sell copies of the Software, and to permit persons to whom the Software i
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ===
+
+Legal Notices
+-------------
+Any legal notice to https://napack.net may only be delivered by contacting the NFS Administrator as located at https://napack.net or by certified mail to the real owner of that domain. 
+For certified mail, legal notices are deemed delivered 7 businesss days after the reception of the certified mail receipt. LEGAL NOTICES MUST NOT BE SENT TO THE DOMAIN REGISTRAR, ONLY TO THE REAL OWNER OF THE DOMAIN.
+For electronic mail, legal noticies are deemed delivered when a confirmation email is sent from the NFS Administrator.
+Legal notices are not deemed as private communications and may be reproduced freely, regardless of any expressed intention of the message in the received legal notice. IF YOU DO NOT AGREE WITH THIS PROVISION, OR ANY OTHER PROVISION OF THE 'TERMS OF USE', YOU ARE NOT AUTHORIZED TO USE THE NAPACK FRAMEWORK SERVER.
+
+Governing Law
+-------------
+As https://napack.net is located in the United States, this website makes no claims that content on the Website is legal outside of the United States.
+If you access the Website from outside the United States, you do so at your own risk and are responsible for complying with your local laws.
+These 'Terms of Use' are governed by the State of Wisconsin, USA.
+
+Enforcement
+-----------
+If any provision herein is held to be unenforceable, the remaining provisions will continue in full force without being affected in any way. Furthermore, the parties agree to replace all unenforceable provision with an enforceable provision that most closely approximates the intent of the unenforceable provision. 
+The waiver of a breach of any provision of these 'Terms of Use' shall not be construed as a waiver of any other or future breach.
