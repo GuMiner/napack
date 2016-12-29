@@ -102,10 +102,10 @@ namespace Napack.Server
                 throw new UnauthorizedUserException();
             }
 
-            // Check that the user is who they say they are.
+            // Check that the user is who they say they are and that the user has performed validation.
             UserIdentifier user = storageManager.GetUser(userId);
             string hash = UserIdentifier.ComputeUserHash(userSecrets);
-            if (!user.Hash.Equals(hash, StringComparison.InvariantCulture))
+            if (!user.EmailConfirmed || !user.Hash.Equals(hash, StringComparison.InvariantCulture))
             {
                 throw new UnauthorizedUserException();
             }

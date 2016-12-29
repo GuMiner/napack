@@ -279,5 +279,10 @@ namespace Napack.Server
 
             authorPackageStore[author].Add(version);
         }
+
+        public void UpdateUser(UserIdentifier user)
+        {
+            users[user.Email] = user;
+        }
     }
 }

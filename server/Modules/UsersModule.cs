@@ -30,6 +30,27 @@ namespace Napack.Server
                     Secrets = secret.Secrets
                 });
             };
+
+            // Confirms a user's registration.
+            Patch["/"] = parameters =>
+            {
+                UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
+                EmailManager.ValidateUserEmail(user.Email);
+
+                UserIdentifier serverSideUser = napackManager.GetUser(user.Email);
+                if (!serverSideUser.EmailConfirmed && user.EmailVerificationCode == serverSideUser.EmailVerificationCode)
+                {
+                    serverSideUser.EmailConfirmed = true;
+                }
+
+                napackManager.UpdateUser(serverSideUser);
+
+                return this.Response.AsJson(new
+                {
+                    UserId = user.Email,
+                    EmailValidated = user.EmailConfirmed
+                });
+            };
         }
     }
 }

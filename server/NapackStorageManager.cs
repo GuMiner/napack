@@ -80,5 +80,10 @@ namespace Napack.Server
         {
             throw new NotImplementedException();
         }
+
+        public void UpdateUser(UserIdentifier user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

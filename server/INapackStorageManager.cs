@@ -42,7 +42,12 @@ namespace Napack.Server
         /// Adds a user for future security validation.
         /// </summary>
         void AddUser(UserIdentifier user);
-        
+
+        /// <summary>
+        /// Updates a user.
+        /// </summary>
+        void UpdateUser(UserIdentifier user);
+
         /// <summary>
         /// Gets the statistics for a Napack package.
         /// </summary>
