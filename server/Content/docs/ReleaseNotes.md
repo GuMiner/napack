@@ -10,12 +10,13 @@ The Napack Database is subject to arbitrary deletion until there are no more rem
 Bugs
 ----
 * NapackAnalyst doesn't have support for interfaces yet.
-* Napack NuGet package automatically imports the client binaries into the package, which is not intended.
 * Case sensitivity / insensitivity issues accross the board, esp. related to JSON serialization of package names.
 * Default user ID / authentication shouldn't be in the NapackSettings.json file, but somewhere else reasonably common and accessible.
 * Significantly increase unit testing and functional testing, so that the website can be tested locally with the in-memory store.
 * The napack icon needs professional attention.
 * Search is missing the 'click for details' function on retrieved items linking to API, versions, authors, etc.
+* Logging is currently to console, not NLog (with file redirection, etc.)
+* Requests don't log IPs or do any attempt at throttling.
 
 Core Functionality
 ------------------
@@ -25,7 +26,7 @@ Core Functionality
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.
 * The Napack NuGet package doesn't automatially create or integrate with MSBuild without manual intervention. Update [Download.md](./Download.md) when done.
 * The Napack Server Framework needs a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
-* Email validation for user registration, and appropriate backend state for that.
+* Email validation for user registration, and appropriate backend state for that. This requires backend email setup on Napack.
 * Create a site statistics page detailing user activity, Napacks downloaded, uptime, etc.
 * Create a tree-view page to navigate through Napacks and their dependencies.
 
@@ -35,3 +36,8 @@ Final Release Steps
 * Validate database backup is working
 * Create several Napacks around key searching, sorting, vectors, and algorithmic functionality.
 * Scrub through the documentation one more time.
+
+Known Issues
+------------
+These issues will be fixed post-release, if possible.
+* Intellisense support for added Napacks requires a project reload.

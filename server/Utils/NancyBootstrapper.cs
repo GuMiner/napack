@@ -26,6 +26,7 @@ namespace Napack.Server
                 [typeof(InvalidNapackFileExtensionException)] = HttpStatusCode.BadRequest,
                 [typeof(InvalidNamespaceException)] = HttpStatusCode.BadRequest,
                 [typeof(UnsupportedNapackFileException)] = HttpStatusCode.BadRequest,
+                [typeof(InvalidUserIdException)] = HttpStatusCode.BadRequest,
                 [typeof(JsonSerializationException)] = HttpStatusCode.BadRequest,
 
                 // 401 -- Unauthorized

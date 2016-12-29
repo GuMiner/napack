@@ -12,7 +12,7 @@ namespace Napack.Server
             Get["/"] = parameters =>
             {
                 Global.Log("Index");
-                return View["Index"];
+                return View["Index", new IndexModel(Global.AdministratorEmail)];
             };
 
             // TODO remove this once I've determined a better way of functional testing Nancy routing.

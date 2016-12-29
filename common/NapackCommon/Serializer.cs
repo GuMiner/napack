@@ -15,8 +15,7 @@ namespace Napack.Common
         {
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
-                Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                Formatting = Formatting.Indented
             };
         }
 

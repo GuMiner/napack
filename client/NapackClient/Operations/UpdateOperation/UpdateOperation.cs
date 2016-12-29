@@ -292,7 +292,8 @@ namespace Napack.Client
 
         private Task GenerateTargetAsync(NapackVersionIdentifier versionId, IDictionary<string, string> targetFiles)
         {
-            string napackFilename = versionId.GenerateTargetName();
+            // Ensure we don't include invalid files in our intellisense hinting.
+            string napackFilename = versionId.GenerateTargetName().Replace('.', '_');
 
             // Add all files as their appropriate listed type.
             StringBuilder targetFileBuilder = new StringBuilder();

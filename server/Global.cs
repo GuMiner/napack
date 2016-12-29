@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -19,6 +20,10 @@ namespace Napack.Server
         /// </summary>
         public static Action<string> Log => (input) => Console.WriteLine(input);
 
+        public static string AdministratorEmail { get; private set; }
+
+        public static string AdministratorName { get; private set; }
+
         /// <summary>
         /// Returns true once initialization has completed, false otherwise.
         /// </summary>
@@ -31,6 +36,11 @@ namespace Napack.Server
 
         public static void Main(string[] args)
         {
+            // Read in common values from our App.config file.
+            Global.AdministratorEmail = ConfigurationManager.AppSettings["AdministratorEmail"];
+            Global.AdministratorName = ConfigurationManager.AppSettings["AdministratorName"];
+            EmailManager.Initialize(ConfigurationManager.AppSettings["NFSEmailHost"], int.Parse(ConfigurationManager.AppSettings["NFSEmailPort"]));
+
             // Turn off certificate validation, because it doesn't work with self-signed certificates.
             ServicePointManager.ServerCertificateValidationCallback =
             delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -38,8 +48,6 @@ namespace Napack.Server
                 return true;
             };
             
-            // To get port 80, you'll need to route route port 9876 to port 80 through this: 
-            //  "sudo /sbin/iptables -t nat -A PREROUTING -i eth+ -p tcp --dport 80 -j REDIRECT --to-port 9876"
             if (args.Length != 1)
             {
                 Log("Expecting the startup URL as the singleton argument!");

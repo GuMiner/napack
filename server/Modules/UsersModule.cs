@@ -15,13 +15,15 @@ namespace Napack.Server
             Post["/"] = parameters =>
             {
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
-                UserSecret secret = UserSecret.CreateNewSecret();
-                user.Hash = UserIdentifier.ComputeUserHash(secret.Secrets);
 
-                // TODO identifier validation (email). Also scan for case sensitive / insensitive errors throughout the codebase.
+                EmailManager.ValidateUserEmail(user.Email);
+                UserSecret secret = UserSecret.CreateNewSecret();
+                user.Reset(UserIdentifier.ComputeUserHash(secret.Secrets));
+
+                EmailManager.SendVerificationEmail(user);
                 napackManager.AddUser(user);
 
-                Global.Log("Assigned user " + user.Email + " a hash and secrets.");
+                Global.Log("Assigned user " + user.Email + " a hash and secrets, and attempted to send a validation email.");
                 return this.Response.AsJson(new Common.UserSecret()
                 {
                     UserId = user.Email,

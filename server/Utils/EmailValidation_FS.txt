@@ -1,0 +1,13 @@
+{0},
+
+Thank you for registering with this Napack Framework Server!
+Once your email address has been validated, you'll be able to upload Napacks in no time.
+
+Your email verification code is {1}
+
+Please note, usage of the Napack Framework Server is contingent on following our Terms of Use at http://napack.net/Content/TermsOfUse.txt
+You can also find our Privacy Policy at http://napack.net/Content/PrivacyPolicy.txt
+
+Sincerely,
+
+The Napack Framework Server Administrators.

@@ -1,7 +1,7 @@
 using System;
 using BasicVector_1;
 
-namespace BasicVector.Core
+namespace BasicVector_Core
 {
     public static class BasicVectorCoreExtensions
     {
@@ -23,7 +23,7 @@ namespace BasicVector.Core
 		
 		public static double Distance(this BasicVector basicVector, BasicVector other)
 		{
-			return Math.Sqrt(BasicVectorCoreBasicVectorExtensions.DistanceSqd(basicVector, other));
+			return Math.Sqrt(BasicVectorCoreExtensions.DistanceSqd(basicVector, other));
 		}
     }
 }

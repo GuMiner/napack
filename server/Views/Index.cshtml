@@ -1,4 +1,7 @@
-﻿@{
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.IndexModel>
+@model Napack.Server.IndexModel
+
+@{
     Layout = "RootLayout.cshtml";
     string pageName = "Napack Framework Server";
 }
@@ -16,7 +19,7 @@
         <aside class="aside960px">
             Source Code: <a href="https://github.com/GuMiner/napack">Source Code</a>
             <br />
-            Contact: <a href="mailto:gus.gran@gmail.com">NFS Administrator</a>
+            Contact: <a href="mailto:@Model.AdministratorEmail">NFS Administrator</a>
         </aside>
     </div>
 </div>

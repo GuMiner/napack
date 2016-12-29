@@ -119,6 +119,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Definitions\IndexModel.cs" />
     <Compile Include="Definitions\VersionsModel.cs" />
     <Compile Include="Definitions\ApiModel.cs" />
     <Compile Include="Definitions\NapackMetadata.cs" />
@@ -144,12 +145,14 @@
     <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\SerializerExtensions.cs" />
+    <Compile Include="Utils\EmailManager.cs" />
     <Compile Include="Utils\Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\Site.css" />
+    <EmbeddedResource Include="Utils\EmailValidation_FS.txt" />
     <Content Include="Views\RootLayout.cshtml" />
     <None Include="packages.config" />
     <Content Include="Views\Index.cshtml" />

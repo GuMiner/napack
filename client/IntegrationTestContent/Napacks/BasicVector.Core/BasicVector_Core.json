@@ -1,6 +1,6 @@
 {
   "description": "Implements core 3D vector mathematical functionality.",
-  "moreInformation": "http://napack.net/api/BasicVector.Core",
+  "moreInformation": "http://napack.net/api/BasicVector_Core",
   "tags": [ "vector", "geometry", "math" ],
   "authorizedUserIds": [],
   "authors": [ "Gustave Granroth" ],

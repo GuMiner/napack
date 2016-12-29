@@ -15,12 +15,41 @@ namespace Napack.Server
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public string Email { get; set; }
-        
+
+        /// <summary>
+        /// True if the email has been confirmed, false otherwise.
+        /// </summary>
+        [JsonProperty(Required = Required.Default)]
+        public bool EmailConfirmed { get; set; }
+
+        /// <summary>
+        /// The code associated with a user used for email verification.
+        /// </summary>
+        [JsonProperty(Required = Required.Default)]
+        public Guid? EmailVerificationCode { get; set; }
+
+        /// <summary>
+        /// The titles of emails that have been sent to this user.
+        /// </summary>
+        [JsonProperty(Required = Required.Default)]
+        public List<string> EmailSubjectsSent { get; set; }
+
         /// <summary>
         /// THe computed hash used to authenticate the user.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
         public string Hash { get; set; }
+
+        /// <summary>
+        /// Resets the user as a non-confirmed user with the hash provided used for authentication.
+        /// </summary>
+        /// <param name="userHash">The hash of the user.</param>
+        public void Reset(string userHash)
+        {
+            this.EmailConfirmed = false;
+            this.EmailSubjectsSent = new List<string>();
+            this.Hash = Hash;
+        }
 
         /// <summary>
         /// Hashes the provided identifiers into a Base64 string using SHA512.
