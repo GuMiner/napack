@@ -1,4 +1,5 @@
-﻿@using Napack.Server
+﻿@using System.Collections.Generic
+@using Napack.Server
 @using Napack.Common
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.VersionsModel>
 @model Napack.Server.VersionsModel
@@ -13,9 +14,9 @@
 <div id="body">
     <h1>@Model.Metadata.Name Versions</h1>
     <h2>Description</h2>
-    @: <p>@Model.Metadata.Description</p>
+    <p>@Model.Metadata.Description</p>
     <h2>More Information</h2>
-    @: <p>@Model.Metadata.MoreInformation</p>
+    <a href="@Model.Metadata.MoreInformation">@Model.Metadata.MoreInformation</a>
     <h2>Versions</h2>
     @foreach (KeyValuePair<int, NapackMajorVersionMetadata> version in Model.Metadata.Versions) { 
         @: <h3>@version.Key</h3>
