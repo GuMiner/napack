@@ -1,29 +1,29 @@
 using System;
-using BasicVector.1;
+using BasicVector_1;
 
 namespace BasicVector.Core
 {
     public static class BasicVectorCoreExtensions
     {
-		public static BasicVector Add(this BasicVector BasicVector, BasicVector other)
+		public static BasicVector Add(this BasicVector basicVector, BasicVector other)
 		{
-			return new BasicVector(BasicVector.X + other.X, BasicVector.Y + other.Y, BasicVector.Z + other.Z);
+			return new BasicVector(basicVector.X + other.X, basicVector.Y + other.Y, basicVector.Z + other.Z);
 		}
 		
-		public static BasicVector Subtract(this BasicVector BasicVector, BasicVector other)
+		public static BasicVector Subtract(this BasicVector basicVector, BasicVector other)
 		{
-			return new BasicVector(BasicVector.X - other.X, BasicVector.Y - other.Y, BasicVector.Z - other.Z);
+			return new BasicVector(basicVector.X - other.X, basicVector.Y - other.Y, basicVector.Z - other.Z);
 		}
 		
-		public static double DistanceSqd(this BasicVector BasicVector, BasicVector other)
+		public static double DistanceSqd(this BasicVector basicVector, BasicVector other)
 		{
-			BasicVector differenceBasicVector = BasicVector.Subtract(other);
+			BasicVector differenceBasicVector = basicVector.Subtract(other);
 			return Math.Pow(differenceBasicVector.X, 2) + Math.Pow(differenceBasicVector.Y, 2) + Math.Pow(differenceBasicVector.Z, 2);
 		}
 		
-		public static double Distance(this BasicVector BasicVector, BasicVector other)
+		public static double Distance(this BasicVector basicVector, BasicVector other)
 		{
-			return Math.Sqrt(BasicVectorCoreBasicVectorExtensions.DistanceSqd(BasicVector, other));
+			return Math.Sqrt(BasicVectorCoreBasicVectorExtensions.DistanceSqd(basicVector, other));
 		}
     }
 }

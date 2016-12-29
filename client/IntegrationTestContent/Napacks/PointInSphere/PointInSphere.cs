@@ -1,6 +1,6 @@
 using System;
-using BasicVector.1;
-using BasicVector.Core.1;
+using BasicVector_1;
+using BasicVector.Core_1;
 
 namespace PointInSphere
 {

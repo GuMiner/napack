@@ -1,5 +1,6 @@
 ﻿using System;   
 using BasicVector_1;
+using BasicVector_Core_1;
 
 namespace Demo
 {
@@ -11,7 +12,6 @@ namespace Demo
 
             BasicVector vector = new BasicVector(1.0, 2.0, 3.0);
             Console.WriteLine($"Test Vector: ({vector.X}, {vector.Y}, {vector.Z})");
-
             Console.WriteLine("Done.");
         }
     }

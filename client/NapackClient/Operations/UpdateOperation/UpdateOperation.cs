@@ -294,6 +294,7 @@ namespace Napack.Client
         {
             string napackFilename = versionId.GenerateTargetName();
 
+            // Add all files as their appropriate listed type.
             StringBuilder targetFileBuilder = new StringBuilder();
             targetFileBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             targetFileBuilder.AppendLine("<Project ToolsVersion=\"14.0\" DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">");
@@ -309,6 +310,13 @@ namespace Napack.Client
 
             targetFileBuilder.AppendLine("    </ItemGroup>");
             targetFileBuilder.AppendLine("  </Target>");
+
+            // Ensure Intellisense can see the new files.
+            targetFileBuilder.AppendLine("  <PropertyGroup>");
+            targetFileBuilder.AppendLine("    <CompileDependsOn>");
+            targetFileBuilder.AppendLine($"      {napackFilename};$(CompileDependsOn)");
+            targetFileBuilder.AppendLine("    </CompileDependsOn>");
+            targetFileBuilder.AppendLine("  </PropertyGroup>");
             targetFileBuilder.AppendLine("</Project>");
 
             string targetsFilename = Path.Combine(this.NapackDirectory, Path.Combine(versionId.GetFullName(), napackFilename + ".targets"));
