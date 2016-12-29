@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Napack</id>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     
     <authors>Gustave Granroth</authors>
     <owners>guminer</owners>
@@ -19,6 +19,8 @@
     <copyright>Copyright © 2016 Gustave Granroth</copyright>
     <tags>nano package api napack componentization manager framework system</tags>
   </metadata>
-  
+  <references>
+	<!-- Don't include any binaries automatically as references, because that's not the point of this NuGet package -->
+  </references>
   <!-- TODO need to add in .targets and .props to modify the build setup to call the Napack Client and setup a basic Napack package storage folder.-->
 </package>
