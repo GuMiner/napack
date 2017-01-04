@@ -12,6 +12,7 @@ namespace Napack.Analyst.ApiSpec
         {
             this.UnknownFiles = new List<NapackFile>();
             this.Classes = new List<ClassSpec>();
+            this.Interfaces = new List<InterfaceSpec>();
         }
 
         /// <summary>
@@ -30,5 +31,10 @@ namespace Napack.Analyst.ApiSpec
         /// All fields listed within other *Spec files only list publically-visible types.
         /// </remarks>
         public List<ClassSpec> Classes { get; set; }
+
+        /// <summary>
+        /// The interfaces of this Napack *that are publically visible*.
+        /// </summary>
+        public List<InterfaceSpec> Interfaces { get; set; }
     }
 }

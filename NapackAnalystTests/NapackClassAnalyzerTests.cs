@@ -13,27 +13,27 @@ namespace NapackAnalystTests
         [ExpectedException(typeof(UnsupportedNapackFileException))]
         public void MultipleNamespacesAreUnsupported()
         {
-            NapackClassAnalyzer.Analyze("unused", "unused", SampleStrings.MultiNamespaceClass);
+            NapackFileAnalyzer.Analyze("unused", "unused", SampleStrings.MultiNamespaceClass);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidNapackFileException))]
         public void NoNamespacesAreDetected()
         {
-            NapackClassAnalyzer.Analyze("unused", "unused", SampleStrings.NoNamespaceClass);
+            NapackFileAnalyzer.Analyze("unused", "unused", SampleStrings.NoNamespaceClass);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidNapackFileException))]
         public void InvalidNamespacesAreDetected()
         {
-            NapackClassAnalyzer.Analyze("NotTest", "unused", SampleStrings.LargeSampleClass);
+            NapackFileAnalyzer.Analyze("NotTest", "unused", SampleStrings.LargeSampleClass);
         }
 
         [TestMethod]
         public void DocumentationIsParsed()
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            ClassSpec classSpec = NapackFileAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).Classes.First();
             Assert.IsNotNull(classSpec.Name);
             Assert.IsNotNull(classSpec.Name.Name);
             Assert.IsNotNull(classSpec.Name.Documentation);
@@ -54,7 +54,7 @@ namespace NapackAnalystTests
         [TestMethod]
         public void MethodAndClassTest()
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            ClassSpec classSpec = NapackFileAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).Classes.First();
             Assert.IsTrue(classSpec.PublicMethods.Count != 0);
 
             MethodSpec method = classSpec.PublicMethods.First();
@@ -71,7 +71,7 @@ namespace NapackAnalystTests
         [TestMethod]
         public void ConstructorAndClassTest()
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            ClassSpec classSpec = NapackFileAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).Classes.First();
             Assert.IsTrue(classSpec.PublicConstructors.Count != 0);
 
             ConstructorSpec constructor = classSpec.PublicConstructors.First();
@@ -94,7 +94,7 @@ namespace NapackAnalystTests
         [TestMethod]
         public void FieldAndClassTest()
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            ClassSpec classSpec = NapackFileAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).Classes.First();
             Assert.AreEqual(1, classSpec.PublicFields.Count);
 
             FieldSpec field = classSpec.PublicFields.First();
@@ -110,7 +110,7 @@ namespace NapackAnalystTests
         [TestMethod]
         public void PropertyAndClassTest()
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).First();
+            ClassSpec classSpec = NapackFileAnalyzer.Analyze("Test", "unused", SampleStrings.LargeSampleClass).Classes.First();
             Assert.AreEqual(1, classSpec.PublicProperties.Count);
 
             PropertySpec property = classSpec.PublicProperties.First();

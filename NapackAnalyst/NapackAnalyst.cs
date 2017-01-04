@@ -89,7 +89,9 @@ namespace Napack.Analyst
 
                 if (fileEntry.Value.MsbuildType.Equals(NapackFile.CompileType, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    spec.Classes.AddRange(NapackClassAnalyzer.Analyze(napackName, filename, fileEntry.Value.Contents));
+                    NapackSpec specForSingleFile = NapackFileAnalyzer.Analyze(napackName, filename, fileEntry.Value.Contents);
+                    spec.Classes.AddRange(specForSingleFile.Classes);
+                    spec.Interfaces.AddRange(specForSingleFile.Interfaces);
                 }
                 else
                 {
@@ -127,8 +129,56 @@ namespace Napack.Analyst
                 }
             }
 
+            foreach (InterfaceSpec oldInterfaceSpec in oldNapack.Interfaces)
+            {
+                InterfaceSpec newInterfaceSpec = newNapack.Interfaces
+                    .FirstOrDefault(cls => cls.Name.Name.Equals(oldInterfaceSpec.Name.Name, StringComparison.InvariantCulture));
+                UpversionType upversionType = NapackAnalyst.AnalyzeInterface(oldInterfaceSpec, newInterfaceSpec);
+                if (upversionType == UpversionType.Major)
+                {
+                    // Exit early, as we found a breaking change.
+                    return UpversionType.Major;
+                }
+                else if (upversionType == UpversionType.Minor)
+                {
+                    maxUpversionType = UpversionType.Minor;
+                }
+            }
+
             // No APIs added in the prior classes. Did the new package add classes?
-            if (maxUpversionType == UpversionType.Patch && newNapack.Classes.Count != oldNapack.Classes.Count)
+            if (maxUpversionType == UpversionType.Patch && (newNapack.Classes.Count != oldNapack.Classes.Count || newNapack.Interfaces.Count != oldNapack.Interfaces.Count))
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            return maxUpversionType;
+        }
+
+        private static UpversionType AnalyzeInterface(InterfaceSpec oldInterfaceSpec, InterfaceSpec newInterfaceSpec)
+        {
+            UpversionType maxUpversionType = UpversionType.Patch;
+            if (newInterfaceSpec == null)
+            {
+                // The new spec removed a publically facing class.
+                return UpversionType.Major;
+            }
+
+            UpversionType upversionType = NapackAnalyst.AnalyzeProperties(oldInterfaceSpec.Properties, newInterfaceSpec.Properties);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
+            {
+                maxUpversionType = UpversionType.Minor;
+            }
+
+            upversionType = NapackAnalyst.AnalyzeMethods(oldInterfaceSpec.Methods, newInterfaceSpec.Methods);
+            if (upversionType == UpversionType.Major)
+            {
+                return upversionType;
+            }
+            else if (upversionType == UpversionType.Minor)
             {
                 maxUpversionType = UpversionType.Minor;
             }

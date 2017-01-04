@@ -10,100 +10,144 @@
 
 @section Title {@pageName + @Model.NapackFullName}
 
+@helper RenderInterface(InterfaceSpec interfaceSpec)
+{
+    @: <h3>@interfaceSpec.Name.Name</h3>
+    @: @(interfaceSpec.Name.Documentation.Count == 0 ? string.Empty : "<b>" + String.Join("<br />", interfaceSpec.Name.Documentation) + "</b> <br />")
+    if (interfaceSpec.Properties.Count != 0)
+    {
+        @: <h4>Properties</h4>
+        foreach (PropertySpec propertySpec in interfaceSpec.Properties)
+        {
+            @: <div class="property">
+            @: @(propertySpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", propertySpec.Name.Documentation) + "</i> <br />")
+            @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name.Name
+            @: </div>
+        }
+    }
+    
+    if (interfaceSpec.Methods.Count != 0)
+    {
+        @: <h4>Methods</h4>
+        foreach (MethodSpec methodSpec in interfaceSpec.Methods)
+        {
+            @: <div class="method">
+            @: @(methodSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", methodSpec.Name.Documentation) + "</i> <br />")
+            @: @methodSpec.ReturnType @methodSpec.Name.Name (
+
+            int count = methodSpec.Parameters.Count;
+            foreach (ParameterSpec parameter in methodSpec.Parameters)
+            {
+                @: @parameter.Modifier @parameter.Type @parameter.Name
+                if (parameter.Default != string.Empty)
+                {
+                    @: = @parameter.Default
+                }
+
+                --count;
+                if (count != 0)
+                {
+                        @: ,
+                    }
+                }
+            @: ) </div>
+        }
+    }
+}
 
 @helper RenderClass(ClassSpec classSpec)
 {
-@: <h3>@classSpec.Name.Name</h3>
-@: <i>@(classSpec.IsStatic ? "Static" : string.Empty) @(classSpec.IsAbstract ? "Abstract" : string.Empty) @(classSpec.IsSealed ? "Sealed" : string.Empty) </i><br />
-@: @(classSpec.Name.Documentation.Count == 0 ? string.Empty : "<b>" + String.Join("<br />", classSpec.Name.Documentation) + "</b> <br />")
-
-if (classSpec.PublicClasses.Count != 0)
-{
-    foreach (ClassSpec downlevelClass in classSpec.PublicClasses)
+    @: <h3>@classSpec.Name.Name</h3>
+    @: <i>@(classSpec.IsStatic ? "Static" : string.Empty) @(classSpec.IsAbstract ? "Abstract" : string.Empty) @(classSpec.IsSealed ? "Sealed" : string.Empty) </i><br />
+    @: @(classSpec.Name.Documentation.Count == 0 ? string.Empty : "<b>" + String.Join("<br />", classSpec.Name.Documentation) + "</b> <br />")
+    
+    if (classSpec.PublicClasses.Count != 0)
     {
-        RenderClass(classSpec);
-    }
-}
-
-if (classSpec.PublicConstructors.Count != 0)
-{
-    @: <h4>Constructors</h4>
-    foreach (ConstructorSpec constructorSpec in classSpec.PublicConstructors)
-    {
-        @: <div class="constructor">
-        @: @(constructorSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", constructorSpec.Name.Documentation) + "</i> <br />")
-        @: @constructorSpec.Name.Name ( 
-        int count = constructorSpec.Parameters.Count;
-        foreach (ParameterSpec parameter in constructorSpec.Parameters)
+        foreach (ClassSpec downlevelClass in classSpec.PublicClasses)
         {
-            @: @parameter.Modifier @parameter.Type @parameter.Name
-            if (parameter.Default != string.Empty)
-            {
-                @: = @parameter.Default
-            }
-
-            --count;
-            if (count != 0)
-            {
-                @: , 
-            }
+            RenderClass(classSpec);
         }
-
-        @: )</div>
     }
-}
-
-if (classSpec.PublicFields.Count != 0)
-{
-    @: <h4>Fields</h4>
-    foreach (FieldSpec fieldSpec in classSpec.PublicFields)
+    
+    if (classSpec.PublicConstructors.Count != 0)
     {
-        @: <div class="field">
-        @: @(fieldSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", fieldSpec.Name.Documentation) + "</i> <br />")
-        @: @(fieldSpec.IsStatic ? "static " : string.Empty) @(fieldSpec.IsConst ? "const " : string.Empty) @(fieldSpec.IsReadonly ? "readonly " : string.Empty) 
-        @: @fieldSpec.Type @fieldSpec.Name.Name
-        @:</div>
-    }
-}
-
-if (classSpec.PublicProperties.Count != 0)
-{
-    @: <h4>Properties</h4>
-    foreach (PropertySpec propertySpec in classSpec.PublicProperties)
-    {
-        @: <div class="property">
-        @: @(propertySpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", propertySpec.Name.Documentation) + "</i> <br />")
-        @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name.Name
-        @: </div>
-    }
-}
-
-if (classSpec.PublicMethods.Count != 0)
-{
-    @: <h4>Methods</h4>
-    foreach (MethodSpec methodSpec in classSpec.PublicMethods)
-    {
-        @: <div class="method">
-        @: @(methodSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", methodSpec.Name.Documentation) + "</i> <br />")
-        @: @methodSpec.ReturnType @methodSpec.Name.Name (
-        int count = methodSpec.Parameters.Count;
-        foreach (ParameterSpec parameter in methodSpec.Parameters)
+        @: <h4>Constructors</h4>
+        foreach (ConstructorSpec constructorSpec in classSpec.PublicConstructors)
         {
-            @: @parameter.Modifier @parameter.Type @parameter.Name
-            if (parameter.Default != string.Empty)
+            @: <div class="constructor">
+            @: @(constructorSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", constructorSpec.Name.Documentation) + "</i> <br />")
+            @: @constructorSpec.Name.Name ( 
+            int count = constructorSpec.Parameters.Count;
+            foreach (ParameterSpec parameter in constructorSpec.Parameters)
             {
+                @: @parameter.Modifier @parameter.Type @parameter.Name
+                if (parameter.Default != string.Empty)
+                {
                     @: = @parameter.Default
+                }
+    
+                --count;
+                if (count != 0)
+                {
+                    @: , 
+                }
             }
-
-            --count;
-            if (count != 0)
-            {
-                    @: ,
-            }
+    
+            @: ) </div>
         }
-        @: ) </div>
     }
-}
+    
+    if (classSpec.PublicFields.Count != 0)
+    {
+        @: <h4>Fields</h4>
+        foreach (FieldSpec fieldSpec in classSpec.PublicFields)
+        {
+            @: <div class="field">
+            @: @(fieldSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", fieldSpec.Name.Documentation) + "</i> <br />")
+            @: @(fieldSpec.IsStatic ? "static " : string.Empty) @(fieldSpec.IsConst ? "const " : string.Empty) @(fieldSpec.IsReadonly ? "readonly " : string.Empty) 
+            @: @fieldSpec.Type @fieldSpec.Name.Name
+            @:</div>
+        }
+    }
+    
+    if (classSpec.PublicProperties.Count != 0)
+    {
+        @: <h4>Properties</h4>
+        foreach (PropertySpec propertySpec in classSpec.PublicProperties)
+        {
+            @: <div class="property">
+            @: @(propertySpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", propertySpec.Name.Documentation) + "</i> <br />")
+            @: @(propertySpec.IsStatic ? "static " : string.Empty) @propertySpec.Type @propertySpec.Name.Name
+            @: </div>
+        }
+    }
+    
+    if (classSpec.PublicMethods.Count != 0)
+    {
+        @: <h4>Methods</h4>
+        foreach (MethodSpec methodSpec in classSpec.PublicMethods)
+        {
+            @: <div class="method">
+            @: @(methodSpec.Name.Documentation.Count == 0 ? string.Empty : "<i>" + String.Join("<br />", methodSpec.Name.Documentation) + "</i> <br />")
+            @: @methodSpec.ReturnType @methodSpec.Name.Name (
+            int count = methodSpec.Parameters.Count;
+            foreach (ParameterSpec parameter in methodSpec.Parameters)
+            {
+                @: @parameter.Modifier @parameter.Type @parameter.Name
+                if (parameter.Default != string.Empty)
+                {
+                        @: = @parameter.Default
+                }
+    
+                --count;
+                if (count != 0)
+                {
+                        @: ,
+                }
+            }
+            @: ) </div>
+        }
+    }
 }
 
 <div id="body">
@@ -111,6 +155,12 @@ if (classSpec.PublicMethods.Count != 0)
     <h2>Classes</h2>
     @foreach (ClassSpec classSpec in Model.Spec.Classes) {
         @: @RenderClass(classSpec)
+    }
+
+    <h2>Interfaces</h2>
+    @foreach (InterfaceSpec interfaceSpec in Model.Spec.Interfaces)
+    {
+        @: @RenderInterface(interfaceSpec)
     }
 
     <h2>Dependent Napacks</h2>

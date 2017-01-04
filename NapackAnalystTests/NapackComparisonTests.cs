@@ -80,11 +80,7 @@ namespace NapackAnalystTests
 
         private NapackSpec LoadNapackSpec(string content)
         {
-            ClassSpec classSpec = NapackClassAnalyzer.Analyze("Test", "unused", content).First();
-            NapackSpec spec = new NapackSpec();
-            spec.Classes.Add(classSpec);
-
-            return spec;
+            return NapackFileAnalyzer.Analyze("Test", "unused", content);
         }
     }
 }

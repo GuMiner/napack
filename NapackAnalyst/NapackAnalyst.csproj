@@ -130,6 +130,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiSpec\InterfaceSpec.cs" />
     <Compile Include="ApiSpec\ConstructorSpec.cs" />
     <Compile Include="ApiSpec\DocumentedElement.cs" />
     <Compile Include="ApiSpec\FieldSpec.cs" />
@@ -138,7 +139,7 @@
     <Compile Include="ApiSpec\NapackSpec.cs" />
     <Compile Include="ApiSpec\ParameterSpec.cs" />
     <Compile Include="ApiSpec\PropertySpec.cs" />
-    <Compile Include="NapackClassAnalyzer.cs" />
+    <Compile Include="NapackFileAnalyzer.cs" />
     <Compile Include="PackageValidationConfig.cs" />
     <Compile Include="NapackAnalyst.cs" />
     <Compile Include="NameValidationConfig.cs" />
