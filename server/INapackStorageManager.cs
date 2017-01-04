@@ -84,6 +84,16 @@ namespace Napack.Server
         List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top);
 
         /// <summary>
+        /// Updates the metadata of a package with ... updated metadata.
+        /// </summary>
+        void UpdatePackageMetadata(NapackMetadata metadata);
+
+        /// <summary>
+        /// Removes a user. Assumes the user has already been removed from all packages the user is authorized to deal with.
+        /// </summary>
+        void RemoveUser(UserIdentifier user);
+
+        /// <summary>
         /// Creates and saves a new napack.
         /// </summary>
         /// <param name="napackName">The name of the napack</param>

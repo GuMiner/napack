@@ -284,5 +284,16 @@ namespace Napack.Server
         {
             users[user.Email] = user;
         }
+
+        public void RemoveUser(UserIdentifier user)
+        {
+            users.Remove(user.Email);
+            authorizedPackages.Remove(user.Email);
+        }
+
+        public void UpdatePackageMetadata(NapackMetadata metadata)
+        {
+            packageMetadataStore[metadata.Name] = metadata;
+        }
     }
 }

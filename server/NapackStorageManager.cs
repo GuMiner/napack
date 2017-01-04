@@ -71,12 +71,22 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
+        public void RemoveUser(UserIdentifier user)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
             throw new NotImplementedException();
         }
 
         public void SaveNewNapackVersion(NapackMetadata package, NapackVersionIdentifier currentVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion, NapackSpec newVersionSpec)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdatePackageMetadata(NapackMetadata metadata)
         {
             throw new NotImplementedException();
         }

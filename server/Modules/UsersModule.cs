@@ -1,4 +1,6 @@
-﻿using Nancy;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Nancy;
 using Napack.Server.Utils;
 
 namespace Napack.Server
@@ -50,6 +52,35 @@ namespace Napack.Server
                     UserId = user.Email,
                     EmailValidated = user.EmailConfirmed
                 });
+            };
+
+            Delete["/"] = parameters =>
+            {
+                UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, new List<string> { user.Email });
+
+                UserIdentifier storedUser = napackManager.GetUser(user.Email);
+
+                IEnumerable<string> authorizedPackages = napackManager.GetAuthorizedPackages(storedUser.Email);
+                List<string> orphanedPackages = new List<string>();
+                foreach (string authorizedPackage in authorizedPackages)
+                {
+                    NapackMetadata metadata = napackManager.GetPackageMetadata(authorizedPackage);
+                    metadata.AuthorizedUserIds.Remove(storedUser.Email);
+                    if (metadata.AuthorizedUserIds.Any())
+                    {
+                        orphanedPackages.Add(authorizedPackage);
+                    }
+
+                    napackManager.UpdatePackageMetadata(metadata);
+                }
+
+                napackManager.RemoveUser(user);
+                return this.Response.AsJson(new
+                {
+                    NapacksDeauthenticatedFrom = authorizedPackages,
+                    OrphanedPackages = orphanedPackages,
+                }, HttpStatusCode.Gone);
             };
         }
     }
