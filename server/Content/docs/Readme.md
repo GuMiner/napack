@@ -35,3 +35,4 @@ Release Notes
 Current Version: 0.1.0 ("Prerelease")
 
 [Release Notes](./ReleaseNotes.md)
+[Third Party Dependenciess](./ThirdParty.md)
