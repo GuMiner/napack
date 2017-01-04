@@ -4,11 +4,14 @@ using System.IO;
 using System.Net.Mail;
 using System.Reflection;
 using Napack.Common;
+using NLog;
 
 namespace Napack.Server
 {
     public class EmailManager
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private static SmtpClient client;
         private static string emailValidationFormatString;
 
@@ -27,7 +30,7 @@ namespace Napack.Server
 
         private static void Client_SendCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            Global.Log($"Email transmission status: {e.UserState as string} -> Cancelled: {e.Cancelled}. {e.Error?.ToString() ?? "No Error"}");
+            logger.Info($"Email transmission status: {e.UserState as string} -> Cancelled: {e.Cancelled}. {e.Error?.ToString() ?? "No Error"}");
         }
 
         /// <summary>
@@ -74,6 +77,7 @@ namespace Napack.Server
 
             try
             {
+                logger.Info($"Sending email to user {user.Email} about {subject}.");
                 client.SendAsync(message, user.Email);
             }
             catch (Exception ex)

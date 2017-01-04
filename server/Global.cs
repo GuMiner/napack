@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.Owin.Hosting;
 using Napack.Analyst;
 using Napack.Common;
+using NLog;
 
 namespace Napack.Server
 {
@@ -15,10 +16,7 @@ namespace Napack.Server
     /// </summary>
     public class Global
     {
-        /// <summary>
-        /// TODO: Convert to Nlog
-        /// </summary>
-        public static Action<string> Log => (input) => Console.WriteLine(input);
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public static string AdministratorEmail { get; private set; }
 
@@ -50,25 +48,25 @@ namespace Napack.Server
             
             if (args.Length != 1)
             {
-                Log("Expecting the startup URL as the singleton argument!");
+                logger.Fatal("Expecting the startup URL as the singleton argument!");
             }
             else
             {
-                Log("Napack Server Startup...");
+                logger.Info("Napack Server Startup...");
                 Global.ShutdownEvent = new ManualResetEvent(false);
 
-                Log("Serializer Setup...");
+                logger.Info("Serializer Setup...");
                 Serializer.Setup();
 
-                Log("Analyst Setup...");
+                logger.Info("Analyst Setup...");
                 NapackAnalyst.Initialize();
 
-                Log("Starting web server...");
+                logger.Info("Starting web server...");
                 using (WebApp.Start<Startup>(args[0]))
                 {
                     Global.Initialized = true;
                     Global.ShutdownEvent.WaitOne();
-                    Global.Log("Napack Server Shutdown.");
+                    logger.Info("Napack Server Shutdown.");
                 }
             }
         }

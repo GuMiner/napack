@@ -2,6 +2,7 @@
 using MarkdownSharp;
 using Nancy;
 using Napack.Analyst;
+using NLog;
 
 namespace Napack.Server
 {
@@ -10,6 +11,8 @@ namespace Napack.Server
     /// </summary>
     public class DocumentationModule : NancyModule
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public DocumentationModule(INapackStorageManager napackManager)
             : base("/documentation")
         {
@@ -20,7 +23,7 @@ namespace Napack.Server
                 string rootDirectory = NapackAnalyst.RootDirectory + "/Content/docs/";
                 string markdownFileName = ((string)parameters.markdownFile).Replace("..", string.Empty);
                 string markdownFilePath = rootDirectory + markdownFileName;
-                Global.Log(markdownFilePath);
+                logger.Debug(markdownFilePath);
 
                 string markdownFile = File.ReadAllText(markdownFilePath);
                 string html = new Markdown(new MarkdownOptions()

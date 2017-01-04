@@ -2,6 +2,7 @@
 using System.Linq;
 using Nancy;
 using Napack.Server.Utils;
+using NLog;
 
 namespace Napack.Server
 {
@@ -10,6 +11,8 @@ namespace Napack.Server
     /// </summary>
     public class UsersModule : NancyModule
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public UsersModule(INapackStorageManager napackManager)
             : base("/users")
         {
@@ -25,7 +28,7 @@ namespace Napack.Server
                 EmailManager.SendVerificationEmail(user);
                 napackManager.AddUser(user);
 
-                Global.Log("Assigned user " + user.Email + " a hash and secrets, and attempted to send a validation email.");
+                logger.Info($"Assigned user {user.Email} a hash and secrets, and attempted to send a validation email.");
                 return this.Response.AsJson(new Common.UserSecret()
                 {
                     UserId = user.Email,

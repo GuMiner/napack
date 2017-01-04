@@ -14,7 +14,6 @@ Bugs
 * Significantly increase unit testing and functional testing, so that the website can be tested locally with the in-memory store.
 * The napack icon needs professional attention.
 * Search is missing the 'click for details' function on retrieved items linking to API, versions, authors, etc.
-* Logging is currently to console, not NLog (with file redirection, etc.)
 * Requests don't log IPs or do any attempt at throttling.
 
 Core Functionality
@@ -24,8 +23,7 @@ Core Functionality
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.
 * The Napack NuGet package doesn't automatially create or integrate with MSBuild without manual intervention. Update [Download.md](./Download.md) when done.
 * The Napack Server Framework needs a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
-* Email validation for user registration, and appropriate backend state for that. This requires backend email setup on Napack.
-* Create a site statistics page detailing user activity, Napacks downloaded, uptime, etc.
+* Backend email setup on Napack to support email validation; fix the default email and settings at that time.
 * Create a tree-view page to navigate through Napacks and their dependencies.
 
 Final Release Steps

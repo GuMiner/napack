@@ -13,3 +13,4 @@ Copy Left used without modifications, transformations, remixing, or additions
 Atttribution-only or otherwise Free-use Packages
 ---------------------------------
 * [Nancy](https://github.com/NancyFx/Nancy) (MIT)
+* [NLog](http://nlog-project.org) (BSD)

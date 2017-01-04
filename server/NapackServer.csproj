@@ -87,6 +87,10 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.1\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Npgsql, Version=3.0.3.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>packages\Npgsql.3.0.3\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
@@ -134,6 +138,7 @@
     <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Definitions\DocumentationModel.cs" />
     <Compile Include="Modules\ApiModule.cs" />
+    <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\SearchModule.cs" />
     <Compile Include="Modules\DocumentationModule.cs" />
     <Compile Include="Modules\UsersModule.cs" />
@@ -156,6 +161,12 @@
     <Content Include="Content\Site.css" />
     <EmbeddedResource Include="Utils\EmailValidation_FS.txt" />
     <Content Include="Views\RootLayout.cshtml" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <Content Include="Views\Index.cshtml" />
     <None Include="Properties\app.manifest" />

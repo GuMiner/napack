@@ -9,11 +9,14 @@ using Nancy.Security;
 using Nancy.TinyIoc;
 using Napack.Common;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Napack.Server
 {
     class NancyBootstrapper : DefaultNancyBootstrapper
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private IDictionary<Type, HttpStatusCode> exceptionStatusCodeMapping =
             new Dictionary<Type, HttpStatusCode>()
             {
@@ -60,6 +63,7 @@ namespace Napack.Server
             pipelines.BeforeRequest += (ctx) =>
             {
                 NancyContext context = ctx as NancyContext;
+                logger.Info(context.Request.UserHostAddress + ": " + context.Request.Url);
 
                 // Technically this is 7.4% over 1 MiB. I'm not going to be pedantic.
                 int maxIterations = 12;
@@ -77,6 +81,7 @@ namespace Napack.Server
                     }
                 }
 
+                logger.Info($"Request from {context.Request.UserHostAddress} to {context.Request.Url} over 1 MiB");
                 return this.GenerateJsonException(new ExcessiveNapackException(), HttpStatusCode.BadRequest);
             };
 
@@ -97,6 +102,7 @@ namespace Napack.Server
                     parsedException = new Exception("Unable to decode the detected exception!");
                 }
 
+                logger.Warn($"Hit a {parsedException.GetType()} exception.");
                 return this.GenerateJsonException(parsedException, code);
             };
         }
