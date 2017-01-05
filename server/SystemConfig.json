@@ -4,5 +4,6 @@
   "EmailHost": "TODO",
   "EmailPort": 1234,
   "PackageValidationFilePath": "Resources/PackageValidation.json",
-  "NameValidationFilePath": "Resources/NameValidation.json"
+  "NameValidationFilePath": "Resources/NameValidation.json",
+  "RequireEmailValidation":  true
 }

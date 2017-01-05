@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Security;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Microsoft.Owin.Hosting;
@@ -19,7 +20,9 @@ namespace Napack.Server
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static SystemConfig SystemConfig;
+        public static string RootDirectory { get; private set; }
+
+        public static SystemConfig SystemConfig { get; set; } = null;
 
         /// <summary>
         /// Returns true once initialization has completed, false otherwise.
@@ -33,11 +36,13 @@ namespace Napack.Server
 
         public static void Main(string[] args)
         {
+            Global.RootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             logger.Info("Serializer Setup...");
             Serializer.Setup();
 
             logger.Info("System Config loading...");
-            Global.SystemConfig = Serializer.Deserialize<SystemConfig>(File.ReadAllText(ConfigurationManager.AppSettings["SystemConfigFilename"]));
+            Global.SystemConfig = Global.SystemConfig ?? Serializer.Deserialize<SystemConfig>(File.ReadAllText(ConfigurationManager.AppSettings["SystemConfigFilename"]));
 
             logger.Info("Email management loading...");
             EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
@@ -59,7 +64,7 @@ namespace Napack.Server
                 Global.ShutdownEvent = new ManualResetEvent(false);
 
                 logger.Info("Analyst Setup...");
-                NapackAnalyst.Initialize();
+                NapackAnalyst.Initialize(Global.SystemConfig.PackageValidationFilePath, Global.SystemConfig.NameValidationFilePath);
 
                 logger.Info("Starting web server...");
                 using (WebApp.Start<Startup>(args[0]))

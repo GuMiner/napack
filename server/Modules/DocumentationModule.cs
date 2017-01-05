@@ -20,7 +20,7 @@ namespace Napack.Server
             Get["/{markdownFile}"] = parameters =>
             {
                 // Prohibit going to a different directory.
-                string rootDirectory = NapackAnalyst.RootDirectory + "/Content/docs/";
+                string rootDirectory = Global.RootDirectory + "/Content/docs/";
                 string markdownFileName = ((string)parameters.markdownFile).Replace("..", string.Empty);
                 string markdownFilePath = rootDirectory + markdownFileName;
                 logger.Debug(markdownFilePath);

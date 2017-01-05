@@ -27,6 +27,16 @@ namespace NapackSystemTests
             // Setup server
             napackServerTask = Task.Factory.StartNew(() =>
             {
+                Global.SystemConfig = new SystemConfig()
+                {
+                    AdministratorEmail = "admin@localhost.fake",
+                    AdministratorName = "test",
+                    EmailHost = "unused",
+                    EmailPort = 1234,
+                    NameValidationFilePath = @"..\..\..\server\Resources\NameValidation.json",
+                    PackageValidationFilePath = @"..\..\..\server\Resources\PackageValidation.json",
+                    RequireEmailValidation = false
+                };
                 Global.Main(new[] { SystemSetup.LocalServer });
             }, TaskCreationOptions.LongRunning);
 

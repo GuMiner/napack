@@ -17,5 +17,7 @@
         public string PackageValidationFilePath { get; set; }
 
         public string NameValidationFilePath { get; set; }
+
+        public bool RequireEmailValidation { get; set; }
     }
 }

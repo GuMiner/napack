@@ -48,7 +48,7 @@ namespace Napack.Server
         {
             this.EmailConfirmed = false;
             this.EmailSubjectsSent = new List<string>();
-            this.Hash = Hash;
+            this.Hash = userHash;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Napack.Server
             // Check that the user is who they say they are and that the user has performed validation.
             UserIdentifier user = storageManager.GetUser(userId);
             string hash = UserIdentifier.ComputeUserHash(userSecrets);
-            if (!user.EmailConfirmed || !user.Hash.Equals(hash, StringComparison.InvariantCulture))
+            if ((Global.SystemConfig.RequireEmailValidation && !user.EmailConfirmed) || !user.Hash.Equals(hash, StringComparison.InvariantCulture))
             {
                 throw new UnauthorizedUserException();
             }
