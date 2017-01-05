@@ -1,0 +1,8 @@
+{
+  "AdministratorEmail": "admin@napack.net",
+  "AdministratorName": "NFS Admin",
+  "EmailHost": "TODO",
+  "EmailPort": 1234,
+  "PackageValidationFilePath": "Resources/PackageValidation.json",
+  "NameValidationFilePath": "Resources/NameValidation.json"
+}

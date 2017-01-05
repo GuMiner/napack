@@ -123,6 +123,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Definitions\SystemConfig.cs" />
     <Compile Include="Definitions\IndexModel.cs" />
     <Compile Include="Definitions\SystemStats.cs" />
     <Compile Include="Definitions\RequestStats.cs" />
@@ -174,6 +175,9 @@
     <Content Include="Views\Search.cshtml" />
     <Content Include="Views\NapackApi.cshtml" />
     <Content Include="Views\NapackVersions.cshtml" />
+    <Content Include="SystemConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -210,11 +214,17 @@
   </Target>
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.104.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.104.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Import Project="..\packages\Nancy.Viewengines.Razor.1.4.3\build\Nancy.ViewEngines.Razor.targets" Condition="Exists('..\packages\Nancy.Viewengines.Razor.1.4.3\build\Nancy.ViewEngines.Razor.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <!-- Manually create a drop folder that functional tests or local integration tests can use. -->
+  <Target Name="CopyToDrop" AfterTargets="Build">
+    <ItemGroup>
+      <BinariesToCopy Include="$(TargetDir)\*.*" />
+      <ContentToCopy Include="$(MSBuildProjectDirectory)\Content\**\*.*" />
+      <ViewsToCopy Include="$(MSBuildProjectDirectory)\Views\**\*.*" />
+      <ResourcesToCopy Include="$(MSBuildProjectDirectory)\Resources\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BinariesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ContentToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Content\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ViewsToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Views\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ResourcesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Resources\%(RecursiveDir)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -63,7 +63,7 @@ namespace Napack.Server
         {
             user.EmailVerificationCode = Guid.NewGuid();
 
-            MailAddress from = new MailAddress(Global.AdministratorEmail, Global.AdministratorName);
+            MailAddress from = new MailAddress(Global.SystemConfig.AdministratorEmail, Global.SystemConfig.AdministratorName);
             MailAddress to = new MailAddress(user.Email);
 
             string subject = "Napack Framework Server User Email Verification";

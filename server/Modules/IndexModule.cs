@@ -11,7 +11,7 @@ namespace Napack.Server
         {
             Get["/"] = parameters =>
             {
-                return View["Index", new IndexModel(Global.AdministratorEmail)];
+                return View["Index", new IndexModel(Global.SystemConfig.AdministratorEmail)];
             };
         }
     }

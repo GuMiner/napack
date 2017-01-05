@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -18,9 +19,7 @@ namespace Napack.Server
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public static string AdministratorEmail { get; private set; }
-
-        public static string AdministratorName { get; private set; }
+        public static SystemConfig SystemConfig;
 
         /// <summary>
         /// Returns true once initialization has completed, false otherwise.
@@ -34,10 +33,14 @@ namespace Napack.Server
 
         public static void Main(string[] args)
         {
-            // Read in common values from our App.config file.
-            Global.AdministratorEmail = ConfigurationManager.AppSettings["AdministratorEmail"];
-            Global.AdministratorName = ConfigurationManager.AppSettings["AdministratorName"];
-            EmailManager.Initialize(ConfigurationManager.AppSettings["NFSEmailHost"], int.Parse(ConfigurationManager.AppSettings["NFSEmailPort"]));
+            logger.Info("Serializer Setup...");
+            Serializer.Setup();
+
+            logger.Info("System Config loading...");
+            Global.SystemConfig = Serializer.Deserialize<SystemConfig>(File.ReadAllText(ConfigurationManager.AppSettings["SystemConfigFilename"]));
+
+            logger.Info("Email management loading...");
+            EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
 
             // Turn off certificate validation, because it doesn't work with self-signed certificates.
             ServicePointManager.ServerCertificateValidationCallback =
@@ -54,9 +57,6 @@ namespace Napack.Server
             {
                 logger.Info("Napack Server Startup...");
                 Global.ShutdownEvent = new ManualResetEvent(false);
-
-                logger.Info("Serializer Setup...");
-                Serializer.Setup();
 
                 logger.Info("Analyst Setup...");
                 NapackAnalyst.Initialize();
