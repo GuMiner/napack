@@ -19,10 +19,6 @@ namespace Napack.Server
 
         public Dictionary<string, string> IpToCountry { get; set; }
 
-        public int TotalNapacksDownloaded { get; set; }
-
-        public int TotalNapacksViewed { get; set; }
-
         public string LookupCountry(string ip)
         {
             // TODO the DB is in terms of IP blocks, which will need a lookup algorithm.
