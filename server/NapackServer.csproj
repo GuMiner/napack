@@ -128,6 +128,7 @@
     <Compile Include="Definitions\IndexModel.cs" />
     <Compile Include="Definitions\SystemStats.cs" />
     <Compile Include="Definitions\RequestStats.cs" />
+    <Compile Include="Definitions\UserModification.cs" />
     <Compile Include="Definitions\VersionsModel.cs" />
     <Compile Include="Definitions\ApiModel.cs" />
     <Compile Include="Definitions\NapackMetadata.cs" />
