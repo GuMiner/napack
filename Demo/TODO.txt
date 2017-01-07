@@ -1,3 +1,0 @@
-- The client used to perform the update, which is stored in the packages directory, needs a target created that will automatically call said client.
-- Intellisense doesn't understand this dynamic generation and needs hinting help.
-- The call used by the client is: Napack.Client.exe -Operation Update -NapackDirectory D:\napack\Demo\napacks -NapackSettingsFile D:\napack\Demo\NapackSettings.json -NapacksFile D:\napack\Demo\Napacks.json -ProjectDirectory D:\napack\Demo

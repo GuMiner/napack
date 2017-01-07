@@ -20,8 +20,10 @@ namespace NapackSystemTests
         public void TestInitialize()
         {
             NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(NapackOperationTests.SettingsFileLocation));
-            settings.DefaultUserId = SystemSetup.AuthorizedUser.UserId;
-            settings.DefaultUserAuthenticationKeys = SystemSetup.AuthorizedUser.Secrets;
+
+            // TODO fix.
+            // settings.DefaultUserId = SystemSetup.AuthorizedUser.UserId;
+            // settings.DefaultUserAuthenticationKeys = SystemSetup.AuthorizedUser.Secrets;
 
             string settingsWithDefaultUserFileLocation = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix;
             File.WriteAllText(settingsWithDefaultUserFileLocation, Serializer.Serialize(settings));

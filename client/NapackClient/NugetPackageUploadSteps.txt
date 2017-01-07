@@ -1,0 +1,2 @@
+nuget.exe pack ~\napack\client\NapackClient\NugetPackage
+Upload using the UI to verify no further changes are necessary.

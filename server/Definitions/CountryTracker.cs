@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace Napack.Server
 {
@@ -16,6 +15,8 @@ namespace Napack.Server
             this.storageManager = storageManager;
             lastSaveDate = DateTime.UtcNow;
 
+            IpToCountry = new ConcurrentDictionary<string, string>();
+            CallsPerCountryPerDay = new ConcurrentDictionary<string, ConcurrentDictionary<DateTime, int>>();
             // TODO load the geolocation DB.
             // TODO load the calls per country per day for the current day.
         }

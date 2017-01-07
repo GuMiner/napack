@@ -17,11 +17,10 @@ Bugs
 Core Functionality
 ------------------
 * Add a persistent Napack database store instead of an in-memory store.
+* Backend email setup on Napack to support email validation; fix the default email and settings at that time.
 * Validate all the workflows, admin included.
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.
-* The Napack NuGet package doesn't automatially create or integrate with MSBuild without manual intervention. Update [Download.md](./Download.md) when done.
 * The Napack Server Framework needs a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
-* Backend email setup on Napack to support email validation; fix the default email and settings at that time.
 * Create a tree-view page to navigate through Napacks and their dependencies.
 * Create a system stats page listing requests per country for the current day.
 

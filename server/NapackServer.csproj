@@ -140,6 +140,8 @@
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Definitions\DocumentationModel.cs" />
+    <Compile Include="Modules\StatusModule.cs" />
+    <Compile Include="Modules\GraphViewModule.cs" />
     <Compile Include="Modules\ApiModule.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\SearchModule.cs" />
@@ -180,6 +182,8 @@
     <Content Include="SystemConfig.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\GraphView.cshtml" />
+    <Content Include="Views\Status.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -220,13 +224,13 @@
   <Target Name="CopyToDrop" AfterTargets="Build">
     <ItemGroup>
       <BinariesToCopy Include="$(TargetDir)\*.*" />
-      <ContentToCopy Include="$(MSBuildProjectDirectory)\Content\**\*.*" />
-      <ViewsToCopy Include="$(MSBuildProjectDirectory)\Views\**\*.*" />
-      <ResourcesToCopy Include="$(MSBuildProjectDirectory)\Resources\**\*.*" />
+      <ContentToCopy Include="$(ProjectDir)\Content\**\*.*" />
+      <ViewsToCopy Include="$(ProjectDir)\Views\**\*.*" />
+      <ResourcesToCopy Include="$(ProjectDir)\Resources\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(BinariesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\%(RecursiveDir)" />
-    <Copy SourceFiles="@(ContentToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Content\%(RecursiveDir)" />
-    <Copy SourceFiles="@(ViewsToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Views\%(RecursiveDir)" />
-    <Copy SourceFiles="@(ResourcesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\drop\Resources\%(RecursiveDir)" />
+    <Copy SourceFiles="@(BinariesToCopy)" DestinationFolder="$(ProjectDir)\drop\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ContentToCopy)" DestinationFolder="$(ProjectDir)\drop\Content\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ViewsToCopy)" DestinationFolder="$(ProjectDir)\drop\Views\%(RecursiveDir)" />
+    <Copy SourceFiles="@(ResourcesToCopy)" DestinationFolder="$(ProjectDir)\drop\Resources\%(RecursiveDir)" />
   </Target>
 </Project>
