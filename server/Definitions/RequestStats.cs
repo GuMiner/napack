@@ -5,34 +5,25 @@ using System.Linq;
 namespace Napack.Server
 {
     /// <summary>
-    /// Holds statistics for requests sent to the Napack Framework Server
+    /// Holds statistics for requests for a single IP sent to the Napack Framework Server
     /// </summary>
     public class RequestStats
     {
-        // TODO config file
-        private static readonly int ThrottleLimitPerHour = 36000; // 10 calls/sec.
-        private static TimeSpan LogTime = TimeSpan.FromHours(1);
-
         public RequestStats()
         {
-            this.CallsByIp = new Dictionary<string, List<DateTime>>();
+            this.Calls = new List<DateTime>();
         }
 
-        public Dictionary<string, List<DateTime>> CallsByIp { get; set; }
+        public List<DateTime> Calls { get; set; }
 
         /// <summary>
-        /// Adds a call for a specified IP, returning true if the IP is currently being throttled.
+        /// Adds a call for this IP, returning true if this IP is now throttled.
         /// </summary>
-        public bool AddCall(string ip)
+        public bool AddCall()
         {
-            if (!CallsByIp.ContainsKey(ip))
-            {
-                CallsByIp.Add(ip, new List<DateTime>());
-            }
-
-            CallsByIp[ip].Add(DateTime.UtcNow);
-            CallsByIp[ip] = CallsByIp[ip].Where(time => time + LogTime > DateTime.UtcNow).ToList();
-            return CallsByIp[ip].Count > ThrottleLimitPerHour;
+            Calls.Add(DateTime.UtcNow);
+            Calls = Calls.Where(time => time + Global.SystemConfig.RequestThrottlingInterval > DateTime.UtcNow).ToList();
+            return Calls.Count > Global.SystemConfig.MaxRequestsPerIpPerInterval;
         }
     }
 }

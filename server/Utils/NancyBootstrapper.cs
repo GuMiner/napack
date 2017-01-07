@@ -45,7 +45,10 @@ namespace Napack.Server
                 [typeof(ExistingUserException)] = HttpStatusCode.Conflict,
 
                 // 410 -- Gone
-                [typeof(NapackRecalledException)] = HttpStatusCode.Gone
+                [typeof(NapackRecalledException)] = HttpStatusCode.Gone,
+
+                // 429 -- Too Many Requests
+                [typeof(ExcessiveQueriesException)] = HttpStatusCode.TooManyRequests
             };
 
         /// <summary>
@@ -64,6 +67,12 @@ namespace Napack.Server
             {
                 NancyContext context = ctx as NancyContext;
                 logger.Info(context.Request.UserHostAddress + ": " + context.Request.Url);
+
+                if (Global.SystemStats.AddCall(context.Request.UserHostAddress))
+                {
+                    logger.Info($"Throttling a request from {context.Request.UserHostAddress}");
+                    return this.GenerateJsonException(new ExcessiveQueriesException(), HttpStatusCode.TooManyRequests);
+                }
 
                 // Technically this is 7.4% over 1 MiB. I'm not going to be pedantic.
                 int maxIterations = 12;
@@ -114,7 +123,7 @@ namespace Napack.Server
         {
             base.ConfigureRequestContainer(container, context);
             
-            container.Register<INapackStorageManager, InMemoryNapackStorageManager>();
+            container.Register<INapackStorageManager>(Global.NapackStorageManager);
         }
 
 

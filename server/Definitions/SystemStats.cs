@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Napack.Server
 {
@@ -6,23 +8,30 @@ namespace Napack.Server
     /// Holds statistics for the Napack Framework Server system as a whole.
     /// </summary>
     /// <remarks>
-    /// TODO this needs a DB redesign as this isn't cheap / will be updated for every single request!!
+    /// This class and its contents is stored in memory.
     /// </remarks>
     public class SystemStats
     {
-        public SystemStats()
+        private CountryTracker countryTracker;
+
+        public SystemStats(INapackStorageManager storageManager)
         {
-            this.RequestStats = new RequestStats();
+            this.countryTracker = new CountryTracker(storageManager);
+            this.RequestStats = new Dictionary<string, RequestStats>();
         }
 
-        public RequestStats RequestStats { get; set; }
+        public Dictionary<string, RequestStats> RequestStats { get; set; }
 
-        public Dictionary<string, string> IpToCountry { get; set; }
-
-        public string LookupCountry(string ip)
+        public bool AddCall(string ip)
         {
-            // TODO the DB is in terms of IP blocks, which will need a lookup algorithm.
-            return string.Empty;
+            countryTracker.LogRequest(ip);
+
+            if (!RequestStats.ContainsKey(ip))
+            {
+                RequestStats[ip] = new RequestStats();
+            }
+
+            return RequestStats[ip].AddCall();
         }
     }
 }

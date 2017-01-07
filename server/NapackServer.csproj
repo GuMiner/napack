@@ -123,6 +123,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Definitions\CountryTracker.cs" />
     <Compile Include="Definitions\SystemConfig.cs" />
     <Compile Include="Definitions\IndexModel.cs" />
     <Compile Include="Definitions\SystemStats.cs" />

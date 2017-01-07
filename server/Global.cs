@@ -24,6 +24,10 @@ namespace Napack.Server
 
         public static SystemConfig SystemConfig { get; set; } = null;
 
+        public static SystemStats SystemStats { get; private set; }
+
+        public static INapackStorageManager NapackStorageManager { get; private set; }
+
         /// <summary>
         /// Returns true once initialization has completed, false otherwise.
         /// </summary>
@@ -46,6 +50,12 @@ namespace Napack.Server
 
             logger.Info("Email management loading...");
             EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
+
+            logger.Info("Database loading...");
+            Global.NapackStorageManager = new InMemoryNapackStorageManager();
+
+            logger.Info("System stats management loading...");
+            Global.SystemStats = new SystemStats(Global.NapackStorageManager);
 
             // Turn off certificate validation, because it doesn't work with self-signed certificates.
             ServicePointManager.ServerCertificateValidationCallback =

@@ -1,4 +1,6 @@
-﻿namespace Napack.Server
+﻿using System;
+
+namespace Napack.Server
 {
     public class SystemConfig
     {
@@ -18,6 +20,12 @@
 
         public string NameValidationFilePath { get; set; }
 
+        public string GeolocationDatabaseFolder { get; set; }
+
         public bool RequireEmailValidation { get; set; }
+
+        public int MaxRequestsPerIpPerInterval { get; set; }
+
+        public TimeSpan RequestThrottlingInterval { get; set; }
     }
 }

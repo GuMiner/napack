@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonHeaders.cs" />
+    <Compile Include="Exceptions\ExcessiveQueriesException.cs" />
     <Compile Include="Exceptions\InvalidNapackException.cs" />
     <Compile Include="Exceptions\ExistingUserException.cs" />
     <Compile Include="Exceptions\NapackFrameworkServerUnavailable.cs" />
