@@ -10,7 +10,6 @@ The Napack Database is subject to arbitrary deletion until there are no more rem
 Bugs
 ----
 * Case sensitivity / insensitivity issues accross the board, esp. related to JSON serialization of package names.
-* Default user ID / authentication shouldn't be in the NapackSettings.json file, but somewhere else reasonably common and accessible.
 * Significantly increase unit testing and functional testing, so that the website can be tested locally with the in-memory store.
 * Search is missing the 'click for details' function on retrieved items linking to API, versions, authors, etc.
 * Request IP throttling internals and country geolocation database reading work.

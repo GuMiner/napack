@@ -25,6 +25,10 @@ namespace Napack.Client
         [Description("The JSON settings file used to configure how this application runs.")]
         public string NapackSettingsFile { get; set; }
 
+        [CommandLineArgument(Position = 3, IsRequired = false)]
+        [Description("Saves the registered user and credentials as defaults in the current user's default folder.")]
+        public bool SaveAsDefault { get; set; }
+
         public bool IsValidOperation() => !string.IsNullOrWhiteSpace(this.Operation) && this.Operation.Equals("Register", StringComparison.InvariantCultureIgnoreCase);
 
         public void PerformOperation()
@@ -38,6 +42,11 @@ namespace Napack.Client
                 foreach (Guid individualSecret in secret.Secrets)
                 {
                     Console.WriteLine($"  {individualSecret}");
+                }
+
+                if (this.SaveAsDefault)
+                {
+                    File.WriteAllText(NapackClient.GetDefaultCredentialFilePath(), Serializer.Serialize(new DefaultCredentials(secret.UserId, secret.Secrets)));
                 }
             }
         }

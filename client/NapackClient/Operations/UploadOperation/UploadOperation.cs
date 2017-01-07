@@ -54,8 +54,16 @@ namespace Napack.Client
         public void PerformOperation()
         {
             NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettingsFile));
-            string userId = string.IsNullOrWhiteSpace(this.UserId) ? settings.DefaultUserId : this.UserId;
-            List<Guid> accessKeys = this.AuthorizationKeys?.Split(';').Select(key => Guid.Parse(key)).ToList() ?? settings.DefaultUserAuthenticationKeys;
+
+            string userId = this.UserId;
+            List<Guid> accessKeys = this.AuthorizationKeys?.Split(';').Select(key => Guid.Parse(key)).ToList();
+            if (string.IsNullOrWhiteSpace(this.UserId) || accessKeys == null || accessKeys.Count == 0)
+            {
+                DefaultCredentials defaultCredentials = Serializer.Deserialize<DefaultCredentials>(File.ReadAllText(NapackClient.GetDefaultCredentialFilePath()));
+                userId = defaultCredentials.UserId;
+                accessKeys = defaultCredentials.Secrets;
+            }
+            
             UserSecret userSecret = new UserSecret()
             {
                 UserId = userId,
@@ -64,7 +72,7 @@ namespace Napack.Client
 
             string packageName = Path.GetFileNameWithoutExtension(this.PackageFile);
             NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageFile));
-            napackDescriptor.Validate(settings.DefaultUserId);
+            napackDescriptor.Validate(userId);
 
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {

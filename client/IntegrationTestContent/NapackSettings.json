@@ -7,10 +7,5 @@
   "autoUpdateMinor": true,
   "warnMajorUpdates": false,
   "lastUpdateTime": "2016-12-26T01:14:03.8053187Z",
-  "autoUpdateInterval": "0.01:00:00",
-  "defaultUserId": "email",
-  "defaultUserAuthenticationKeys": [
-  "47e4ce7b-cd76-4600-bf6e-bfebe49c8392",
-  "bc396e86-b05c-486e-a84f-93a6fb2c92d7",
-  "9dcb37fa-0e3e-4fbd-a95f-69e524063226"]
+  "autoUpdateInterval": "0.01:00:00"
 }

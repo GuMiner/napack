@@ -56,6 +56,7 @@
     <Compile Include="Operations\NapackOperationFinder.cs" />
     <Compile Include="NapackClient.cs" />
     <Compile Include="NapackClientSettings.cs" />
+    <Compile Include="Operations\RegisterOperation\DefaultCredentials.cs" />
     <Compile Include="Operations\UpdateOperation\NapackAttributions.cs" />
     <Compile Include="Operations\UpdateOperation\UpdateOperation.cs" />
     <Compile Include="Operations\UpdateOperation\NapackTargets.cs" />

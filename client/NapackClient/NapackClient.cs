@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Napack.Common;
 
 namespace Napack.Client
@@ -7,6 +8,13 @@ namespace Napack.Client
     {
         public const int ERROR = 1;
         public const int SUCCESS = 0;
+
+        public static string GetDefaultCredentialFilePath()
+        {
+            string path = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
+            path = Environment.OSVersion.Version.Major >= 6 ? Directory.GetParent(path).ToString() : path;
+            return Path.Combine(path, "NapackDefaultCredentials.json");
+        }
 
         public static int Main(string[] args)
         {

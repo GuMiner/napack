@@ -35,7 +35,7 @@ namespace Napack.Client
         /// </summary>
         public Dictionary<string, int> Dependencies { get; set; }
         
-        public void Validate(string defaultUserId)
+        public void Validate(string userId)
         {
             if (string.IsNullOrWhiteSpace(this.Description))
             {
@@ -47,14 +47,14 @@ namespace Napack.Client
                 throw new InvalidNapackException("The tags must contain at least one populated value.");
             }
 
-            if (!this.AuthorizedUserIds.Any() && string.IsNullOrWhiteSpace(defaultUserId))
+            if (!this.AuthorizedUserIds.Any() && string.IsNullOrWhiteSpace(userId))
             {
                 throw new InvalidOperationException("Cannot upload a Napack without authorized users when the default user is not specified in the settings file.");
             }
-            else if (!this.AuthorizedUserIds.Contains(defaultUserId))
+            else if (!this.AuthorizedUserIds.Contains(userId))
             {
                 // If the current user isn't on the authorization list, we add them there.
-                this.AuthorizedUserIds.Add(defaultUserId);
+                this.AuthorizedUserIds.Add(userId);
             }
 
             this.License.Validate();

@@ -62,14 +62,5 @@ namespace Napack.Client
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public TimeSpan AutoUpdateInterval { get; set; }
-
-        /// <summary>
-        /// TODO these belong in a separate default location.
-        /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
-        public string DefaultUserId { get; set; }
-
-        [JsonProperty(Required = Required.AllowNull)]
-        public List<Guid> DefaultUserAuthenticationKeys { get; set; }
     }
 }
