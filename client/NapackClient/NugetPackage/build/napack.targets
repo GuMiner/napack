@@ -4,6 +4,6 @@
   <Import Project="$(ProjectDir)napack.targets" />
   
   <Target Name="NapackUpdateTarget" BeforeTargets="BeforeBuild">
-    <Exec Command="Napack.Client.exe -Operation Update -NapackDirectory $(ProjectDir)napacks -NapackSettingsFile $(ProjectDir)NapackSettings.json -NapacksFile $(ProjectDir)Napacks.json -ProjectDirectory $(ProjectDir)"
+    <Exec Command="$(MSBuildThisFileDirectory)..\lib\Napack.Client.exe -Operation Update -NapackDirectory $(ProjectDir)napacks -NapackSettingsFile $(ProjectDir)NapackSettings.json -NapacksFile $(ProjectDir)Napacks.json -ProjectDirectory $(ProjectDir)" />
   </Target>
 </Project>

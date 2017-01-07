@@ -1,37 +1,37 @@
 {
-  "basicVector": [
+  "BasicVector": [
     {
-      "major": 1,
-      "minor": 0,
-      "patch": 0,
-      "authors": [
+      "Major": 1,
+      "Minor": 0,
+      "Patch": 0,
+      "Authors": [
         "Gustave Granroth"
       ],
-      "files": {},
-      "license": {
-        "licenseType": 0,
-        "licenseText": null
+      "Files": {},
+      "License": {
+        "LicenseType": 0,
+        "LicenseText": null
       },
-      "dependencies": []
+      "Dependencies": []
     }
   ],
-  "basicVector.Core": [
+  "BasicVector_Core": [
     {
-      "major": 1,
-      "minor": 0,
-      "patch": 0,
-      "authors": [
+      "Major": 1,
+      "Minor": 0,
+      "Patch": 0,
+      "Authors": [
         "Gustave Granroth"
       ],
-      "files": {},
-      "license": {
-        "licenseType": 0,
-        "licenseText": null
+      "Files": {},
+      "License": {
+        "LicenseType": 0,
+        "LicenseText": null
       },
-      "dependencies": [
+      "Dependencies": [
         {
-          "name": "BasicVector",
-          "major": 1
+          "Name": "BasicVector",
+          "Major": 1
         }
       ]
     }
