@@ -16,7 +16,6 @@ Bugs
 
 Core Functionality
 ------------------
-* Add a persistent Napack database store instead of an in-memory store.
 * Backend email setup on Napack to support email validation; fix the default email and settings at that time.
 * Validate all the workflows, admin included.
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.

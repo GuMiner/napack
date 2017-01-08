@@ -24,9 +24,9 @@ namespace Napack.Server
 
         public static SystemConfig SystemConfig { get; set; } = null;
 
-        public static SystemStats SystemStats { get; private set; }
+        public static INapackStorageManager NapackStorageManager { get; set; } = null;
 
-        public static INapackStorageManager NapackStorageManager { get; private set; }
+        public static SystemStats SystemStats { get; private set; }
 
         /// <summary>
         /// Returns true once initialization has completed, false otherwise.
@@ -52,7 +52,7 @@ namespace Napack.Server
             EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
 
             logger.Info("Database loading...");
-            Global.NapackStorageManager = new InMemoryNapackStorageManager();
+            Global.NapackStorageManager = Global.NapackStorageManager ?? new LiteDbNapackStorageManager(Global.SystemConfig.DatabaseFileName);
 
             logger.Info("System stats management loading...");
             Global.SystemStats = new SystemStats(Global.NapackStorageManager);

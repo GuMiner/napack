@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LiteDB;
+using Newtonsoft.Json;
 
 namespace Napack.Common
 {
@@ -9,6 +11,10 @@ namespace Napack.Common
     /// </summary>
     public class NapackVersionIdentifier
     {
+        public NapackVersionIdentifier()
+        {
+        }
+
         public NapackVersionIdentifier(string fullNapackName)
         {
             List<string> components = fullNapackName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -55,10 +61,12 @@ namespace Napack.Common
         public int Minor { get; private set; }
 
         public int Patch { get; private set; }
-
+        
+        [BsonIgnore]
         public string GetFullName()
             => this.NapackName + "." + this.Major + "." + this.Minor + "." + this.Patch;
 
+        [BsonIgnore]
         public string GenerateTargetName()
              => this.NapackName + "_" + this.Major + "_" + this.Minor + "_" + this.Patch;
 

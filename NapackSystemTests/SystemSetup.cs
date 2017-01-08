@@ -37,6 +37,9 @@ namespace NapackSystemTests
                     PackageValidationFilePath = @"..\..\..\server\Resources\PackageValidation.json",
                     RequireEmailValidation = false
                 };
+
+                Global.NapackStorageManager = new InMemoryNapackStorageManager();
+
                 Global.Main(new[] { SystemSetup.LocalServer });
             }, TaskCreationOptions.LongRunning);
 

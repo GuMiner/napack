@@ -39,6 +39,7 @@ namespace Napack.Server
                 [typeof(NapackNotFoundException)] = HttpStatusCode.NotFound,
                 [typeof(NapackVersionNotFoundException)] = HttpStatusCode.NotFound,
                 [typeof(KeyNotFoundException)] = HttpStatusCode.NotFound,
+                [typeof(UserNotFoundException)] = HttpStatusCode.NotFound,
 
                 // 409 -- Conflict
                 [typeof(DuplicateNapackException)] = HttpStatusCode.Conflict,

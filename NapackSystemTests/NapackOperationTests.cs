@@ -7,7 +7,7 @@ using Napack.Common;
 namespace NapackSystemTests
 {
     /// <summary>
-    /// Tests that each 
+    /// Tests that each major napack operation works.
     /// </summary>
     [TestClass]
     public class NapackOperationTests

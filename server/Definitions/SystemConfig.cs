@@ -27,5 +27,7 @@ namespace Napack.Server
         public int MaxRequestsPerIpPerInterval { get; set; }
 
         public TimeSpan RequestThrottlingInterval { get; set; }
+
+        public string DatabaseFileName { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using LiteDB;
 using Napack.Common;
 using Newtonsoft.Json;
 
@@ -14,6 +15,7 @@ namespace Napack.Server
         /// The email the user has provided; used as the user's ID.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
+        [BsonId]
         public string Email { get; set; }
 
         /// <summary>
