@@ -14,3 +14,7 @@ Atttribution-only or otherwise Free-use Packages
 ---------------------------------
 * [Nancy](https://github.com/NancyFx/Nancy) (MIT)
 * [NLog](http://nlog-project.org) (BSD)
+* [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) (MIT)
+* [Ookii.CommandLine](http://ookiicommandline.codeplex.com/) (Ms-PL)
+* [Costura.Fody](https://github.com/Fody/Costura) (MIT)
+* [Fody](https://github.com/Fody/Fody) (MIT)
