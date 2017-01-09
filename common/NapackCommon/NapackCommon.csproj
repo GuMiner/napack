@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="CommonHeaders.cs" />
     <Compile Include="Exceptions\ExcessiveQueriesException.cs" />
+    <Compile Include="Exceptions\NapackStatsNotFoundException.cs" />
     <Compile Include="Exceptions\UserNotFoundException.cs" />
     <Compile Include="Exceptions\InvalidNapackException.cs" />
     <Compile Include="Exceptions\ExistingUserException.cs" />

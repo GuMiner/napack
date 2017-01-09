@@ -20,6 +20,7 @@ namespace Napack.Server
         private const string UsersCollection = "users";
         private const string AuthorPackageMapCollection = "authorPackageMap";
         private const string UserAuthorizedPackageCollection = "userAuthorizedPackageMap";
+        private const string PackageStatsCollection = "packageStats";
 
         public LiteDbNapackStorageManager(string databaseFileName)
         {
@@ -28,12 +29,15 @@ namespace Napack.Server
             // Allow us to serialize URIs in documents.
             // Interestingly, this is used as an example in the docs here: https://github.com/mbdavid/LiteDB/wiki/Object-Mapping
             BsonMapper.Global.RegisterType<Uri>((uri) => uri.AbsoluteUri, (bson) => new Uri(bson.AsString));
+            BsonMapper.Global.RegisterType<DateTime>((time) => time.ToString("o"), (bson) => DateTime.Parse(bson.AsString));
+            BsonMapper.Global.RegisterType<TimeSpan>((span) => span.ToString(), (bson) => TimeSpan.Parse(bson.AsString));
         }
 
         public void AddUser(UserIdentifier user)
         {
             try
             {
+                user.Id = UserIdentifier.GetSafeId(user.Email);
                 LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(LiteDbNapackStorageManager.UsersCollection);
                 users.Insert(user);
             }
@@ -51,24 +55,34 @@ namespace Napack.Server
 
         public UserIdentifier GetUser(string userId)
         {
-            UserIdentifier user;
-            try
-            {
-                LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(LiteDbNapackStorageManager.UsersCollection);
-                user = users.FindById(userId);
-            }
-            catch (LiteException le)
-            {
-                logger.Warn(le);
-                throw;
-            }
-            
+            LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(LiteDbNapackStorageManager.UsersCollection);
+            UserIdentifier user = users.FindById(UserIdentifier.GetSafeId(userId));
             if (user == null)
             {
+                logger.Warn($"User not found {userId}.");
                 throw new UserNotFoundException(userId);
             }
 
             return user;
+        }
+
+        public void UpdateUser(UserIdentifier user)
+        {
+            user.Id = UserIdentifier.GetSafeId(user.Email);
+            LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(LiteDbNapackStorageManager.UsersCollection);
+            if (!users.Update(user))
+            {
+                throw new UserNotFoundException(user.Email);
+            }
+        }
+
+        public void RemoveUser(UserIdentifier user)
+        {
+            LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(LiteDbNapackStorageManager.UsersCollection);
+            if (!users.Delete(UserIdentifier.GetSafeId(user.Email)))
+            {
+                throw new UserNotFoundException(user.Email);
+            }
         }
 
         public class AuthorPackageMap
@@ -128,6 +142,19 @@ namespace Napack.Server
             return map?.PackageConsumers ?? new List<NapackVersionIdentifier>();
         }
 
+        public NapackStats GetPackageStatistics(string packageName)
+        {
+            LiteCollection<NapackStats> packageStatsCollection = database.GetCollection<NapackStats>(LiteDbNapackStorageManager.PackageStatsCollection);
+            NapackStats stats = packageStatsCollection.FindById(packageName);
+            if (stats == null)
+            {
+                logger.Warn($"Package stats not found {packageName}.");
+                throw new NapackStatsNotFoundException(packageName);
+            }
+
+            return stats;
+        }
+
         public bool ContainsNapack(string packageName)
         {
             throw new NotImplementedException();
@@ -148,24 +175,12 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
-        public NapackStats GetPackageStatistics(string packageName)
-        {
-            throw new NotImplementedException();
-        }
-
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
             throw new NotImplementedException();
         }
-
         
-
         public void IncrementPackageDownload(string packageName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveUser(UserIdentifier user)
         {
             throw new NotImplementedException();
         }
@@ -185,10 +200,7 @@ namespace Napack.Server
             throw new NotImplementedException();
         }
 
-        public void UpdateUser(UserIdentifier user)
-        {
-            throw new NotImplementedException();
-        }
+        
         
         protected virtual void Dispose(bool disposing)
         {

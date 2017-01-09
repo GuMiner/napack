@@ -107,6 +107,17 @@ namespace Napack.Server
         {
             return users[userId];
         }
+        
+        public void UpdateUser(UserIdentifier user)
+        {
+            users[user.Email] = user;
+        }
+
+        public void RemoveUser(UserIdentifier user)
+        {
+            users.Remove(user.Email);
+            authorizedPackages.Remove(user.Email);
+        }
 
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
@@ -278,17 +289,6 @@ namespace Napack.Server
             }
 
             authorPackageStore[author].Add(version);
-        }
-
-        public void UpdateUser(UserIdentifier user)
-        {
-            users[user.Email] = user;
-        }
-
-        public void RemoveUser(UserIdentifier user)
-        {
-            users.Remove(user.Email);
-            authorizedPackages.Remove(user.Email);
         }
 
         public void UpdatePackageMetadata(NapackMetadata metadata)
