@@ -1,0 +1,1 @@
+The SQLite DB is stored in this folder.

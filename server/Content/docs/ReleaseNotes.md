@@ -9,10 +9,12 @@ The Napack Database is subject to arbitrary deletion until there are no more rem
 
 Bugs
 ----
+* NuGet package still auto-includes the exe incorrectly.
 * Case sensitivity / insensitivity issues accross the board, esp. related to JSON serialization of package names.
 * Significantly increase unit testing and functional testing, so that the website can be tested locally with the in-memory store.
 * Search is missing the 'click for details' function on retrieved items linking to API, versions, authors, etc.
 * Request IP throttling internals and country geolocation database reading work.
+* Data storage layer needs another layer of abstraction to properly avoid duplicating business logic.
 
 Core Functionality
 ------------------
@@ -22,6 +24,8 @@ Core Functionality
 * The Napack Server Framework needs a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
 * Create a tree-view page to navigate through Napacks and their dependencies.
 * Create a system stats page listing requests per country for the current day.
+* Search should include code search, doc search, and main search.
+* Data storage should use RavenDb instead of LiteDb due to LiteDb's size limitations.
 
 Final Release Steps
 -------------------

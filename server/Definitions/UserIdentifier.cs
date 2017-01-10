@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using LiteDB;
 using Napack.Common;
 using Newtonsoft.Json;
 
@@ -11,10 +10,6 @@ namespace Napack.Server
 {
     public class UserIdentifier
     {
-        [JsonIgnore]
-        [BsonId]
-        public string Id { get; set; }
-
         /// <summary>
         /// The email the user has provided; used as the user's ID.
         /// </summary>
@@ -44,15 +39,7 @@ namespace Napack.Server
         /// </summary>
         [JsonProperty(Required = Required.Default)]
         public string Hash { get; set; }
-
-        /// <summary>
-        /// Used to avoid incorrect key values in LiteDb
-        /// </summary>
-        public static string GetSafeId(string email)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(email));
-        }
-
+        
         /// <summary>
         /// Resets the user as a non-confirmed user with the hash provided used for authentication.
         /// </summary>

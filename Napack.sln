@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackClient.Common", "Napa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{C8B5EF71-393B-46F6-9F83-697A3369809B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoSqlLiteDemo", "MonoSqlLiteDemo\MonoSqlLiteDemo.csproj", "{83CE94E9-0790-456B-960B-FEF48156D979}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{C8B5EF71-393B-46F6-9F83-697A3369809B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8B5EF71-393B-46F6-9F83-697A3369809B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8B5EF71-393B-46F6-9F83-697A3369809B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83CE94E9-0790-456B-960B-FEF48156D979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83CE94E9-0790-456B-960B-FEF48156D979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83CE94E9-0790-456B-960B-FEF48156D979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83CE94E9-0790-456B-960B-FEF48156D979}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

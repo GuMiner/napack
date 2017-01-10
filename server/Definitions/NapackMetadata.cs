@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiteDB;
 using Napack.Common;
 
 namespace Napack.Server
@@ -11,7 +10,6 @@ namespace Napack.Server
         /// <summary>
         /// The name of the package.
         /// </summary>
-        [BsonId]
         public string Name { get; set; }
 
         /// <summary>

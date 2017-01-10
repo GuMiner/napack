@@ -52,7 +52,7 @@ namespace Napack.Server
             EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
 
             logger.Info("Database loading...");
-            Global.NapackStorageManager = Global.NapackStorageManager ?? new LiteDbNapackStorageManager(Global.SystemConfig.DatabaseFileName);
+            Global.NapackStorageManager = Global.NapackStorageManager ?? new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName);
 
             logger.Info("System stats management loading...");
             Global.SystemStats = new SystemStats(Global.NapackStorageManager);

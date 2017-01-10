@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiteDB;
-using Newtonsoft.Json;
 
 namespace Napack.Common
 {
@@ -62,11 +60,9 @@ namespace Napack.Common
 
         public int Patch { get; private set; }
         
-        [BsonIgnore]
         public string GetFullName()
             => this.NapackName + "." + this.Major + "." + this.Minor + "." + this.Patch;
-
-        [BsonIgnore]
+        
         public string GenerateTargetName()
              => this.NapackName + "_" + this.Major + "_" + this.Minor + "_" + this.Patch;
 

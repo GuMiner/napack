@@ -1,0 +1,1 @@
+The NLog logs are stored in this folder.

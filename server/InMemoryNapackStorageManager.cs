@@ -61,7 +61,7 @@ namespace Napack.Server
         static InMemoryNapackStorageManager()
         {
             authorPackageStore = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCultureIgnoreCase); // Author names are case insensitive
-            users = new Dictionary<string, UserIdentifier>(StringComparer.InvariantCulture);
+            users = new Dictionary<string, UserIdentifier>(StringComparer.InvariantCultureIgnoreCase);
             authorizedPackages = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCulture); // User names are case sensitive.
             consumingPackages = new Dictionary<string, List<NapackVersionIdentifier>>(StringComparer.InvariantCulture);
             packageMetadataStore = new Dictionary<string, NapackMetadata>(StringComparer.InvariantCulture);
@@ -139,6 +139,11 @@ namespace Napack.Server
             return statsStore[packageName];
         }
 
+        public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            return specStore[packageVersion.GetFullName()];
+        }
+
         public void IncrementPackageDownload(string packageName)
         {
             statsStore[packageName].Downloads++;
@@ -155,10 +160,7 @@ namespace Napack.Server
             return packageStore[packageVersion.GetFullName()];
         }
 
-        public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
-        {
-            return specStore[packageVersion.GetFullName()];
-        }
+        
 
         /// <summary>
         /// Creates and saves a new napack.

@@ -9,5 +9,5 @@
   "RequireEmailValidation": true,
   "MaxRequestsPerIpPerInterval": 36000,
   "RequestThrottlingInterval": "0.01:00:00",
-  "DatabaseFileName": "Data/NapackDatabase.db"
+  "DatabaseFileName": "data/NapackDatabase.db"
 }
