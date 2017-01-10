@@ -24,7 +24,7 @@ namespace Napack.Server
 
         private IDbConnection database;
         
-        private const string UsersCollection = "users";
+        private const string UsersTable = "users";
         private const string AuthorPackageMapCollection = "authorPackageMap";
         private const string UserAuthorizedPackageCollection = "userAuthorizedPackageMap";
         private const string PackageStatsCollection = "packageStats";
@@ -52,8 +52,8 @@ namespace Napack.Server
         
         private void CreateTablesAndIndices()
         {
-            string usersTable = "users (" +
-                "email TEXT PRIMARY KEY COLLATE NOCASE NOT NULL, " +
+            string usersTable = $"{UsersTable} (" +
+                "email TEXT PRIMARY KEY NOT NULL, " +
                 "userData TEXT NOT NULL)";
             CreateTable(usersTable);
 
@@ -69,56 +69,79 @@ namespace Napack.Server
             }
         }
 
+        private void ExecuteCommand(string commandText, Action<IDbCommand> commandAction)
+        {
+            ExecuteCommand(commandText, (command) =>
+            {
+                commandAction(command);
+                return 0;
+            });
+        }
+
+        private T ExecuteCommand<T>(string commandText, Func<IDbCommand, T> commandAction)
+        {
+            using (IDbCommand command = database.CreateCommand())
+            {
+                try
+                {
+                    command.CommandText = commandText;
+                    return commandAction(command);
+                }
+                catch (SqliteException se)
+                {
+                    logger.Warn(se);
+                    throw;
+                }
+            }
+        }
+        
         public void AddUser(UserIdentifier user)
         {
-            //using (IDbCommand command = database.CreateCommand())
-            //{
-            //    command.ExecuteNonQuery();
-            //}
-                // try
-                // {
-                //     user.Id = UserIdentifier.GetSafeId(user.Email);
-                //     LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(RavenDbNapackStorageManager.UsersCollection);
-                //     users.Insert(user);
-                // }
-                // catch (LiteException le)
-                // {
-                //     logger.Warn(le);
-                //     if (le.ErrorCode == LiteException.INDEX_DUPLICATE_KEY)
-                //     {
-                //         throw new ExistingUserException(user.Email);
-                //     }
-                // 
-                //     throw ;
-                // }
-                throw new NotImplementedException();
+            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
+            string userJson = Serializer.SerializeToBase64(user);
+            ExecuteCommand($"INSERT INTO {UsersTable} (\"{userEmail}\", \"{userJson}\")", command =>
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SqliteException se) when (se.ErrorCode == SQLiteErrorCode.Constraint)
+                {
+                    throw new ExistingUserException(user.Email);
+                }
+            });
         }
 
         public UserIdentifier GetUser(string userId)
         {
-            // LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(RavenDbNapackStorageManager.UsersCollection);
-            // UserIdentifier user = users.FindById(UserIdentifier.GetSafeId(userId));
-            // if (user == null)
-            // {
-            //     logger.Warn($"User not found {userId}.");
-            //     throw new UserNotFoundException(userId);
-            // }
-            // 
-            // return user;
+            string userEmail = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
+            return ExecuteCommand($"SELECT userData FROM {UsersTable} WHERE email = \"{userEmail}\"", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<UserIdentifier>(reader.GetString(0));
+                    }
 
-            throw new NotImplementedException();
+                    throw new UserNotFoundException(userId);
+                }
+            });
         }
 
         public void UpdateUser(UserIdentifier user)
         {
-            // user.Id = UserIdentifier.GetSafeId(user.Email);
-            // LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(RavenDbNapackStorageManager.UsersCollection);
-            // if (!users.Update(user))
-            // {
-            //     throw new UserNotFoundException(user.Email);
-            // }
-
-            throw new NotImplementedException();
+            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
+            string userJson = Serializer.SerializeToBase64(user);
+            ExecuteCommand($"UPDATE {UsersTable} SET userData = \"{userJson}\" WHERE email = \"{userEmail}\"", command =>
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+                logger.Info($"Update affected {rowsAffected} rows.");
+                if (rowsAffected == 0)
+                {
+                    throw new UserNotFoundException(user.Email);
+                }
+            });
         }
 
         public void RemoveUser(UserIdentifier user)

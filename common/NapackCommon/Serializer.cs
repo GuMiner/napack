@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using System;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Napack.Common
 {
@@ -27,6 +28,16 @@ namespace Napack.Common
         public static string Serialize<T>(T @object)
         {
             return JsonConvert.SerializeObject(@object);
+        }
+
+        public static T DeserializeFromBase64<T>(string @object)
+        {
+            return Deserialize<T>(Encoding.UTF8.GetString(Convert.FromBase64String(@object)));
+        }
+
+        public static string SerializeToBase64<T>(T @object)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@object)));
         }
     }
 }
