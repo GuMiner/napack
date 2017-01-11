@@ -77,7 +77,7 @@ namespace Napack.Server
 
         public bool ContainsNapack(string packageName)
         {
-            return packageStore.ContainsKey(packageName);
+            return packageMetadataStore.ContainsKey(packageName);
         }
 
         public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
@@ -159,9 +159,7 @@ namespace Napack.Server
         {
             return packageStore[packageVersion.GetFullName()];
         }
-
         
-
         /// <summary>
         /// Creates and saves a new napack.
         /// </summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Text;
+using System.Linq;
 using Mono.Data.Sqlite;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
@@ -22,12 +22,22 @@ namespace Napack.Server
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
+        // If you're using more than this, you're searching for the wrong thing.
+        private const int maxSearchTerms = 20;
+
         private IDbConnection database;
         
         private const string UsersTable = "users";
-        private const string AuthorPackageMapCollection = "authorPackageMap";
-        private const string UserAuthorizedPackageCollection = "userAuthorizedPackageMap";
-        private const string PackageStatsCollection = "packageStats";
+        private const string AuthorPackageTable = "authorPackage";
+        private const string UserPackageTable = "userPackage";
+        private const string PackageConsumersTable = "packageConsumers";
+        private const string PackageStatsTable = "packageStats";
+        private const string PackageSpecsTable = "packageSpecs";
+        private const string PackageMetadataTable = "packageMetadata";
+        private const string PackageStoreTable = "packageStore";
+
+        private const string PackageMetadataDescriptionIndex = "packageMetadataDescriptionIndex";
+        private const string PackageMetadataTagsIndex = "packageMetadataTagsIndex";
 
         public SqliteNapackStorageManager(string databaseFileName)
         {
@@ -57,7 +67,44 @@ namespace Napack.Server
                 "userData TEXT NOT NULL)";
             CreateTable(usersTable);
 
-            
+            string authorPackageTable = $"{AuthorPackageTable} (" +
+                "authorName TEXT PRIMARY KEY NOT NULL, " +
+                "packageVersionList TEXT NOT NULL)";
+            CreateTable(authorPackageTable);
+
+            string userPackageTable = $"{UserPackageTable} (" +
+                "userId TEXT PRIMARY KEY NOT NULL, " +
+                "packageNameList TEXT NOT NULL)";
+            CreateTable(userPackageTable);
+
+            string packageConsumersTable = $"{PackageConsumersTable} (" +
+                "packageMajorVersionId TEXT PRIMARY KEY NOT NULL, " +
+                "consumingPackages TEXT NOT NULL)";
+            CreateTable(packageConsumersTable);
+
+            string statsTable = $"{PackageStatsTable} (" +
+                "packageName TEXT PRIMARY KEY NOT NULL, " +
+                "packageStat TEXT NOT NULL)";
+            CreateTable(statsTable);
+
+            string specsTable = $"{PackageSpecsTable} (" +
+                "packageVersion TEXT PRIMARY KEY NOT NULL, " +
+                "packageSpec TEXT NOT NULL)";
+            CreateTable(specsTable);
+
+            string packageMetadataTable = $"{PackageMetadataTable} (" +
+                "packageName TEXT PRIMARY KEY NOT NULL, " +
+                "description TEXT COLLATE NOCASE NOT NULL, " +
+                "tags TEXT COLLATE NOCASE NOT NULL, " +
+                "metadata TEXT NOT NULL)";
+            CreateTable(packageMetadataTable);
+            CreateIndex(PackageMetadataDescriptionIndex, PackageMetadataTable, "description");
+            CreateIndex(PackageMetadataDescriptionIndex, PackageMetadataTagsIndex, "tags");
+
+            string packageStoreTable = $"{PackageStoreTable} (" +
+                "packageVersion TEXT PRIMARY KEY NOT NULL, " +
+                "package TEXT NOT NULL)";
+            CreateTable(packageStoreTable);
         }
 
         private void CreateTable(string tableCreationLogic)
@@ -65,6 +112,15 @@ namespace Napack.Server
             using (IDbCommand command = database.CreateCommand())
             {
                 command.CommandText = $"CREATE TABLE {tableCreationLogic}";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void CreateIndex(string indexName, string tableName, string columnName)
+        {
+            using (IDbCommand command = database.CreateCommand())
+            {
+                command.CommandText = $"CREATE INDEX {indexName} ON {tableName} ({columnName} COLLATE NOCASE)";
                 command.ExecuteNonQuery();
             }
         }
@@ -99,7 +155,7 @@ namespace Napack.Server
         {
             string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
             string userJson = Serializer.SerializeToBase64(user);
-            ExecuteCommand($"INSERT INTO {UsersTable} (\"{userEmail}\", \"{userJson}\")", command =>
+            ExecuteCommand($"INSERT INTO {UsersTable} ('{userEmail}', '{userJson}')", command =>
             {
                 try
                 {
@@ -115,7 +171,7 @@ namespace Napack.Server
         public UserIdentifier GetUser(string userId)
         {
             string userEmail = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
-            return ExecuteCommand($"SELECT userData FROM {UsersTable} WHERE email = \"{userEmail}\"", command =>
+            return ExecuteCommand($"SELECT userData FROM {UsersTable} WHERE email = '{userEmail}'", command =>
             {
                 using (IDataReader reader = command.ExecuteReader())
                 {
@@ -133,7 +189,7 @@ namespace Napack.Server
         {
             string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
             string userJson = Serializer.SerializeToBase64(user);
-            ExecuteCommand($"UPDATE {UsersTable} SET userData = \"{userJson}\" WHERE email = \"{userEmail}\"", command =>
+            ExecuteCommand($"UPDATE {UsersTable} SET userData = '{userJson}' WHERE email = '{userEmail}'", command =>
             {
                 int rowsAffected = command.ExecuteNonQuery();
                 logger.Info($"Update affected {rowsAffected} rows.");
@@ -146,117 +202,192 @@ namespace Napack.Server
 
         public void RemoveUser(UserIdentifier user)
         {
-            // LiteCollection<UserIdentifier> users = database.GetCollection<UserIdentifier>(RavenDbNapackStorageManager.UsersCollection);
-            // if (!users.Delete(UserIdentifier.GetSafeId(user.Email)))
-            // {
-            //     throw new UserNotFoundException(user.Email);
-            // }
-
-            throw new NotImplementedException();
-        }
-
-        public class AuthorPackageMap
-        {
-            public AuthorPackageMap()
+            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
+            ExecuteCommand($"DELETE FROM {UsersTable} WHERE email = '{userEmail}'", command =>
             {
-            }
-            
-            public string AuthorNameBase64 { get; set; }
-
-            public List<NapackVersionIdentifier> AuthoredPackage { get; set; }
-        }
-
-        public class UserAuthorizedPackageMap
-        {
-            public UserAuthorizedPackageMap()
-            {
-            }
-            
-            public string UserNameBase64 { get; set; }
-
-            public List<string> AuthorizedPackages { get; set; }
-        }
-
-        public class PackageConsumerMap
-        {
-            public PackageConsumerMap()
-            {
-            }
-            
-            public string PackageMajorVersion { get; set; }
-
-            public List<NapackVersionIdentifier> PackageConsumers { get; set; }
+                int rowsAffected = command.ExecuteNonQuery();
+                logger.Info($"Delete affected {rowsAffected} rows.");
+                if (rowsAffected == 0)
+                {
+                    throw new UserNotFoundException(user.Email);
+                }
+            });
         }
 
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
-            //LiteCollection<AuthorPackageMap> authorPackageMap = database.GetCollection<AuthorPackageMap>(RavenDbNapackStorageManager.AuthorPackageMapCollection);
-            //AuthorPackageMap map = authorPackageMap.FindById(Convert.ToBase64String(Encoding.UTF8.GetBytes(authorName.ToUpperInvariant())));
-            //return map?.AuthoredPackage ?? new List<NapackVersionIdentifier>();
-            throw new NotImplementedException();
+            string authorNameEncoded = Serializer.SerializeToBase64<string>(authorName.ToUpperInvariant());
+            
+            return ExecuteCommand($"SELECT packageVersionList FROM {AuthorPackageTable} WHERE authorName = '{authorNameEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<List<NapackVersionIdentifier>>(reader.GetString(0));
+                    }
+
+                    return Enumerable.Empty<NapackVersionIdentifier>();
+                }
+            });
         }
 
         public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
-            throw new NotImplementedException();
-            // LiteCollection<UserAuthorizedPackageMap> userAuthorizedPackageMap = database.GetCollection<UserAuthorizedPackageMap>(RavenDbNapackStorageManager.UserAuthorizedPackageCollection);
-            // UserAuthorizedPackageMap map = userAuthorizedPackageMap.FindById(Convert.ToBase64String(Encoding.UTF8.GetBytes(userId)));
-            // return map?.AuthorizedPackages ?? new List<string>();
-            throw new NotImplementedException();
+            string userIdEncoded = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
+
+            return ExecuteCommand($"SELECT packageNameList FROM {UserPackageTable} WHERE userId = '{userIdEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<List<string>>(reader.GetString(0));
+                    }
+
+                    return Enumerable.Empty<string>();
+                }
+            });
         }
 
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
-            throw new NotImplementedException();
-            // LiteCollection<PackageConsumerMap> packageConsumerMap = database.GetCollection<PackageConsumerMap>(RavenDbNapackStorageManager.UserAuthorizedPackageCollection);
-            // PackageConsumerMap map = packageConsumerMap.FindById(packageMajorVersion.ToString());
-            // return map?.PackageConsumers ?? new List<NapackVersionIdentifier>();
+            string pmvEncoded = Serializer.SerializeToBase64<string>(packageMajorVersion.ToString());
+
+            return ExecuteCommand($"SELECT consumingPackages FROM {PackageConsumersTable} WHERE packageMajorVersionId = '{pmvEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<List<NapackVersionIdentifier>>(reader.GetString(0));
+                    }
+
+                    return Enumerable.Empty<NapackVersionIdentifier>();
+                }
+            });
         }
 
         public NapackStats GetPackageStatistics(string packageName)
         {
-            throw new NotImplementedException();
-            // LiteCollection<NapackStats> packageStatsCollection = database.GetCollection<NapackStats>(RavenDbNapackStorageManager.PackageStatsCollection);
-            // NapackStats stats = packageStatsCollection.FindById(packageName);
-            // if (stats == null)
-            // {
-            //     logger.Warn($"Package stats not found {packageName}.");
-            //     throw new NapackStatsNotFoundException(packageName);
-            // }
-            // 
-            // return stats;
+            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
+
+            return ExecuteCommand($"SELECT packageStat FROM {PackageStatsTable} WHERE packageName = '{packageNameEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<NapackStats>(reader.GetString(0));
+                    }
+
+                    throw new NapackStatsNotFoundException(packageName);
+                }
+            });
         }
 
         public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
         {
-            throw new NotImplementedException();
+            string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
+
+            return ExecuteCommand($"SELECT packageSpec FROM {PackageSpecsTable} WHERE packageVersion = '{packageVersionEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<NapackSpec>(reader.GetString(0));
+                    }
+
+                    throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch);
+                }
+            });
         }
 
         public bool ContainsNapack(string packageName)
         {
-            throw new NotImplementedException();
+            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
+
+            return ExecuteCommand($"SELECT packageName FROM {PackageMetadataTable} WHERE packageName = '{packageNameEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
         }
 
         public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
         {
+            IEnumerable<string> searchKeys = searchPhrase.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Take(maxSearchTerms);
+            // TODO SELECT ITEMS FROM TABLE WHERE COLUMN = 'key' AND ... LIMIT SKIP OFFSET TOP
+
+            // For each metadata item found, retrieve the NapackStats.
+
             throw new NotImplementedException();
-        }        
+        }
+
+        public void IncrementPackageDownload(string packageName)
+        {
+            NapackStats stats = GetPackageStatistics(packageName);
+            stats.Downloads++;
+
+            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
+            string packageStatsEncoded = Serializer.SerializeToBase64(stats);
+
+            ExecuteCommand($"UPDATE {PackageStatsTable} SET packageStat = '{packageStatsEncoded}' WHERE packageName = '{packageNameEncoded}'", command =>
+            {
+                int rowsAffected = command.ExecuteNonQuery();
+                logger.Info($"Update affected {rowsAffected} rows.");
+                if (rowsAffected == 0)
+                {
+                    throw new NapackStatsNotFoundException(packageName);
+                }
+            });
+
+        }
 
         public NapackMetadata GetPackageMetadata(string packageName)
         {
-            throw new NotImplementedException();
+            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
+
+            return ExecuteCommand($"SELECT metadata FROM {PackageMetadataTable} WHERE packageName = '{packageNameEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<NapackMetadata>(reader.GetString(0));
+                    }
+
+                    throw new NapackNotFoundException(packageName);
+                }
+            });
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
-            throw new NotImplementedException();
+            string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
+
+            return ExecuteCommand($"SELECT package FROM {PackageStoreTable} WHERE packageVersion = '{packageVersionEncoded}'", command =>
+            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return Serializer.DeserializeFromBase64<NapackVersion>(reader.GetString(0));
+                    }
+
+                    throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch);
+                }
+            });
         }
         
-        public void IncrementPackageDownload(string packageName)
-        {
-            throw new NotImplementedException();
-        }
-
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
             throw new NotImplementedException();
