@@ -36,8 +36,7 @@ namespace Napack.Server
         private const string PackageMetadataTable = "packageMetadata";
         private const string PackageStoreTable = "packageStore";
 
-        private const string PackageMetadataDescriptionIndex = "packageMetadataDescriptionIndex";
-        private const string PackageMetadataTagsIndex = "packageMetadataTagsIndex";
+        private const string PackageMetadataDescriptionAndTagsIndex = "packageMetadataDATIndex";
 
         public SqliteNapackStorageManager(string databaseFileName)
         {
@@ -94,12 +93,10 @@ namespace Napack.Server
 
             string packageMetadataTable = $"{PackageMetadataTable} (" +
                 "packageName TEXT PRIMARY KEY NOT NULL, " +
-                "description TEXT COLLATE NOCASE NOT NULL, " +
-                "tags TEXT COLLATE NOCASE NOT NULL, " +
+                "descriptionAndTags TEXT COLLATE NOCASE NOT NULL, " +
                 "metadata TEXT NOT NULL)";
             CreateTable(packageMetadataTable);
-            CreateIndex(PackageMetadataDescriptionIndex, PackageMetadataTable, "description");
-            CreateIndex(PackageMetadataDescriptionIndex, PackageMetadataTagsIndex, "tags");
+            CreateIndex(PackageMetadataDescriptionAndTagsIndex, PackageMetadataTable, "descriptionAndTags");
 
             string packageStoreTable = $"{PackageStoreTable} (" +
                 "packageVersion TEXT PRIMARY KEY NOT NULL, " +
@@ -390,17 +387,149 @@ namespace Napack.Server
         
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
-            throw new NotImplementedException();
+            string napackNameEncoded = Serializer.SerializeToBase64<string>(napackName);
+            
+            NapackVersionIdentifier version = new NapackVersionIdentifier(napackName, 1, 0, 0);
+            NapackMetadata metadata = NapackMetadata.CreateFromNewNapack(napackName, newNapack);
+            NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapack.NewNapackVersion);
+            
+            // TODO these should be repeat get-update loops until success. If the save fails, they should do the reverse to 'unsave'.
+            // foreach (string author in newNapack.NewNapackVersion.Authors)
+            // {
+            //     AddAuthorConsumption(author, version);
+            //     command.ExecuteNonQuery()
+            // }
+            // 
+            // foreach (string userId in newNapack.AuthorizedUserIds)
+            // {
+            //     AddUserAuthorization(userId, napackName);
+            // }
+            // 
+            // foreach (NapackMajorVersion consumedPackage in newNapack.NewNapackVersion.Dependencies)
+            // {
+            //     AddConsumingPackage(consumedPackage, version);
+            // }
+
+            using (IDbTransaction transaction = database.BeginTransaction())
+            {
+                using (IDbCommand command = database.CreateCommand())
+                {
+                    try
+                    {
+                        // Add the new napack to all the various stores.
+                        NapackStats stats = new NapackStats();
+                        stats.AddVersion(newNapack.NewNapackVersion);
+
+                        string statsEncoded = Serializer.SerializeToBase64(stats);
+                        command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES ('{napackNameEncoded}', '{statsEncoded}')";
+                        command.ExecuteNonQuery();
+
+                        string metadataEncoded = Serializer.SerializeToBase64(metadata);
+                        string safeDescriptionAndTags = GetSafeDescriptionAndTags(metadata);
+                        command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES ('{napackNameEncoded}', '{safeDescriptionAndTags}', '{metadataEncoded}')";
+                        command.ExecuteNonQuery();
+
+                        string versionEncoded = Serializer.SerializeToBase64(version.GetFullName());
+                        string napackSpecEncoded = Serializer.SerializeToBase64(napackSpec);
+                        command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES('{versionEncoded}', '{napackSpecEncoded}')";
+                        command.ExecuteNonQuery();
+
+                        string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
+                        command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES('{versionEncoded}', '{packageVersionEncoded}')";
+                        command.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch (SqliteException se)
+                    {
+                        try
+                        {
+                            transaction.Rollback();
+                        }
+                        catch (SqliteException ser)
+                        {
+                            logger.Warn("Rollback failed!");
+                            logger.Warn(ser);
+                        }
+
+                        logger.Warn(se);
+                        throw;
+                    }
+                }
+            }
         }
 
         public void SaveNewNapackVersion(NapackMetadata package, NapackVersionIdentifier currentVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion, NapackSpec newVersionSpec)
         {
-            throw new NotImplementedException();
+            NapackVersionIdentifier nextVersion = new NapackVersionIdentifier(currentVersion.NapackName, currentVersion.Major, currentVersion.Minor, currentVersion.Patch);
+            NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapackVersion);
+
+            // TODO this needs work as per listed above.
+            // foreach (string author in newNapackVersion.Authors)
+            // {
+            //     AddAuthorConsumption(author, nextVersion);
+            // }
+            // 
+            // // Changes in user authorization do not occur through napack version updates.
+            // 
+            // foreach (NapackMajorVersion consumedPackage in newNapackVersion.Dependencies)
+            // {
+            //     AddConsumingPackage(consumedPackage, nextVersion);
+            // }
+
+            UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
+            
+            // TODO convert to SQL.
+            // packageStore.Add(nextVersion.GetFullName(), packageVersion);
+            // specStore.Add(nextVersion.GetFullName(), newVersionSpec);
+        }
+
+        private void UpdatePackageMetadataStore(NapackMetadata package, NapackVersionIdentifier nextVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion)
+        {
+            if (upversionType == NapackAnalyst.UpversionType.Major)
+            {
+                NapackMajorVersionMetadata newMajorVersionMetadata = new NapackMajorVersionMetadata()
+                {
+                    Recalled = false,
+                    Versions = new Dictionary<int, List<int>>
+                    {
+                        [0] = new List<int> { 0 }
+                    },
+                    License = newNapackVersion.License
+                };
+
+                package.Versions.Add(nextVersion.Major, newMajorVersionMetadata);
+            }
+            else if (upversionType == NapackAnalyst.UpversionType.Minor)
+            {
+                package.Versions[nextVersion.Major].Versions.Add(nextVersion.Minor, new List<int> { 0 });
+            }
+            else
+            {
+                package.Versions[nextVersion.Major].Versions[nextVersion.Minor].Add(nextVersion.Patch);
+            }
+
+            // TODO convert to SQL
+            // statsStore[nextVersion.NapackName].AddVersion(newNapackVersion);
+            // searchIndices[nextVersion.NapackName].LastUpdateTime = statsStore[nextVersion.NapackName].LastUpdateTime;
+            // searchIndices[nextVersion.NapackName].LastUsedLicense = newNapackVersion.License;
+            // 
+            // packageMetadataStore[nextVersion.NapackName] = package;
         }
 
         public void UpdatePackageMetadata(NapackMetadata metadata)
         {
-            throw new NotImplementedException();
+            string packageNameEncoded = Serializer.SerializeToBase64(metadata.Name);
+            string metadataEncoded = Serializer.SerializeToBase64(metadata);
+
+            ExecuteCommand($"UPDATE {PackageMetadataTable} SET metadata = '{metadataEncoded}', descriptionAndTags = '{GetSafeDescriptionAndTags(metadata)}' WHERE packageName = '{packageNameEncoded}'", command =>
+            {
+                int rowsUpdated = command.ExecuteNonQuery();
+                if (rowsUpdated == 0)
+                {
+                    throw new NapackNotFoundException(metadata.Name);
+                }
+            });
         }
         
         protected virtual void Dispose(bool disposing)
@@ -417,6 +546,11 @@ namespace Napack.Server
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private string GetSafeDescriptionAndTags(NapackMetadata metadata)
+        {
+            return (metadata.Description + " " + string.Join(" ", metadata.Tags)).Replace("'", "''");
         }
     }
 }
