@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Mono.Data.Sqlite;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
@@ -360,12 +361,50 @@ namespace Napack.Server
 
         public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)
         {
-            IEnumerable<string> searchKeys = searchPhrase.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Take(maxSearchTerms);
-            // TODO SELECT ITEMS FROM TABLE WHERE COLUMN = 'key' AND ... LIMIT SKIP OFFSET TOP
+            // Sanitize and return if the user didn't search for anything!
+            List<string> searchKeys = searchPhrase.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Take(maxSearchTerms).Select(item => item.Replace("'", "''")).ToList();
+            if (searchKeys.Count == 0)
+            {
+                return new List<NapackSearchIndex>();
+            }
 
-            // For each metadata item found, retrieve the NapackStats.
+            // Build the SQL query
+            StringBuilder searchString = new StringBuilder();
+            searchString.Append($"SELECT metadata FROM {PackageMetadataTable} WHERE ");
+            for (int i = 0; i < searchKeys.Count; i++)
+            {
+                searchString.Append($"descriptionAndTags LIKE '%{searchKeys[i]}%'");
+                if (i != searchKeys.Count - 1)
+                {
+                    searchString.Append(" AND ");
+                }
+            }
 
-            throw new NotImplementedException();
+            searchString.Append($" LIMIT {top} OFFSET {skip}");
+            logger.Info($"Searching for {searchString.ToString()}");
+
+            return ExecuteCommand((command) =>
+            {
+                List<NapackMetadata> metadatas = new List<NapackMetadata>();
+                command.CommandText = searchString.ToString();
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        metadatas.Add(Serializer.DeserializeFromBase64<NapackMetadata>(reader.GetString(0)));
+                    }
+                }
+
+                logger.Info($"Search returned {metadatas.Count} items.");
+
+                return metadatas.Select(metadata =>
+                {
+                    string packageNameEncoded = Serializer.SerializeToBase64<string>(metadata.Name);
+                    NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                        () => { throw new NapackStatsNotFoundException(metadata.Name); });
+                    return NapackSearchIndex.CreateFromMetadataAndStats(metadata, stats);
+                }).ToList();
+            });
         }
 
         public void IncrementPackageDownload(string packageName)
