@@ -13,7 +13,7 @@ namespace Napack.Server
         // TODO configurable
         private const int MaxResultsPerPage = 50;
 
-        public SearchModule(INapackStorageManager napackManager)
+        public SearchModule()
             : base("/search")
         {
             // Retrieves and displays the basic search page.
@@ -29,7 +29,7 @@ namespace Napack.Server
                 int skip = int.Parse(this.Request.Query["$skip"]);
                 int top = Math.Min(int.Parse(this.Request.Query["$top"]), SearchModule.MaxResultsPerPage);
 
-                List<NapackSearchIndex> packagesFound = napackManager.FindPackages(query, skip, top);
+                List<NapackSearchIndex> packagesFound = Global.NapackStorageManager.FindPackages(query, skip, top);
                 return this.Response.AsJson(new
                 {
                     Results = packagesFound.Select(package => package.ToAnonymousType()),
@@ -41,8 +41,8 @@ namespace Napack.Server
             Get["/result/{packageName}"] = parameters =>
             {
                 string packageName = parameters.packageName;
-                NapackMetadata metadata = napackManager.GetPackageMetadata(packageName);
-                NapackStats stats = napackManager.GetPackageStatistics(packageName);
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackStats stats = Global.NapackStorageManager.GetPackageStatistics(packageName);
 
                 return this.Response.AsJson(new
                 {

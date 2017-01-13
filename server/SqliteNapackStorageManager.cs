@@ -55,7 +55,12 @@ namespace Napack.Server
 
             if (createTablesAndIndices)
             {
+                logger.Info($"DB doesn't exist, creating tables and indices.");
                 CreateTablesAndIndices();
+            }
+            else
+            {
+                logger.Info($"DB already exists and has been loaded.");
             }
         }
         
@@ -64,52 +69,53 @@ namespace Napack.Server
             string usersTable = $"{UsersTable} (" +
                 "email TEXT PRIMARY KEY NOT NULL, " +
                 "userData TEXT NOT NULL)";
-            CreateTable(usersTable);
+            CreateTable(UsersTable, usersTable);
 
             string authorPackageTable = $"{AuthorPackageTable} (" +
                 "authorName TEXT PRIMARY KEY NOT NULL, " +
                 "packageVersionList TEXT NOT NULL)";
-            CreateTable(authorPackageTable);
+            CreateTable(AuthorPackageTable, authorPackageTable);
 
             string userPackageTable = $"{UserPackageTable} (" +
                 "userId TEXT PRIMARY KEY NOT NULL, " +
                 "packageNameList TEXT NOT NULL)";
-            CreateTable(userPackageTable);
+            CreateTable(UserPackageTable, userPackageTable);
 
             string packageConsumersTable = $"{PackageConsumersTable} (" +
                 "packageMajorVersionId TEXT PRIMARY KEY NOT NULL, " +
                 "consumingPackages TEXT NOT NULL)";
-            CreateTable(packageConsumersTable);
+            CreateTable(PackageConsumersTable, packageConsumersTable);
 
             string statsTable = $"{PackageStatsTable} (" +
                 "packageName TEXT PRIMARY KEY NOT NULL, " +
                 "packageStat TEXT NOT NULL)";
-            CreateTable(statsTable);
+            CreateTable(PackageStatsTable, statsTable);
 
             string specsTable = $"{PackageSpecsTable} (" +
                 "packageVersion TEXT PRIMARY KEY NOT NULL, " +
                 "packageSpec TEXT NOT NULL)";
-            CreateTable(specsTable);
+            CreateTable(PackageSpecsTable, specsTable);
 
             string packageMetadataTable = $"{PackageMetadataTable} (" +
                 "packageName TEXT PRIMARY KEY NOT NULL, " +
                 "descriptionAndTags TEXT COLLATE NOCASE NOT NULL, " +
                 "metadata TEXT NOT NULL)";
-            CreateTable(packageMetadataTable);
+            CreateTable(PackageMetadataTable, packageMetadataTable);
             CreateIndex(PackageMetadataDescriptionAndTagsIndex, PackageMetadataTable, "descriptionAndTags");
 
             string packageStoreTable = $"{PackageStoreTable} (" +
                 "packageVersion TEXT PRIMARY KEY NOT NULL, " +
                 "package TEXT NOT NULL)";
-            CreateTable(packageStoreTable);
+            CreateTable(PackageStoreTable, packageStoreTable);
         }
 
-        private void CreateTable(string tableCreationLogic)
+        private void CreateTable(string tableName, string tableCreationLogic)
         {
             using (IDbCommand command = database.CreateCommand())
             {
                 command.CommandText = $"CREATE TABLE {tableCreationLogic}";
                 command.ExecuteNonQuery();
+                logger.Info($"Created table {tableName}.");
             }
         }
 
@@ -119,6 +125,7 @@ namespace Napack.Server
             {
                 command.CommandText = $"CREATE INDEX {indexName} ON {tableName} ({columnName} COLLATE NOCASE)";
                 command.ExecuteNonQuery();
+                logger.Info($"Created index {indexName} on {tableName}");
             }
         }
 
@@ -126,6 +133,7 @@ namespace Napack.Server
         {
             ExecuteCommand(commandText, (command) =>
             {
+                logger.Info(command.ToString());
                 commandAction(command);
                 return 0;
             });
@@ -133,26 +141,122 @@ namespace Napack.Server
 
         private T ExecuteCommand<T>(string commandText, Func<IDbCommand, T> commandAction)
         {
+            return ExecuteCommand((command) =>
+            {
+                command.CommandText = commandText;
+                return commandAction(command);
+            });
+        }
+
+        private T ExecuteCommand<T>(Func<IDbCommand, T> commandAction)
+        {
             using (IDbCommand command = database.CreateCommand())
             {
                 try
                 {
-                    command.CommandText = commandText;
                     return commandAction(command);
                 }
                 catch (SqliteException se)
                 {
-                    logger.Warn(se);
+                    logger.Warn(se.Message);
                     throw;
                 }
             }
         }
-        
+
+        private void ExecuteTransactionCommand(Action<IDbCommand> commandAction)
+        {
+            using (IDbCommand command = database.CreateCommand())
+            {
+                try
+                {
+                    command.CommandText = "BEGIN IMMEDIATE TRANSACTION";
+                    command.ExecuteNonQuery();
+
+                    commandAction(command);
+
+                    command.CommandText = "END TRANSACTION";
+                    command.ExecuteNonQuery();
+                }
+                catch (SqliteException se)
+                {
+                    try
+                    {
+                        command.CommandText = "ROLLBACK TRANSACTION";
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("Transaction rollback failure!");
+                        logger.Warn(ex.Message);
+                    }
+
+                    logger.Warn(se.Message);
+                    throw;
+                }
+            }
+        }
+
+        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string keyEncoded, string valueName)
+            where T: class
+        {
+            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = '{keyEncoded}'";
+            using (IDataReader reader = currentCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    return Serializer.DeserializeFromBase64<T>(reader.GetString(0));
+                }
+
+                return null;
+            }
+        }
+
+        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string keyEncoded, string valueName, Func<T> missingAction)
+            where T : class
+        {
+            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = '{keyEncoded}'";
+            using (IDataReader reader = currentCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    return Serializer.DeserializeFromBase64<T>(reader.GetString(0));
+                }
+
+                return missingAction();
+            }
+        }
+
+        public void AddItem<T>(string key, T item, string table, string keyName, string valueName, bool distinct)
+        {
+            string keyEncoded = Serializer.SerializeToBase64<string>(key);
+            ExecuteTransactionCommand((command) =>
+            {
+                List<T> items = GetItem<List<T>>(command, table, keyName, keyEncoded, valueName);
+                if (items == null)
+                {
+                    string itemsEncoded = Serializer.SerializeToBase64(new List<T>() { item });
+                    command.CommandText = $"INSERT INTO {table} VALUES ('{keyEncoded}', '{itemsEncoded}') ";
+                    command.ExecuteNonQuery();
+                }
+                else
+                {
+                    items.Add(item);
+                    items = distinct ? items.Distinct().ToList() : items;
+                    string itemsEncoded = Serializer.SerializeToBase64(items);
+
+                    command.CommandText = $"UPDATE {table} SET {valueName} = '{itemsEncoded}' WHERE {keyName} = '{keyEncoded}'";
+                    command.ExecuteNonQuery();
+                }
+            });
+        }
+
         public void AddUser(UserIdentifier user)
         {
             string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
             string userJson = Serializer.SerializeToBase64(user);
-            ExecuteCommand($"INSERT INTO {UsersTable} ('{userEmail}', '{userJson}')", command =>
+            
+            ExecuteCommand($"INSERT INTO {UsersTable} VALUES ('{userEmail}', '{userJson}')", command =>
             {
                 try
                 {
@@ -168,18 +272,8 @@ namespace Napack.Server
         public UserIdentifier GetUser(string userId)
         {
             string userEmail = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
-            return ExecuteCommand($"SELECT userData FROM {UsersTable} WHERE email = '{userEmail}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<UserIdentifier>(reader.GetString(0));
-                    }
-
-                    throw new UserNotFoundException(userId);
-                }
-            });
+            return ExecuteCommand((command) => GetItem<UserIdentifier>(command, UsersTable, "email", userEmail, "userData",
+                () => { throw new UserNotFoundException(userId); }));
         }
 
         public void UpdateUser(UserIdentifier user)
@@ -214,91 +308,36 @@ namespace Napack.Server
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
             string authorNameEncoded = Serializer.SerializeToBase64<string>(authorName.ToUpperInvariant());
-            
-            return ExecuteCommand($"SELECT packageVersionList FROM {AuthorPackageTable} WHERE authorName = '{authorNameEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<List<NapackVersionIdentifier>>(reader.GetString(0));
-                    }
-
-                    return Enumerable.Empty<NapackVersionIdentifier>();
-                }
-            });
+            return ExecuteCommand((command) => GetItem(command, AuthorPackageTable, "authorName", authorNameEncoded, "packageVersionList",
+                () => Enumerable.Empty<NapackVersionIdentifier>()));
         }
 
         public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
             string userIdEncoded = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
-
-            return ExecuteCommand($"SELECT packageNameList FROM {UserPackageTable} WHERE userId = '{userIdEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<List<string>>(reader.GetString(0));
-                    }
-
-                    return Enumerable.Empty<string>();
-                }
-            });
+            return ExecuteCommand((command) => GetItem(command, UserPackageTable, "userId", userIdEncoded, "packageNameList",
+                () => Enumerable.Empty<string>()));
         }
 
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
             string pmvEncoded = Serializer.SerializeToBase64<string>(packageMajorVersion.ToString());
-
-            return ExecuteCommand($"SELECT consumingPackages FROM {PackageConsumersTable} WHERE packageMajorVersionId = '{pmvEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<List<NapackVersionIdentifier>>(reader.GetString(0));
-                    }
-
-                    return Enumerable.Empty<NapackVersionIdentifier>();
-                }
-            });
+            return ExecuteCommand((command) => GetItem(command, PackageConsumersTable, "packageMajorVersionId", pmvEncoded, "consumingPackages",
+                () => Enumerable.Empty<NapackVersionIdentifier>()));
         }
 
         public NapackStats GetPackageStatistics(string packageName)
         {
             string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-
-            return ExecuteCommand($"SELECT packageStat FROM {PackageStatsTable} WHERE packageName = '{packageNameEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<NapackStats>(reader.GetString(0));
-                    }
-
-                    throw new NapackStatsNotFoundException(packageName);
-                }
-            });
+            return ExecuteCommand((command) => GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                () => { throw new NapackStatsNotFoundException(packageName); }));
         }
 
         public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
         {
             string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
-
-            return ExecuteCommand($"SELECT packageSpec FROM {PackageSpecsTable} WHERE packageVersion = '{packageVersionEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<NapackSpec>(reader.GetString(0));
-                    }
-
-                    throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch);
-                }
-            });
+            return ExecuteCommand((command) => GetItem<NapackSpec>(command, PackageSpecsTable, "packageVersion", packageVersionEncoded, "packageSpec",
+                () => { throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch); }));
         }
 
         public bool ContainsNapack(string packageName)
@@ -331,20 +370,17 @@ namespace Napack.Server
 
         public void IncrementPackageDownload(string packageName)
         {
-            NapackStats stats = GetPackageStatistics(packageName);
-            stats.Downloads++;
-
             string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-            string packageStatsEncoded = Serializer.SerializeToBase64(stats);
 
-            ExecuteCommand($"UPDATE {PackageStatsTable} SET packageStat = '{packageStatsEncoded}' WHERE packageName = '{packageNameEncoded}'", command =>
+            ExecuteTransactionCommand((command) =>
             {
-                int rowsAffected = command.ExecuteNonQuery();
-                logger.Info($"Update affected {rowsAffected} rows.");
-                if (rowsAffected == 0)
-                {
-                    throw new NapackStatsNotFoundException(packageName);
-                }
+                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                    () => { throw new NapackStatsNotFoundException(packageName); });
+                stats.Downloads++;
+
+                string packageStatsEncoded = Serializer.SerializeToBase64(stats);
+                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = '{packageStatsEncoded}' WHERE packageName = '{packageNameEncoded}'";
+                command.ExecuteNonQuery();
             });
 
         }
@@ -352,136 +388,98 @@ namespace Napack.Server
         public NapackMetadata GetPackageMetadata(string packageName)
         {
             string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-
-            return ExecuteCommand($"SELECT metadata FROM {PackageMetadataTable} WHERE packageName = '{packageNameEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<NapackMetadata>(reader.GetString(0));
-                    }
-
-                    throw new NapackNotFoundException(packageName);
-                }
-            });
+            return ExecuteCommand((command) => GetItem<NapackMetadata>(command, PackageMetadataTable, "packageName", packageNameEncoded, "metadata",
+                () => { throw new NapackNotFoundException(packageName); }));
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
             string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
-
-            return ExecuteCommand($"SELECT package FROM {PackageStoreTable} WHERE packageVersion = '{packageVersionEncoded}'", command =>
-            {
-                using (IDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        return Serializer.DeserializeFromBase64<NapackVersion>(reader.GetString(0));
-                    }
-
-                    throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch);
-                }
-            });
+            return ExecuteCommand((command) => GetItem<NapackVersion>(command, PackageStoreTable, "packageVersion", packageVersionEncoded, "package",
+                () => { throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch); }));
         }
-        
+
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
             string napackNameEncoded = Serializer.SerializeToBase64<string>(napackName);
-            
+
             NapackVersionIdentifier version = new NapackVersionIdentifier(napackName, 1, 0, 0);
             NapackMetadata metadata = NapackMetadata.CreateFromNewNapack(napackName, newNapack);
             NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapack.NewNapackVersion);
-            
-            // TODO these should be repeat get-update loops until success. If the save fails, they should do the reverse to 'unsave'.
-            // foreach (string author in newNapack.NewNapackVersion.Authors)
-            // {
-            //     AddAuthorConsumption(author, version);
-            //     command.ExecuteNonQuery()
-            // }
-            // 
-            // foreach (string userId in newNapack.AuthorizedUserIds)
-            // {
-            //     AddUserAuthorization(userId, napackName);
-            // }
-            // 
-            // foreach (NapackMajorVersion consumedPackage in newNapack.NewNapackVersion.Dependencies)
-            // {
-            //     AddConsumingPackage(consumedPackage, version);
-            // }
 
-            using (IDbTransaction transaction = database.BeginTransaction())
+            foreach (string author in newNapack.NewNapackVersion.Authors)
             {
-                using (IDbCommand command = database.CreateCommand())
-                {
-                    try
-                    {
-                        // Add the new napack to all the various stores.
-                        NapackStats stats = new NapackStats();
-                        stats.AddVersion(newNapack.NewNapackVersion);
-
-                        string statsEncoded = Serializer.SerializeToBase64(stats);
-                        command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES ('{napackNameEncoded}', '{statsEncoded}')";
-                        command.ExecuteNonQuery();
-
-                        string metadataEncoded = Serializer.SerializeToBase64(metadata);
-                        string safeDescriptionAndTags = GetSafeDescriptionAndTags(metadata);
-                        command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES ('{napackNameEncoded}', '{safeDescriptionAndTags}', '{metadataEncoded}')";
-                        command.ExecuteNonQuery();
-
-                        string versionEncoded = Serializer.SerializeToBase64(version.GetFullName());
-                        string napackSpecEncoded = Serializer.SerializeToBase64(napackSpec);
-                        command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES('{versionEncoded}', '{napackSpecEncoded}')";
-                        command.ExecuteNonQuery();
-
-                        string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
-                        command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES('{versionEncoded}', '{packageVersionEncoded}')";
-                        command.ExecuteNonQuery();
-
-                        transaction.Commit();
-                    }
-                    catch (SqliteException se)
-                    {
-                        try
-                        {
-                            transaction.Rollback();
-                        }
-                        catch (SqliteException ser)
-                        {
-                            logger.Warn("Rollback failed!");
-                            logger.Warn(ser);
-                        }
-
-                        logger.Warn(se);
-                        throw;
-                    }
-                }
+                AddItem(author.ToUpperInvariant(), version, AuthorPackageTable, "authorName", "packageVersionList", false);
             }
+
+            foreach (string userId in newNapack.AuthorizedUserIds)
+            {
+                AddItem(userId.ToUpperInvariant(), napackName, UserPackageTable, "userId", "packageNameList", true);
+            }
+
+            foreach (NapackMajorVersion consumedPackage in newNapack.NewNapackVersion.Dependencies)
+            {
+                AddItem(consumedPackage.ToString(), version, PackageConsumersTable, "packageMajorVersionId", "consumingPackages", false);
+            }
+
+            // Add the new napack to all the various stores.
+            NapackStats stats = new NapackStats();
+            stats.AddVersion(newNapack.NewNapackVersion);
+
+            ExecuteTransactionCommand((command) =>
+            {
+                string statsEncoded = Serializer.SerializeToBase64(stats);
+                command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES ('{napackNameEncoded}', '{statsEncoded}')";
+                command.ExecuteNonQuery();
+
+                string metadataEncoded = Serializer.SerializeToBase64(metadata);
+                string safeDescriptionAndTags = GetSafeDescriptionAndTags(metadata);
+                command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES ('{napackNameEncoded}', '{safeDescriptionAndTags}', '{metadataEncoded}')";
+                command.ExecuteNonQuery();
+
+                string versionEncoded = Serializer.SerializeToBase64(version.GetFullName());
+                string napackSpecEncoded = Serializer.SerializeToBase64(napackSpec);
+                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES ('{versionEncoded}', '{napackSpecEncoded}')";
+                command.ExecuteNonQuery();
+
+                string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
+                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES ('{versionEncoded}', '{packageVersionEncoded}')";
+                command.ExecuteNonQuery();
+            });
         }
 
         public void SaveNewNapackVersion(NapackMetadata package, NapackVersionIdentifier currentVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion, NapackSpec newVersionSpec)
         {
             NapackVersionIdentifier nextVersion = new NapackVersionIdentifier(currentVersion.NapackName, currentVersion.Major, currentVersion.Minor, currentVersion.Patch);
             NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapackVersion);
+            
+            foreach (string author in newNapackVersion.Authors)
+            {
+                AddItem(author.ToUpperInvariant(), nextVersion, AuthorPackageTable, "authorName", "packageVersionList", false);
+            }
 
-            // TODO this needs work as per listed above.
-            // foreach (string author in newNapackVersion.Authors)
-            // {
-            //     AddAuthorConsumption(author, nextVersion);
-            // }
             // 
             // // Changes in user authorization do not occur through napack version updates.
             // 
-            // foreach (NapackMajorVersion consumedPackage in newNapackVersion.Dependencies)
-            // {
-            //     AddConsumingPackage(consumedPackage, nextVersion);
-            // }
+
+            foreach (NapackMajorVersion consumedPackage in newNapackVersion.Dependencies)
+            {
+                AddItem(consumedPackage.ToString(), nextVersion, PackageConsumersTable, "packageMajorVersionId", "consumingPackages", false);
+            }
 
             UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
             
-            // TODO convert to SQL.
-            // packageStore.Add(nextVersion.GetFullName(), packageVersion);
-            // specStore.Add(nextVersion.GetFullName(), newVersionSpec);
+            ExecuteTransactionCommand((command) =>
+            {
+                string versionEncoded = Serializer.SerializeToBase64(nextVersion.GetFullName());
+                string napackSpecEncoded = Serializer.SerializeToBase64(newVersionSpec);
+                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES ('{versionEncoded}', '{napackSpecEncoded}')";
+                command.ExecuteNonQuery();
+
+                string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
+                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES ('{versionEncoded}', '{packageVersionEncoded}')";
+                command.ExecuteNonQuery();
+            });
         }
 
         private void UpdatePackageMetadataStore(NapackMetadata package, NapackVersionIdentifier nextVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion)
@@ -509,12 +507,21 @@ namespace Napack.Server
                 package.Versions[nextVersion.Major].Versions[nextVersion.Minor].Add(nextVersion.Patch);
             }
 
-            // TODO convert to SQL
-            // statsStore[nextVersion.NapackName].AddVersion(newNapackVersion);
-            // searchIndices[nextVersion.NapackName].LastUpdateTime = statsStore[nextVersion.NapackName].LastUpdateTime;
-            // searchIndices[nextVersion.NapackName].LastUsedLicense = newNapackVersion.License;
-            // 
-            // packageMetadataStore[nextVersion.NapackName] = package;
+            ExecuteTransactionCommand((command) =>
+            {
+                string packageNameEncoded = Serializer.SerializeToBase64<string>(package.Name);
+                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                    () => { throw new NapackStatsNotFoundException(package.Name); });
+                stats.AddVersion(newNapackVersion);
+
+                string statsEncoded = Serializer.SerializeToBase64(stats);
+                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = '{statsEncoded}' WHERE packageName = '{packageNameEncoded}'";
+                command.ExecuteNonQuery();
+            });
+            
+            // TODO unfortunately we really should be getting the metadata and updating it here to avoid multi-user bugs.
+            // I'm putting that down as a future redesign as we'll only hit this with unlucky concurrent updates to the same package.
+            UpdatePackageMetadata(package);
         }
 
         public void UpdatePackageMetadata(NapackMetadata metadata)

@@ -25,7 +25,11 @@ Core Functionality
 * Create a tree-view page to navigate through Napacks and their dependencies.
 * Create a system stats page listing requests per country for the current day.
 * Search should include code search, doc search, and main search.
-* Data storage should use RavenDb instead of LiteDb due to LiteDb's size limitations.
+
+Misc
+----
+* Have option to add to project file directly, making it appear in solution explorer and giving Intellisense support for free.
+* Auto-update workflow for the Napack Client.
 
 Final Release Steps
 -------------------

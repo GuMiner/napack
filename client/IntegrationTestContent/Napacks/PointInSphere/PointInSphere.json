@@ -10,6 +10,6 @@
   },
   "dependencies": {
 	"BasicVector": 1,
-	"BasicVector.Core": 1,
+	"BasicVector_Core": 1,
   }
 }

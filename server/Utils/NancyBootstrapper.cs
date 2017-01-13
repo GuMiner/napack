@@ -112,19 +112,9 @@ namespace Napack.Server
                     parsedException = new Exception("Unable to decode the detected exception!");
                 }
 
-                logger.Warn($"Hit a {parsedException.GetType()} exception.");
+                logger.Warn($"Hit a {parsedException.GetType()} exception: {parsedException.Message}");
                 return this.GenerateJsonException(parsedException, code);
             };
-        }
-
-        /// <summary>
-        /// Modify our container registration so that it auto-loads our interfaces we use.
-        /// </summary>
-        protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
-        {
-            base.ConfigureRequestContainer(container, context);
-            
-            container.Register<INapackStorageManager>(Global.NapackStorageManager);
         }
 
 

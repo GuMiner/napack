@@ -13,7 +13,7 @@ namespace Napack.Server
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public DocumentationModule(INapackStorageManager napackManager)
+        public DocumentationModule()
             : base("/documentation")
         {
             // Retrieves and displays a documentation file from Markdown.

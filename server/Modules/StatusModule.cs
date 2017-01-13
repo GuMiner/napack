@@ -13,7 +13,7 @@ namespace Napack.Server
     /// </summary>
     public class StatusModule : NancyModule
     {
-        public StatusModule(INapackStorageManager napackManager)
+        public StatusModule()
             : base("/systemstatus")
         {
             // Gets the system status view.

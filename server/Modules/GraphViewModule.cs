@@ -13,7 +13,7 @@ namespace Napack.Server
     /// </summary>
     public class GraphViewModule : NancyModule
     {
-        public GraphViewModule(INapackStorageManager napackManager)
+        public GraphViewModule()
             : base("/graphview")
         {
             // Gets the summary view.

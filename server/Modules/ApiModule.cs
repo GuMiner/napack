@@ -13,7 +13,7 @@ namespace Napack.Server
     /// </summary>
     public class ApiModule : NancyModule
     {
-        public ApiModule(INapackStorageManager napackManager)
+        public ApiModule()
             : base("/api")
         {
             // Gets a Napack package or series of package versions.
@@ -31,7 +31,7 @@ namespace Napack.Server
 
                 if (version == null)
                 {
-                    NapackMetadata metadata = napackManager.GetPackageMetadata(packageName);
+                    NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
                     return View["NapackVersions", new VersionsModel(metadata)];
                 }
                 else
@@ -52,8 +52,8 @@ namespace Napack.Server
                     }
 
                     NapackVersionIdentifier versionId = new NapackVersionIdentifier(packageName, components[0], components[1], components[2]);
-                    NapackSpec spec = napackManager.GetPackageSpecification(versionId);
-                    NapackVersion packageVersion = napackManager.GetPackageVersion(versionId);
+                    NapackSpec spec = Global.NapackStorageManager.GetPackageSpecification(versionId);
+                    NapackVersion packageVersion = Global.NapackStorageManager.GetPackageVersion(versionId);
 
                     return View["NapackApi", new ApiModel(versionId.GetFullName(), spec, packageVersion.Dependencies)];
                 }

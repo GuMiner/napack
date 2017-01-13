@@ -226,15 +226,15 @@
       <ContentToCopy Include="$(ProjectDir)\Content\**\*.*" />
       <ViewsToCopy Include="$(ProjectDir)\Views\**\*.*" />
       <ResourcesToCopy Include="$(ProjectDir)\Resources\**\*.*" />
-	  <DataToCopy Include="$(ProjectDir)\data\**\*.*" />
-	  <LogsToCopy Include="$(ProjectDir)\logs\**\*.*" />
+      <DataToCopy Include="$(ProjectDir)\data\**\*.*" />
+      <LogsToCopy Include="$(ProjectDir)\logs\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(BinariesToCopy)" DestinationFolder="$(ProjectDir)\drop\%(RecursiveDir)" />
     <Copy SourceFiles="@(ContentToCopy)" DestinationFolder="$(ProjectDir)\drop\Content\%(RecursiveDir)" />
     <Copy SourceFiles="@(ViewsToCopy)" DestinationFolder="$(ProjectDir)\drop\Views\%(RecursiveDir)" />
     <Copy SourceFiles="@(ResourcesToCopy)" DestinationFolder="$(ProjectDir)\drop\Resources\%(RecursiveDir)" />
-	<Copy SourceFiles="@(DataToCopy)" DestinationFolder="$(ProjectDir)\drop\data\%(RecursiveDir)" />
-	<Copy SourceFiles="@(LogsToCopy)" DestinationFolder="$(ProjectDir)\drop\logs\%(RecursiveDir)" />
+    <Copy SourceFiles="@(DataToCopy)" DestinationFolder="$(ProjectDir)\drop\data\%(RecursiveDir)" />
+    <Copy SourceFiles="@(LogsToCopy)" DestinationFolder="$(ProjectDir)\drop\logs\%(RecursiveDir)" />
   </Target>
   <Import Project="..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets" Condition="Exists('..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets')" />
   <Target Name="EnsureMonoDataSqlitePortableImported" BeforeTargets="BeforeBuild" Condition="'$(MonoDataSqlitePortableImported)' == ''">

@@ -10,7 +10,7 @@ namespace Napack.Server.Modules
     /// </summary>
     public class NapackDownloadModule : NancyModule
     {
-        public NapackDownloadModule(INapackStorageManager napackManager)
+        public NapackDownloadModule()
             : base("/napackDownload")
         {
             // Downloads a specific Napack package.
@@ -18,7 +18,7 @@ namespace Napack.Server.Modules
             {
                 string fullPackageName = parameters.fullPackageName;
                 NapackVersionIdentifier napackId = new NapackVersionIdentifier(fullPackageName);
-                return GetSpecificPackage(napackManager, napackId);
+                return GetSpecificPackage(Global.NapackStorageManager, napackId);
             };
 
             // Downloads the most recent (minor/patch) of the specified major-version Napack package.
@@ -26,7 +26,7 @@ namespace Napack.Server.Modules
             {
                 string partialPackageName = parameters.partialPackageName;
                 NapackVersionIdentifier napackId = new NapackVersionIdentifier(partialPackageName + ".0.0");
-                return GetMostRecentMajorVersion(napackManager, napackId.NapackName, napackId.Major);
+                return GetMostRecentMajorVersion(Global.NapackStorageManager, napackId.NapackName, napackId.Major);
             };
         }
 

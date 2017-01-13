@@ -13,7 +13,7 @@ namespace Napack.Server
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public UsersModule(INapackStorageManager napackManager)
+        public UsersModule()
             : base("/users")
         {
             // Generates a random series of user identifiers, returning them to the user.
@@ -26,7 +26,7 @@ namespace Napack.Server
                 user.Reset(UserIdentifier.ComputeUserHash(secret.Secrets));
 
                 EmailManager.SendVerificationEmail(user);
-                napackManager.AddUser(user);
+                Global.NapackStorageManager.AddUser(user);
 
                 logger.Info($"Assigned user {user.Email} a hash and secrets, and attempted to send a validation email.");
                 return this.Response.AsJson(new Common.UserSecret()
@@ -42,13 +42,13 @@ namespace Napack.Server
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
                 EmailManager.ValidateUserEmail(user.Email);
 
-                UserIdentifier serverSideUser = napackManager.GetUser(user.Email);
+                UserIdentifier serverSideUser = Global.NapackStorageManager.GetUser(user.Email);
                 if (!serverSideUser.EmailConfirmed && user.EmailVerificationCode == serverSideUser.EmailVerificationCode)
                 {
                     serverSideUser.EmailConfirmed = true;
                 }
 
-                napackManager.UpdateUser(serverSideUser);
+                Global.NapackStorageManager.UpdateUser(serverSideUser);
 
                 return this.Response.AsJson(new
                 {
@@ -60,25 +60,25 @@ namespace Napack.Server
             Delete["/"] = parameters =>
             {
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
-                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, new List<string> { user.Email });
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, new List<string> { user.Email });
 
-                UserIdentifier storedUser = napackManager.GetUser(user.Email);
+                UserIdentifier storedUser = Global.NapackStorageManager.GetUser(user.Email);
 
-                IEnumerable<string> authorizedPackages = napackManager.GetAuthorizedPackages(storedUser.Email);
+                IEnumerable<string> authorizedPackages = Global.NapackStorageManager.GetAuthorizedPackages(storedUser.Email);
                 List<string> orphanedPackages = new List<string>();
                 foreach (string authorizedPackage in authorizedPackages)
                 {
-                    NapackMetadata metadata = napackManager.GetPackageMetadata(authorizedPackage);
+                    NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(authorizedPackage);
                     metadata.AuthorizedUserIds.Remove(storedUser.Email);
                     if (metadata.AuthorizedUserIds.Any())
                     {
                         orphanedPackages.Add(authorizedPackage);
                     }
 
-                    napackManager.UpdatePackageMetadata(metadata);
+                    Global.NapackStorageManager.UpdatePackageMetadata(metadata);
                 }
 
-                napackManager.RemoveUser(user);
+                Global.NapackStorageManager.RemoveUser(user);
                 return this.Response.AsJson(new
                 {
                     NapacksDeauthenticatedFrom = authorizedPackages,

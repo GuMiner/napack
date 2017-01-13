@@ -15,7 +15,7 @@ namespace Napack.Server.Modules
     /// </summary>
     public class NapackModule : NancyModule
     {
-        public NapackModule(INapackStorageManager napackManager)
+        public NapackModule()
             : base("/napacks")
         {
             // Gets a Napack package or series of package versions.
@@ -34,7 +34,7 @@ namespace Napack.Server.Modules
                 if (version == null)
                 {
                     // The user is asking for all major versions of the specified package.
-                    NapackMetadata package = napackManager.GetPackageMetadata(packageName);
+                    NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
                     return this.Response.AsJson(package.AsSummaryJson());
                 }
                 else
@@ -53,15 +53,15 @@ namespace Napack.Server.Modules
                     // Handle the resulting version components.
                     if (components.Count == 1 || components.Count == 2)
                     {
-                        NapackMetadata package = napackManager.GetPackageMetadata(packageName);
+                        NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
                         NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(components[0]);
 
                         return this.Response.AsJson(majorVersion.AsSummaryJson());
                     }
                     else if (components.Count == 3)
                     {
-                        NapackVersion specificVersion = napackManager.GetPackageVersion(new NapackVersionIdentifier(packageName, components[0], components[1], components[2]));
-                        napackManager.IncrementPackageDownload(packageName);
+                        NapackVersion specificVersion = Global.NapackStorageManager.GetPackageVersion(new NapackVersionIdentifier(packageName, components[0], components[1], components[2]));
+                        Global.NapackStorageManager.IncrementPackageDownload(packageName);
 
                         return this.Response.AsJson(specificVersion.AsSummaryJson());
                     }
@@ -76,7 +76,7 @@ namespace Napack.Server.Modules
             Post["/{packageName}"] = parameters =>
             {
                 string packageName = parameters.packageName;
-                if (napackManager.ContainsNapack(packageName))
+                if (Global.NapackStorageManager.ContainsNapack(packageName))
                 {
                     throw new DuplicateNapackException();
                 }
@@ -85,12 +85,12 @@ namespace Napack.Server.Modules
                 NewNapack newNapack = SerializerExtensions.Deserialize<NewNapack>(this.Context);
                 newNapack.Validate();
 
-                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, newNapack.AuthorizedUserIds);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, newNapack.AuthorizedUserIds);
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
-                NapackModule.ValidateDependentPackages(napackManager, newNapack.NewNapackVersion);
+                NapackModule.ValidateDependentPackages(Global.NapackStorageManager, newNapack.NewNapackVersion);
 
                 newNapack.NewNapackVersion.UpdateNamespaceOfFiles(packageName, 1);
-                napackManager.SaveNewNapack(packageName, newNapack, generatedApiSpec);
+                Global.NapackStorageManager.SaveNewNapack(packageName, newNapack, generatedApiSpec);
 
                 return this.Response.AsJson(new
                 {
@@ -105,12 +105,12 @@ namespace Napack.Server.Modules
                 newNapackVersion.Validate();
 
                 string packageName = parameters.packageName;
-                NapackMetadata package = napackManager.GetPackageMetadata(packageName);
-                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), napackManager, package.AuthorizedUserIds);
+                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, package.AuthorizedUserIds);
                 
                 // Validate and create a spec for this new version.
                 NapackSpec newVersionSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapackVersion.Files);
-                NapackModule.ValidateDependentPackages(napackManager, newNapackVersion);
+                NapackModule.ValidateDependentPackages(Global.NapackStorageManager, newNapackVersion);
 
                 // Determine what upversioning will be performed.
                 int majorVersion = package.Versions.Max(version => version.Key);
@@ -127,7 +127,7 @@ namespace Napack.Server.Modules
                 {
                     // Perform specification and license analysis.
                     NapackVersionIdentifier oldVersionId = new NapackVersionIdentifier(packageName, majorVersion, minorVersion, patchVersion);
-                    NapackSpec oldVersionSpec = napackManager.GetPackageSpecification(oldVersionId);
+                    NapackSpec oldVersionSpec = Global.NapackStorageManager.GetPackageSpecification(oldVersionId);
                     NapackAnalyst.UpversionType specUpversionType = NapackAnalyst.DeterminedRequiredUpversioning(oldVersionSpec, newVersionSpec);
                     if (specUpversionType == NapackAnalyst.UpversionType.Major || newNapackVersion.License.NeedsMajorUpversioning(package.GetMajorVersion(majorVersion).License)) 
                     {
@@ -141,7 +141,7 @@ namespace Napack.Server.Modules
                 }
 
                 newNapackVersion.UpdateNamespaceOfFiles(packageName, majorVersion);
-                napackManager.SaveNewNapackVersion(package, new NapackVersionIdentifier(packageName, majorVersion, minorVersion, patchVersion), upversionType, newNapackVersion, newVersionSpec);
+                Global.NapackStorageManager.SaveNewNapackVersion(package, new NapackVersionIdentifier(packageName, majorVersion, minorVersion, patchVersion), upversionType, newNapackVersion, newVersionSpec);
 
                 return this.Response.AsJson(new
                 {
