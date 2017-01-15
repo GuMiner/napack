@@ -25,6 +25,15 @@ namespace Napack.Client.Common
                 });
         }
 
+        public Task<string> VerifyUserAsync(string userEmail, Guid verificationCode)
+        {
+            return this.PatchAsync<string, object>("/users", new
+            {
+                Email = userEmail,
+                EmailVerificationCode = verificationCode
+            });
+        }
+
         public Task<string> CreatePackageAsync(string packageName, NewNapack newNapack, UserSecret userSecret)
         {
             return this.PostAsync<string, NewNapack>("/napacks/" + packageName, newNapack, userSecret,

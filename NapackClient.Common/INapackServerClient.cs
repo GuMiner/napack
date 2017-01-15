@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Napack.Common;
 
 namespace Napack.Client.Common
@@ -41,6 +42,14 @@ namespace Napack.Client.Common
         /// <param name="userEmail">The email to register.</param>
         /// <returns>The secrets that have been assigned to the user.</returns>
         Task<UserSecret> RegisterUserAsync(string userEmail);
+
+        /// <summary>
+        /// Verifies a user's email with the Napack Framework System.
+        /// </summary>
+        /// <param name="userEmail">The email being verified.</param>
+        /// <param name="verificationCode">The verification code the user received.</param>
+        /// <returns>The verification status.</returns>
+        Task<string> VerifyUserAsync(string userEmail, Guid verificationCode);
 
         /// <summary>
         /// Creates a new Napack package.

@@ -55,7 +55,7 @@ namespace Napack.Server
             Global.NapackStorageManager = Global.NapackStorageManager ?? new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName);
 
             logger.Info("System stats management loading...");
-            Global.SystemStats = new SystemStats(Global.NapackStorageManager);
+            Global.SystemStats = new SystemStats();
 
             // Turn off certificate validation, because it doesn't work with self-signed certificates.
             ServicePointManager.ServerCertificateValidationCallback =

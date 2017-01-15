@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.CSharp.RuntimeBinder;
-using Nancy;
-using Napack.Analyst.ApiSpec;
-using Napack.Common;
+﻿using Nancy;
 
 namespace Napack.Server
 {
     /// <summary>
-    /// Handles Napack Framwork Server API graph view.
+    /// Handles Napack Framwork Server status display
     /// </summary>
     public class StatusModule : NancyModule
     {
@@ -19,7 +13,7 @@ namespace Napack.Server
             // Gets the system status view.
             Get["/"] = parameters =>
             {
-                return View["Status"];
+                return View["Status", new StatusModel(Global.SystemStats.TotalCallsSinceUptime, Global.SystemStats.UniqueIpsSinceUptime, Global.SystemStats.Uptime)];
             };
         }
     }

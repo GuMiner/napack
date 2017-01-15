@@ -5,7 +5,6 @@
   "EmailPort": 1234,
   "PackageValidationFilePath": "Resources/PackageValidation.json",
   "NameValidationFilePath": "Resources/NameValidation.json",
-  "GeolocationDatabaseFolder": "Resources/GeolocationDB",
   "RequireEmailValidation": true,
   "MaxRequestsPerIpPerInterval": 36000,
   "RequestThrottlingInterval": "0.01:00:00",

@@ -10,7 +10,8 @@ namespace Napack.Client
         {
             typeof(UpdateOperation),
             typeof(UploadOperation),
-            typeof(RegisterOperation)
+            typeof(RegisterOperation),
+            typeof(VerifyEmailOperation)
         };
 
         public static INapackOperation FindOperation(string[] args)

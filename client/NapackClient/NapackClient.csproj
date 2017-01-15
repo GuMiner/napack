@@ -66,6 +66,7 @@
     <Compile Include="Operations\UploadOperation\NapackLocalDescriptor.cs" />
     <Compile Include="Operations\RegisterOperation\RegisterOperation.cs" />
     <Compile Include="Operations\UploadOperation\UploadOperation.cs" />
+    <Compile Include="Operations\VerifyEmailOperation\VerifyEmailOperation.cs" />
     <Compile Include="PathUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

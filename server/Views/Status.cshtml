@@ -1,4 +1,7 @@
-﻿@{
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<Napack.Server.StatusModel>
+@model Napack.Server.StatusModel
+
+@{
     Layout = "RootLayout.cshtml";
     string pageName = "System Status";
 }
@@ -7,6 +10,11 @@
 
 <div id="body">
     <h2>System Status</h2>
-    <p>TODO render the overall system status.</p>
+    <h3>Uptime</h3>
+    @Model.Uptime.Days days, @Model.Uptime.Hours hours, @Model.Uptime.Minutes minutes, and @Model.Uptime.Seconds seconds/
+    <h3>Total Calls Since Last Restart</h3>
+    @Model.TotalCalls total calls.
+    <h3>Unique IPs Since Last Restart</h3>
+    @Model.UniqueIps unique IP addresses.
 </div>
     

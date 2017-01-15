@@ -124,14 +124,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Definitions\CountryTracker.cs" />
-    <Compile Include="Definitions\SystemConfig.cs" />
-    <Compile Include="Definitions\IndexModel.cs" />
-    <Compile Include="Definitions\SystemStats.cs" />
-    <Compile Include="Definitions\RequestStats.cs" />
+    <Compile Include="Definitions\Models\StatusModel.cs" />
+    <Compile Include="Definitions\SystemStats\SystemConfig.cs" />
+    <Compile Include="Definitions\Models\IndexModel.cs" />
+    <Compile Include="Definitions\SystemStats\SystemStats.cs" />
+    <Compile Include="Definitions\SystemStats\RequestStats.cs" />
     <Compile Include="Definitions\UserModification.cs" />
-    <Compile Include="Definitions\VersionsModel.cs" />
-    <Compile Include="Definitions\ApiModel.cs" />
+    <Compile Include="Definitions\Models\VersionsModel.cs" />
+    <Compile Include="Definitions\Models\ApiModel.cs" />
     <Compile Include="Definitions\NapackMetadata.cs" />
     <Compile Include="Definitions\NapackMajorVersionMetadata.cs" />
     <Compile Include="Definitions\NapackSearchIndex.cs" />
@@ -140,7 +140,7 @@
     <Compile Include="Definitions\UserSecret.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
     <Compile Include="INapackStorageManager.cs" />
-    <Compile Include="Definitions\DocumentationModel.cs" />
+    <Compile Include="Definitions\Models\DocumentationModel.cs" />
     <Compile Include="Modules\StatusModule.cs" />
     <Compile Include="Modules\GraphViewModule.cs" />
     <Compile Include="Modules\ApiModule.cs" />
@@ -152,6 +152,7 @@
     <Compile Include="Modules\NapackModule.cs" />
     <Compile Include="InMemoryNapackStorageManager.cs" />
     <Compile Include="SqliteNapackStorageManager.cs" />
+    <Compile Include="Utils\LambdaComparer.cs" />
     <Compile Include="Utils\NancyBootstrapper.cs" />
     <Compile Include="Utils\RootPathProvider.cs" />
     <Compile Include="Modules\IndexModule.cs" />
