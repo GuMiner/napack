@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Net;
 using System.Net.Mail;
 using System.Reflection;
 using Napack.Common;
@@ -11,6 +12,7 @@ namespace Napack.Server
     public class EmailManager
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private const string MailCredsFile = "../mailCreds.txt";
 
         private static SmtpClient client;
         private static string emailValidationFormatString;
@@ -19,6 +21,7 @@ namespace Napack.Server
         {
             EmailManager.client = new SmtpClient(host, port);
             EmailManager.client.EnableSsl = true;
+            EmailManager.client.Credentials = new NetworkCredential(File.ReadAllLines(EmailManager.MailCredsFile)[0], File.ReadAllLines(EmailManager.MailCredsFile)[1]);
             EmailManager.client.SendCompleted += Client_SendCompleted;
             
             // TODO remove this duplication.

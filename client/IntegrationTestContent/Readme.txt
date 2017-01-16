@@ -1,6 +1,7 @@
 Test Instructions
 1. Register:
   Napack.Client.exe -Operation Register -UserEmail gus.gran@gmail.com -NapackSettingsFile D:\napack\client\IntegrationTestContent\NapackSettings.json -SaveAsDefault true
+  Napack.Client.exe -Operation VerifyEmail -UserEmail gus.gran@gmail.com -VerificationCode CODE -NapackSettingsFile D:\napack\client\IntegrationTestContent\NapackSettings.json
 
 2. Upload in order:
 

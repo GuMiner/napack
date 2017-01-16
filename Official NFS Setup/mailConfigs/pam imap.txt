@@ -1,0 +1,6 @@
+auth    required        pam_unix.so nullok
+account required        pam_unix.so
+auth    required        pam_shells.so
+auth    include         system-auth
+account include         system-auth
+session include         system-auth

@@ -1,12 +1,17 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
+using System.Net;
+using System.Net.Mail;
+using System.Security;
+using System.Threading;
 using Mono.Data.Sqlite;
 
 namespace MonoSqlLiteDemo
 {
     /// <summary>
-    /// Demonstrates usage of Sqlite on Mono.
+    /// Demonstrates Mono functionality in a small demo executable.
     /// </summary>
     /// <remarks>
     /// More or less pulled directly from http://www.mono-project.com/docs/database-access/providers/sqlite/, created using:
@@ -19,9 +24,41 @@ namespace MonoSqlLiteDemo
     /// </remarks>
     public class Program
     {
-        static void Main(string[] args)
+        private static void Client_SendCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            string filePath = "demo.db";
+            Console.WriteLine($"Email transmission status: {e.UserState as string} -> Cancelled: {e.Cancelled}. {e.Error?.ToString() ?? "No Error"}");
+        }
+
+        public static void Main(string[] args)
+        {
+            SmtpClient client = new SmtpClient(args[0], int.Parse(args[1]));
+            client.EnableSsl = true;
+            client.Credentials = new NetworkCredential(args[2], args[3]);
+            client.SendCompleted += Client_SendCompleted;
+            
+            MailAddress from = new MailAddress("admin@napack.net", "TestUser");
+            MailAddress to = new MailAddress("gus.gran@helium24.net");
+
+            string subject = "Napack Framework Server User Email Verification";
+            MailMessage message = new MailMessage(from, to)
+            {
+                Subject = subject,
+                Body = "Test Data",
+                IsBodyHtml = false,
+            };
+
+            try
+            {
+                client.SendAsync(message, "gus.gran@helium24.net");
+            }
+            catch (Exception ex)
+            {
+                Client_SendCompleted(null, new AsyncCompletedEventArgs(ex, false, "gus.gran@helium24.net"));
+            }
+
+            Thread.Sleep(20000);
+
+            /*string filePath = "demo.db";
             File.Delete(filePath);
             SqliteConnection.CreateFile(filePath);
 
@@ -78,7 +115,7 @@ namespace MonoSqlLiteDemo
                 //             firstName, lastName);
                 //     }
                 // }
-            }
+            }*/
         }
     }
 }

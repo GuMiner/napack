@@ -17,12 +17,11 @@ Bugs
 
 Core Functionality
 ------------------
-* Backend email setup on Napack to support email validation; fix the default email and settings at that time.
+* Search should include code search, doc search, and main search.
 * Validate all the workflows, admin included.
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.
 * The Napack Server Framework needs a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
 * Create a tree-view page to navigate through Napacks and their dependencies.
-* Search should include code search, doc search, and main search.
 
 Misc
 ----

@@ -10,6 +10,14 @@ Debian 8.6 x64
 512 MiB, 1 CPU, 20 GB SSD, 1 TiB transfer / month.
 SF region 2
 
+==DNS Records==
+A mail.napack.net IP 1800
+A napack.net IP 1800
+MX napack.net mail.napack.net 50 IP 500
+NS napack.net DigitalOcean1
+NS napack.net DigitalOcean2
+NS napack.net DigitalOcean3
+
 ==Total Maintenance Cost==
 Date ; Purpose ; Cost
 12/14/2016 ; Domain ; 15.98
@@ -31,56 +39,21 @@ apt-get install nginx
 ==git==
 apt-get install git
 
-==apache2==
-apt-get install apache2
-apt-get install apache2-dev
-/etc/apache2/ports.conf -> 80 to 8080
-/etc/apache2/sites-enabled/000-default.conf -> 80 to 8080
-service apache2 restart
-
-==pandoc==
-apt-get install pandoc
-
-===apache-mod-markdown===
-apt-get install build-essential libtool automake autoconf
-apt-get install libmarkdown2-dev
-
-git clone https://github.com/Orc/discount
-cd discount
-./configure.sh
-make install
-
-git clone https://github.com/hamano/apache-mod-markdown.git
-cd apache-mod-markdown
-autoreconf -f -i
-./configure --with-apxs=/usr/bin/apxs --with-discount=/usr/local
-
-
 ==letsencrypt==
 echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee /etc/apt/sources.list.d/backports.list
 apt-get update
 apt-get install certbot -t jessie-backports
 certbot certonly --webroot -w /home/napackstar/drop/Content -d napack.net
 
-IMPORTANT NOTES:
- - Congratulations! Your certificate and chain have been saved at
-   /etc/letsencrypt/live/napack.net/fullchain.pem. Your cert will
-   expire on 2017-03-16. To obtain a new or tweaked version of this
-   certificate in the future, simply run certbot again. To
-   non-interactively renew *all* of your certificates, run "certbot
-   renew"
- - If you like Certbot, please consider supporting our work by:
-
-   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
-   Donating to EFF:                    https://eff.org/donate-le
-
+Cert locations:
+/etc/letsencrypt/live/napack.net/fullchain.pem. Your cert will expire on 2017-03-16. 
+/etc/letsencrypt/live/mail.napack.net/fullchain.pem. Your cert will expire on 2017-04-15.
 
 ==supervisor==
 apt-get install supervisor
 >>> Copy in supervisorconf<<
 supervisorctl
 > reload
-
 
 ==General Purpose User==
 useradd USER_NAME
@@ -89,15 +62,43 @@ mkdir /home/USER_NAME
 chown USER_NAME:users /home/USER_NAME
 
 ==Copying Contents==
-zip changes
+zip 'drop'
 using user, remote in.
 upload changes
 unzip
-restart supervisor
-chown USER_NAME:users *.* (... better recursive acls...)
+supervisor restart napack
+chown -R USER_NAME:users *.* (... better recursive acls...)
 
+==Email==
+=Install=
+apt-get remove exmi4
+apt-get install postfix -- 'Internet Site', 'napack.net'
+postfix stop
 
+apt-get install dovecot
+apt-get install dovecot-imapd
 
+=Config=
+Edit /etc/aliases to add 'admin: root' and 'root: napackstar'. Run 'newaliases' (zero output == ok)
+Replace /etc/postfix/main.cf with the provided version of main.cf
+Setup /etc/postfix/master.cf with:
+"submission inet n       -       -       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_wrappermode=no
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth"
+
+Replace /etc/dovecot/dovecot.cf with the provided version of dovecot.cf
+Create /etc/pam.d/imap with the listed contents.
+
+Run:
+newaliases
+postfix reload
+service dovecot restart
 
 
 

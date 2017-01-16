@@ -53,7 +53,7 @@ namespace Napack.Server
                 return this.Response.AsJson(new
                 {
                     UserId = user.Email,
-                    EmailValidated = user.EmailConfirmed
+                    EmailValidated = serverSideUser.EmailConfirmed
                 });
             };
 

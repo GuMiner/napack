@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapackClient.Common", "Napa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{C8B5EF71-393B-46F6-9F83-697A3369809B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoSqlLiteDemo", "MonoSqlLiteDemo\MonoSqlLiteDemo.csproj", "{83CE94E9-0790-456B-960B-FEF48156D979}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDemo", "MonoSqlLiteDemo\MonoDemo.csproj", "{83CE94E9-0790-456B-960B-FEF48156D979}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
