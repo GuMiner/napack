@@ -9,7 +9,7 @@ The Napack Database is subject to arbitrary deletion until there are no more rem
 
 Bugs
 ----
-* Should use parameters instead of inlining queries and remove base64 logic as it's not needed (http://stackoverflow.com/questions/809246/adding-parameters-in-sqlite-with-c-sharp)
+* Should remove base64 logic as it's not needed
 * Data storage layer needs another layer of abstraction to properly avoid duplicating business logic.
 
 Core Functionality
@@ -31,3 +31,4 @@ These issues will be fixed post-release, if possible.
 * Intellisense support for added Napacks requires a project reload.
 * Search doesn't include a code search or documentation search.
 * The Napack Server Framework should have a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
+* Graph view actually doesn't do anything yet.
