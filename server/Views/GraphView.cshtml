@@ -1,12 +1,28 @@
 ﻿@{
     Layout = "RootLayout.cshtml";
     string pageName = "Graph View";
+
+    string canvasId = "graphViewPane";
 }
 
 @section Title {@pageName}
 
 <div id="body">
     <h2>Graph View</h2>
-    <p>TODO render the overall graph view here.</p>
+    <h3>NOTE</h3>
+    <p>This is an experimental feature and is under active development!</p>
+    <h3></h3>
+    <canvas width="800" height="600" id="@canvasId" style="border: 1px dashed #000000;"></canvas>
 </div>
-    
+
+@section Scripts{
+    <script type="text/javascript" src="~/Content/Scripts/jquery-3.1.1.js"></script>
+    <script type="text/javascript">
+        var canvas = document.getElementById("@canvasId");
+        var context = canvas.getContext("2d");
+
+        // Clear the screen
+        context.fillStyle = "#123456";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    </script>
+}

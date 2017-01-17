@@ -11,6 +11,7 @@
     string errorsText = "errorsText";
 
     string urlSearchQuery = "/search/query";
+    string napackRetrievalQuery = "/napacks/";
     int resultsToGet = 20;
 }
 
@@ -39,11 +40,13 @@
             var prefix = "<li><div class=\"napack\">";
             var postfix = "</div></li>";
             for (var i = 0; i < data.results.length; i++) {
-                var top = data.results[i].name + ". Downloads: " + data.results[i].downloads + ". Relevance: " + data.results[i].relevance + ".";
-                var middle = "Description: " + data.results[i].description + ". Last Update Time: " + data.results[i].lastUpdateTime + ".";
-                var bottom = "License: " + data.results[i].licenseType + ". Views: " + data.results[i].views + ".";
+                var moreDetails = "<a id='" + data.results[i].name + "link' href='#' data-napackname='" + data.results[i].name + "' onclick='ToggleTrigger(this)'>More Details</a>" +
+                    "<span class='moreDetails' id='" + data.results[i].name + "details'></span>";
+                var top = "<b>" + data.results[i].name + "</b>. <small>Downloads: " + data.results[i].downloads + ". Relevance: " + data.results[i].relevance + ".</small>";
+                var middle = data.results[i].description + " " + moreDetails;
+                var bottom = "<small> Last Update Time: " + data.results[i].lastUpdateTime + ". License: " + data.results[i].licenseType + ". Views: " + data.results[i].views + ".</small>";
 
-                $("#@resultsHolder").append(prefix + top + middle + bottom + postfix);
+                $("#@resultsHolder").append(prefix + top + "<br />" + middle + "<br />" + bottom + postfix);
             }
 
             // Update the load more button to allow for incremental searches.
@@ -70,6 +73,40 @@
                     $("#@errorsText").text(data.responseText);
                 }
             });
+        }
+
+        function ToggleTrigger(item) {
+            var itemName = $(item).data('napackname');
+            var elementName = itemName + "details";
+            var linkName = itemName + "link";
+
+            if ($("#" + elementName).html().length > 0) {
+                // We've already retrieved data, so don't perform the network query again.
+                if ($("#" + elementName).is(':hidden')) {
+                    $("#" + elementName).show();
+                    $("#" + linkName).text("Hide");
+                } else {
+                    $("#" + elementName).hide();
+                    $("#" + linkName).text("More Details");
+                }
+                
+            }
+            else {
+                $.ajax({
+                    url: @napackRetrievalQuery + itemName,
+                    type: 'GET',
+                    success: function (data) {
+                        var majorVersions = data.validVersions.join();
+                        var moreInfo = data.moreInformation;
+                        var tags = data.tags.join();
+                        $("#" + linkName).text("Hide");
+                        $("#" + elementName).html("<br />Major Versions: " + majorVersions + "<br/><small>More information: <a href='" + moreInfo + "'>" + moreInfo + "</a> Tags: " + tags + "</small>");
+                    },
+                    error: function (data) {
+                        $("#@errorsText").text(data.responseText);
+                    }
+                });
+            }
         }
 
         $("#@loadMoreSearchButton").click(function () {

@@ -237,8 +237,11 @@ namespace Napack.Server
                 if (items == null)
                 {
                     string itemsEncoded = Serializer.SerializeToBase64(new List<T>() { item });
-                    command.CommandText = $"INSERT INTO {table} VALUES ('{keyEncoded}', '{itemsEncoded}') ";
+                    command.Parameters.Add(keyEncoded);
+                    command.Parameters.Add(itemsEncoded);
+                    command.CommandText = $"INSERT INTO {table} VALUES (?, ?)";
                     command.ExecuteNonQuery();
+                    command.Parameters.Clear();
                 }
                 else
                 {
