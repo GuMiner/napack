@@ -14,3 +14,4 @@ Packages
 * [Ookii.CommandLine](http://ookiicommandline.codeplex.com/) (Ms-PL)
 * [Costura.Fody](https://github.com/Fody/Costura) (MIT)
 * [Fody](https://github.com/Fody/Fody) (MIT)
+* [SQLite] (https://sqlite.org/) [Public Domain]

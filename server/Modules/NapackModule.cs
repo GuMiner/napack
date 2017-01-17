@@ -140,7 +140,7 @@ namespace Napack.Server.Modules
                     upversionType = NapackAnalyst.UpversionType.Minor;
                 }
 
-                newNapackVersion.UpdateNamespaceOfFiles(packageName, majorVersion);
+                newNapackVersion.UpdateNamespaceOfFiles(packageName, upversionType != NapackAnalyst.UpversionType.Major ? majorVersion : majorVersion + 1);
                 Global.NapackStorageManager.SaveNewNapackVersion(package, new NapackVersionIdentifier(packageName, majorVersion, minorVersion, patchVersion), upversionType, newNapackVersion, newVersionSpec);
 
                 return this.Response.AsJson(new

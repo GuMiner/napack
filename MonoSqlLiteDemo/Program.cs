@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Security;
 using System.Threading;
-using Mono.Data.Sqlite;
 
 namespace MonoSqlLiteDemo
 {
@@ -29,13 +29,13 @@ namespace MonoSqlLiteDemo
             Console.WriteLine($"Email transmission status: {e.UserState as string} -> Cancelled: {e.Cancelled}. {e.Error?.ToString() ?? "No Error"}");
         }
 
-        public static void Main(string[] args)
+        private static void MailTest(string[] args)
         {
             SmtpClient client = new SmtpClient(args[0], int.Parse(args[1]));
             client.EnableSsl = true;
             client.Credentials = new NetworkCredential(args[2], args[3]);
             client.SendCompleted += Client_SendCompleted;
-            
+
             MailAddress from = new MailAddress("admin@napack.net", "TestUser");
             MailAddress to = new MailAddress("gus.gran@helium24.net");
 
@@ -57,13 +57,16 @@ namespace MonoSqlLiteDemo
             }
 
             Thread.Sleep(20000);
+        }
 
-            /*string filePath = "demo.db";
+        private static void SqlTest(string[] args)
+        {
+            string filePath = "demo.db";
             File.Delete(filePath);
-            SqliteConnection.CreateFile(filePath);
+            SQLiteConnection.CreateFile(filePath);
 
             string uri = $"Data Source={filePath}";
-            using (IDbConnection dbcon = new SqliteConnection(uri))
+            using (IDbConnection dbcon = new SQLiteConnection(uri))
             {
                 dbcon.Open();
                 Console.WriteLine("Create Table");
@@ -88,9 +91,9 @@ namespace MonoSqlLiteDemo
                     {
                         dbcmd.ExecuteNonQuery();
                     }
-                    catch (SqliteException se)
+                    catch (SQLiteException se)
                     {
-                        if (se.ErrorCode != SQLiteErrorCode.Constraint)
+                        if (se.ErrorCode != (int)SQLiteErrorCode.Constraint)
                         {
                             throw;
                         }
@@ -115,7 +118,16 @@ namespace MonoSqlLiteDemo
                 //             firstName, lastName);
                 //     }
                 // }
-            }*/
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            // MailTest(args);
+            // return;
+
+            SqlTest(args);
+            return;
         }
     }
 }

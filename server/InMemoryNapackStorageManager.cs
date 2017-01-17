@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
@@ -37,7 +38,7 @@ namespace Napack.Server
         /// The listing of package name => package metadata
         /// </summary>
         private static readonly Dictionary<string, NapackMetadata> packageMetadataStore;
-        
+
         /// <summary>
         /// The listing of package name => package statistics.
         /// </summary>
@@ -78,6 +79,11 @@ namespace Napack.Server
         public bool ContainsNapack(string packageName)
         {
             return packageMetadataStore.ContainsKey(packageName);
+        }
+
+        public void RunDbBackup(object sender, ElapsedEventArgs e)
+        {
+            // No use implementing this
         }
 
         public List<NapackSearchIndex> FindPackages(string searchPhrase, int skip, int top)

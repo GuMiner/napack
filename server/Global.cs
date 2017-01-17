@@ -19,6 +19,7 @@ namespace Napack.Server
     public class Global
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static System.Timers.Timer dbBackupTimer;
 
         public static string RootDirectory { get; private set; }
 
@@ -54,6 +55,17 @@ namespace Napack.Server
             logger.Info("Database loading...");
             Global.NapackStorageManager = Global.NapackStorageManager ?? new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName);
 
+            logger.Info("Database backup thread loading...");
+            dbBackupTimer = new System.Timers.Timer() 
+            {
+                AutoReset = true,
+                Enabled = true,
+                Interval = TimeSpan.FromDays(1).TotalMilliseconds, // Run every day.
+            };
+
+            dbBackupTimer.Elapsed += Global.NapackStorageManager.RunDbBackup;
+            dbBackupTimer.Start();
+
             logger.Info("System stats management loading...");
             Global.SystemStats = new SystemStats();
 
@@ -81,6 +93,11 @@ namespace Napack.Server
                 {
                     Global.Initialized = true;
                     Global.ShutdownEvent.WaitOne();
+                    logger.Info("Napack Server Shutting down...");
+
+                    logger.Info("Databsae backup timer stopped.");
+                    dbBackupTimer.Stop();
+
                     logger.Info("Napack Server Shutdown.");
                 }
             }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Mono.Data.Sqlite;
+using System.Timers;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
@@ -26,7 +28,8 @@ namespace Napack.Server
         // If you're using more than this, you're searching for the wrong thing.
         private const int maxSearchTerms = 20;
 
-        private IDbConnection database;
+        private SQLiteConnection database;
+        private readonly string databaseFolder;
         
         private const string UsersTable = "users";
         private const string AuthorPackageTable = "authorPackage";
@@ -43,15 +46,15 @@ namespace Napack.Server
         {
             bool createTablesAndIndices = false;
 
-            logger.Info($"SQLite version: {SqliteConnection.SQLiteVersion}");
+            logger.Info($"SQLite version: {SQLiteConnection.SQLiteVersion}");
             if (!File.Exists(databaseFileName))
             {
-                SqliteConnection.SetConfig(SQLiteConfig.MultiThread);
-                SqliteConnection.CreateFile(databaseFileName);
+                SQLiteConnection.CreateFile(databaseFileName);
                 createTablesAndIndices = true;
             }
 
-            database = new SqliteConnection($"Data Source={databaseFileName}");
+            databaseFolder = Path.GetDirectoryName(databaseFileName);
+            database = new SQLiteConnection($"Data Source={databaseFileName}");
             database.Open();
 
             if (createTablesAndIndices)
@@ -157,7 +160,7 @@ namespace Napack.Server
                 {
                     return commandAction(command);
                 }
-                catch (SqliteException se)
+                catch (SQLiteException se)
                 {
                     logger.Warn(se.Message);
                     throw;
@@ -179,7 +182,7 @@ namespace Napack.Server
                     command.CommandText = "END TRANSACTION";
                     command.ExecuteNonQuery();
                 }
-                catch (SqliteException se)
+                catch (SQLiteException se)
                 {
                     try
                     {
@@ -266,7 +269,7 @@ namespace Napack.Server
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (SqliteException se) when (se.ErrorCode == SQLiteErrorCode.Constraint)
+                catch (SQLiteException se) when (se.ErrorCode == (int)SQLiteErrorCode.Constraint)
                 {
                     throw new ExistingUserException(user.Email);
                 }
@@ -600,6 +603,36 @@ namespace Napack.Server
         private string GetSafeDescriptionAndTags(NapackMetadata metadata)
         {
             return (metadata.Description + " " + string.Join(" ", metadata.Tags)).Replace("'", "''");
+        }
+
+        /// <summary>
+        /// Saves the SQLite DB to a local file.
+        /// </summary>
+        /// <param name="sender">Unused</param>
+        /// <param name="e">Unused</param>
+        public void RunDbBackup(object sender, ElapsedEventArgs e)
+        {
+            string backupFileName = Path.Combine(databaseFolder, DateTime.UtcNow.ToString("yyy-MM-dd-hh-mm") + ".backup");
+
+            logger.Info("Backing up the DB to " + backupFileName);
+            Stopwatch backupTimer = Stopwatch.StartNew();
+            try
+            {
+                SQLiteConnection.CreateFile(backupFileName);
+                using (SQLiteConnection backupConnection = new SQLiteConnection($"Data Source={backupFileName}"))
+                {
+                    backupConnection.Open();
+                    database.BackupDatabase(backupConnection, "main", "main", -1, null, 1000);
+                }
+
+                logger.Info("Backup completed successfully in " + backupTimer.ElapsedMilliseconds + " ms.");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error saving the DB backup: " + ex.Message + ". " + ex.StackTrace);
+            }
+
+            backupTimer.Stop();
         }
     }
 }

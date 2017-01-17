@@ -100,6 +100,14 @@ newaliases
 postfix reload
 service dovecot restart
 
+==Building SQLite==
+Download and transfer:
+  https://system.data.sqlite.org/downloads/1.0.104.0/sqlite-netFx-full-source-1.0.104.0.zip
+apt-get update // From http://blog.wezeku.com/2016/10/09/using-system-data-sqlite-under-linux-and-mono/
+apt-get install build-essential
+cd <source root>/Setup
+chmod +x compile-interop-assembly-release.sh
+./compile-interop-assembly-release.sh
 
 
 

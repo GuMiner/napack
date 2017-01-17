@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Timers;
 using Napack.Analyst;
 using Napack.Analyst.ApiSpec;
 using Napack.Common;
@@ -10,6 +11,13 @@ namespace Napack.Server
     /// </summary>
     public interface INapackStorageManager
     {
+        /// <summary>
+        /// Backups up whatever is storing the database.
+        /// </summary>
+        /// <param name="sender">Unused</param>
+        /// <param name="e">Unused</param>
+        void RunDbBackup(object sender, ElapsedEventArgs e);
+
         /// <summary>
         /// Returns true if the napack exists, false otherwise.
         /// </summary>
