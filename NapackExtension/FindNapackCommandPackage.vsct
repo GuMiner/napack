@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--Files defining the IDs for commands and the command IDs for shell menus. -->
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <!-- The entirety of our menu display. -->
+  <Commands package="guidFindNapackCommandPackage">
+
+    <!-- The menu extension to the 'Tools' drop-down. -->
+    <Menus>
+      <Menu guid="guidFindNapackCommandPackageCmdSet" id="NapackMenu" priority="0x0000" type="Menu">
+        <Parent guid="guidFindNapackCommandPackageCmdSet" id="TopLevelGroup"/>
+        <Strings>
+          <ButtonText>Napacks</ButtonText>
+          <CommandName>Napacks</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+    
+    <!-- Group(s) in the menu -->
+    <Groups>
+      <Group guid="guidFindNapackCommandPackageCmdSet" id="TopLevelGroup" priority="0xFF50">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+      
+      <Group guid="guidFindNapackCommandPackageCmdSet" id="NapackMenuGroup" priority="0x0000">
+        <Parent guid="guidFindNapackCommandPackageCmdSet" id="NapackMenu"/>
+      </Group>
+    </Groups>
+
+    <!-- Buttons in the menu -->
+    <Buttons>
+      <Button guid="guidFindNapackCommandPackageCmdSet" id="FindNapackCommandId" priority="0x0001" type="Button">
+        <Parent guid="guidFindNapackCommandPackageCmdSet" id="NapackMenuGroup" />
+        <Strings>
+          <ButtonText>Find a Napack</ButtonText>
+          <CommandName>FindNapackCommandId</CommandName>
+        </Strings>
+      </Button>
+      <Button guid="guidFindNapackCommandPackageCmdSet" id="ExtractToNapackCommandId" priority="0x0002" type="Button">
+        <Parent guid="guidFindNapackCommandPackageCmdSet" id="NapackMenuGroup" />
+        <Strings>
+          <ButtonText>Create a Napack</ButtonText>
+          <CommandName>ExtractToNapackCommandId</CommandName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <!--This section is where you can associate a command with a keyboard shortcut; this association is
+
+  valid within a specific UI context, that is when the shell is inside a specific mode, e.g. during
+
+  debugging, editing a file or when the user is using a specific designer.-->
+
+  <KeyBindings>
+    <KeyBinding guid="guidFindNapackCommandPackageCmdSet" id="FindNapackCommandId" editor="guidVSStd97" mod1="Control" key1="e" mod2="Control" key2="n" />
+    <KeyBinding guid="guidFindNapackCommandPackageCmdSet" id="ExtractToNapackCommandId" editor="guidVSStd97" mod1="Control" key1="e" mod2="Control" key2="c" />
+  </KeyBindings>
+  
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidFindNapackCommandPackage" value="{17bf7a7f-1bc8-4bee-8cdd-f110fc1e5425}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidFindNapackCommandPackageCmdSet" value="{e441a6ff-58c4-4d48-9b86-a8ec0fb35105}">
+      <IDSymbol name="NapackMenu" value="0x1010" />
+      <IDSymbol name="NapackMenuGroup" value="0x1020" />
+      <IDSymbol name="TopLevelGroup" value="0x1030" />
+      
+      <IDSymbol name="FindNapackCommandId" value="0x0100" />
+      <IDSymbol name="ExtractToNapackCommandId" value="0x0101"/>
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
