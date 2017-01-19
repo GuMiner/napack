@@ -7,10 +7,6 @@ Status
 
 The Napack Database is subject to arbitrary deletion until there are no more remaining tasks in this list.
 
-Bugs
-----
-* Should remove base64 logic as it's not needed
-* Data storage layer needs another layer of abstraction to properly avoid duplicating business logic.
 
 Core Functionality
 ------------------
@@ -32,3 +28,4 @@ These issues will be fixed post-release, if possible.
 * Search doesn't include a code search or documentation search.
 * The Napack Server Framework should have a webpage for Napack upload/update and user registration. Update [Creation.md](./Creation.md) and [Registration.md](Registration.md) when done.
 * Graph view actually doesn't do anything yet.
+* Two clients updating a Napack at the exact same time may overwrite each other.

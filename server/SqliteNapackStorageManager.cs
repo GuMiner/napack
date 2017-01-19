@@ -201,17 +201,17 @@ namespace Napack.Server
             }
         }
 
-        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string keyEncoded, string valueName)
+        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string key, string valueName)
             where T: class
         {
-            currentCommand.Parameters.Add(keyEncoded);
+            currentCommand.Parameters.Add(key);
             currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = ?";
             T item = null;
             using (IDataReader reader = currentCommand.ExecuteReader())
             {
                 if (reader.Read())
                 {
-                    item = Serializer.DeserializeFromBase64<T>(reader.GetString(0));
+                    item = Serializer.Deserialize<T>(reader.GetString(0));
                 }
             }
 
@@ -219,17 +219,17 @@ namespace Napack.Server
             return item;
         }
 
-        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string keyEncoded, string valueName, Func<T> missingAction)
+        public T GetItem<T>(IDbCommand currentCommand, string table, string keyName, string key, string valueName, Func<T> missingAction)
             where T : class
         {
-            currentCommand.Parameters.Add(keyEncoded);
+            currentCommand.Parameters.Add(key);
             currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = ?";
             T item = null;
             using (IDataReader reader = currentCommand.ExecuteReader())
             {
                 if (reader.Read())
                 {
-                    item = Serializer.DeserializeFromBase64<T>(reader.GetString(0));
+                    item = Serializer.Deserialize<T>(reader.GetString(0));
                 }
                 else
                 {
@@ -243,14 +243,13 @@ namespace Napack.Server
 
         public void AddItem<T>(string key, T item, string table, string keyName, string valueName, bool distinct)
         {
-            string keyEncoded = Serializer.SerializeToBase64<string>(key);
             ExecuteTransactionCommand((command) =>
             {
-                List<T> items = GetItem<List<T>>(command, table, keyName, keyEncoded, valueName);
+                List<T> items = GetItem<List<T>>(command, table, keyName, key, valueName);
                 if (items == null)
                 {
-                    string itemsEncoded = Serializer.SerializeToBase64(new List<T>() { item });
-                    command.Parameters.Add(keyEncoded);
+                    string itemsEncoded = Serializer.Serialize(new List<T>() { item });
+                    command.Parameters.Add(key);
                     command.Parameters.Add(itemsEncoded);
                     command.CommandText = $"INSERT INTO {table} VALUES (?, ?)";
                     command.ExecuteNonQuery();
@@ -261,9 +260,9 @@ namespace Napack.Server
                     items.Add(item);
                     items = distinct ? items.Distinct().ToList() : items;
 
-                    string itemsEncoded = Serializer.SerializeToBase64(items);
+                    string itemsEncoded = Serializer.Serialize(items);
                     command.Parameters.Add(itemsEncoded);
-                    command.Parameters.Add(keyEncoded);
+                    command.Parameters.Add(key);
                     command.CommandText = $"UPDATE {table} SET {valueName} = ? WHERE {keyName} = ?";
                     command.ExecuteNonQuery();
                     command.Parameters.Clear();
@@ -273,8 +272,8 @@ namespace Napack.Server
 
         public void AddUser(UserIdentifier user)
         {
-            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
-            string userJson = Serializer.SerializeToBase64(user);
+            string userEmail = user.Email.ToUpperInvariant();
+            string userJson = Serializer.Serialize(user);
             
             ExecuteCommand($"INSERT INTO {UsersTable} VALUES (?, ?)", command =>
             {
@@ -294,15 +293,15 @@ namespace Napack.Server
 
         public UserIdentifier GetUser(string userId)
         {
-            string userEmail = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
+            string userEmail = Serializer.Serialize<string>(userId.ToUpperInvariant());
             return ExecuteCommand((command) => GetItem<UserIdentifier>(command, UsersTable, "email", userEmail, "userData",
                 () => { throw new UserNotFoundException(userId); }));
         }
 
         public void UpdateUser(UserIdentifier user)
         {
-            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
-            string userJson = Serializer.SerializeToBase64(user);
+            string userEmail = user.Email.ToUpperInvariant();
+            string userJson = Serializer.Serialize(user);
             ExecuteCommand($"UPDATE {UsersTable} SET userData = ? WHERE email = ?", command =>
             {
                 command.Parameters.Add(userJson);
@@ -320,7 +319,7 @@ namespace Napack.Server
 
         public void RemoveUser(UserIdentifier user)
         {
-            string userEmail = Serializer.SerializeToBase64<string>(user.Email.ToUpperInvariant());
+            string userEmail = user.Email.ToUpperInvariant();
             ExecuteCommand($"DELETE FROM {UsersTable} WHERE email = ?", command =>
             {
                 command.Parameters.Add(userEmail);
@@ -337,47 +336,40 @@ namespace Napack.Server
 
         public IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName)
         {
-            string authorNameEncoded = Serializer.SerializeToBase64<string>(authorName.ToUpperInvariant());
-            return ExecuteCommand((command) => GetItem(command, AuthorPackageTable, "authorName", authorNameEncoded, "packageVersionList",
+            return ExecuteCommand((command) => GetItem(command, AuthorPackageTable, "authorName", authorName.ToUpperInvariant(), "packageVersionList",
                 () => Enumerable.Empty<NapackVersionIdentifier>()));
         }
 
         public IEnumerable<string> GetAuthorizedPackages(string userId)
         {
-            string userIdEncoded = Serializer.SerializeToBase64<string>(userId.ToUpperInvariant());
-            return ExecuteCommand((command) => GetItem(command, UserPackageTable, "userId", userIdEncoded, "packageNameList",
+            return ExecuteCommand((command) => GetItem(command, UserPackageTable, "userId", userId.ToUpperInvariant(), "packageNameList",
                 () => Enumerable.Empty<string>()));
         }
 
         public IEnumerable<NapackVersionIdentifier> GetPackageConsumers(NapackMajorVersion packageMajorVersion)
         {
-            string pmvEncoded = Serializer.SerializeToBase64<string>(packageMajorVersion.ToString());
-            return ExecuteCommand((command) => GetItem(command, PackageConsumersTable, "packageMajorVersionId", pmvEncoded, "consumingPackages",
+            return ExecuteCommand((command) => GetItem(command, PackageConsumersTable, "packageMajorVersionId", packageMajorVersion.ToString(), "consumingPackages",
                 () => Enumerable.Empty<NapackVersionIdentifier>()));
         }
 
         public NapackStats GetPackageStatistics(string packageName)
         {
-            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-            return ExecuteCommand((command) => GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+            return ExecuteCommand((command) => GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageName, "packageStat",
                 () => { throw new NapackStatsNotFoundException(packageName); }));
         }
 
         public NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion)
         {
-            string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
-            return ExecuteCommand((command) => GetItem<NapackSpec>(command, PackageSpecsTable, "packageVersion", packageVersionEncoded, "packageSpec",
+            return ExecuteCommand((command) => GetItem<NapackSpec>(command, PackageSpecsTable, "packageVersion", packageVersion.GetFullName(), "packageSpec",
                 () => { throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch); }));
         }
 
         public bool ContainsNapack(string packageName)
         {
-            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-
             return ExecuteCommand($"SELECT packageName FROM {PackageMetadataTable} WHERE packageName = ?", command =>
             {
                 bool hasNapack = false;
-                command.Parameters.Add(packageNameEncoded);
+                command.Parameters.Add(packageName);
                 using (IDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
@@ -423,7 +415,7 @@ namespace Napack.Server
                 {
                     while (reader.Read())
                     {
-                        metadatas.Add(Serializer.DeserializeFromBase64<NapackMetadata>(reader.GetString(0)));
+                        metadatas.Add(Serializer.Deserialize<NapackMetadata>(reader.GetString(0)));
                     }
                 }
 
@@ -431,8 +423,7 @@ namespace Napack.Server
 
                 return metadatas.Select(metadata =>
                 {
-                    string packageNameEncoded = Serializer.SerializeToBase64<string>(metadata.Name);
-                    NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                    NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", metadata.Name, "packageStat",
                         () => { throw new NapackStatsNotFoundException(metadata.Name); });
                     return NapackSearchIndex.CreateFromMetadataAndStats(metadata, stats);
                 }).ToList();
@@ -441,17 +432,15 @@ namespace Napack.Server
 
         public void IncrementPackageDownload(string packageName)
         {
-            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-
             ExecuteTransactionCommand((command) =>
             {
-                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageName, "packageStat",
                     () => { throw new NapackStatsNotFoundException(packageName); });
                 stats.Downloads++;
 
-                string packageStatsEncoded = Serializer.SerializeToBase64(stats);
+                string packageStatsEncoded = Serializer.Serialize(stats);
                 command.Parameters.Add(packageStatsEncoded);
-                command.Parameters.Add(packageNameEncoded);
+                command.Parameters.Add(packageName);
                 command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = ? WHERE packageName = ?";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
@@ -461,22 +450,18 @@ namespace Napack.Server
 
         public NapackMetadata GetPackageMetadata(string packageName)
         {
-            string packageNameEncoded = Serializer.SerializeToBase64<string>(packageName);
-            return ExecuteCommand((command) => GetItem<NapackMetadata>(command, PackageMetadataTable, "packageName", packageNameEncoded, "metadata",
+            return ExecuteCommand((command) => GetItem<NapackMetadata>(command, PackageMetadataTable, "packageName", packageName, "metadata",
                 () => { throw new NapackNotFoundException(packageName); }));
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
         {
-            string packageVersionEncoded = Serializer.SerializeToBase64<string>(packageVersion.GetFullName());
-            return ExecuteCommand((command) => GetItem<NapackVersion>(command, PackageStoreTable, "packageVersion", packageVersionEncoded, "package",
+            return ExecuteCommand((command) => GetItem<NapackVersion>(command, PackageStoreTable, "packageVersion", packageVersion.GetFullName(), "package",
                 () => { throw new NapackVersionNotFoundException(packageVersion.Major, packageVersion.Minor, packageVersion.Patch); }));
         }
 
         public void SaveNewNapack(string napackName, NewNapack newNapack, NapackSpec napackSpec)
         {
-            string napackNameEncoded = Serializer.SerializeToBase64<string>(napackName);
-
             NapackVersionIdentifier version = new NapackVersionIdentifier(napackName, 1, 0, 0);
             NapackMetadata metadata = NapackMetadata.CreateFromNewNapack(napackName, newNapack);
             NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapack.NewNapackVersion);
@@ -502,32 +487,31 @@ namespace Napack.Server
 
             ExecuteTransactionCommand((command) =>
             {
-                string statsEncoded = Serializer.SerializeToBase64(stats);
-                command.Parameters.Add(napackNameEncoded);
+                string statsEncoded = Serializer.Serialize(stats);
+                command.Parameters.Add(napackName);
                 command.Parameters.Add(statsEncoded);
                 command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES (?, ?)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
-                string metadataEncoded = Serializer.SerializeToBase64(metadata);
+                string metadataEncoded = Serializer.Serialize(metadata);
                 string safeDescriptionAndTags = GetSafeDescriptionAndTags(metadata);
-                command.Parameters.Add(napackNameEncoded);
+                command.Parameters.Add(napackName);
                 command.Parameters.Add(safeDescriptionAndTags);
                 command.Parameters.Add(metadataEncoded);
                 command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES (?, ?, ?)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
-
-                string versionEncoded = Serializer.SerializeToBase64(version.GetFullName());
-                string napackSpecEncoded = Serializer.SerializeToBase64(napackSpec);
-                command.Parameters.Add(versionEncoded);
+                
+                string napackSpecEncoded = Serializer.Serialize(napackSpec);
+                command.Parameters.Add(version.GetFullName());
                 command.Parameters.Add(napackSpecEncoded);
                 command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES (?, ?)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
-                string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
-                command.Parameters.Add(versionEncoded);
+                string packageVersionEncoded = Serializer.Serialize(packageVersion);
+                command.Parameters.Add(version.GetFullName());
                 command.Parameters.Add(packageVersionEncoded);
                 command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES (?, ?)";
                 command.ExecuteNonQuery();
@@ -558,16 +542,15 @@ namespace Napack.Server
             
             ExecuteTransactionCommand((command) =>
             {
-                string versionEncoded = Serializer.SerializeToBase64(nextVersion.GetFullName());
-                string napackSpecEncoded = Serializer.SerializeToBase64(newVersionSpec);
-                command.Parameters.Add(versionEncoded);
+                string napackSpecEncoded = Serializer.Serialize(newVersionSpec);
+                command.Parameters.Add(nextVersion.GetFullName());
                 command.Parameters.Add(napackSpecEncoded);
                 command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES (?, ?)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
-                string packageVersionEncoded = Serializer.SerializeToBase64(packageVersion);
-                command.Parameters.Add(versionEncoded);
+                string packageVersionEncoded = Serializer.Serialize(packageVersion);
+                command.Parameters.Add(nextVersion.GetFullName());
                 command.Parameters.Add(packageVersionEncoded);
                 command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES (?, ?)";
                 command.ExecuteNonQuery();
@@ -602,14 +585,13 @@ namespace Napack.Server
 
             ExecuteTransactionCommand((command) =>
             {
-                string packageNameEncoded = Serializer.SerializeToBase64<string>(package.Name);
-                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", packageNameEncoded, "packageStat",
+                NapackStats stats = GetItem<NapackStats>(command, PackageStatsTable, "packageName", package.Name, "packageStat",
                     () => { throw new NapackStatsNotFoundException(package.Name); });
                 stats.AddVersion(newNapackVersion);
 
-                string statsEncoded = Serializer.SerializeToBase64(stats);
+                string statsEncoded = Serializer.Serialize(stats);
                 command.Parameters.Add(statsEncoded);
-                command.Parameters.Add(packageNameEncoded);
+                command.Parameters.Add(package.Name);
                 command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = ? WHERE packageName = ?";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
@@ -622,14 +604,13 @@ namespace Napack.Server
 
         public void UpdatePackageMetadata(NapackMetadata metadata)
         {
-            string packageNameEncoded = Serializer.SerializeToBase64(metadata.Name);
-            string metadataEncoded = Serializer.SerializeToBase64(metadata);
+            string metadataEncoded = Serializer.Serialize(metadata);
 
             ExecuteCommand($"UPDATE {PackageMetadataTable} SET metadata = ?, descriptionAndTags = ? WHERE packageName = ?", command =>
             {
                 command.Parameters.Add(metadataEncoded);
                 command.Parameters.Add(GetSafeDescriptionAndTags(metadata));
-                command.Parameters.Add(packageNameEncoded);
+                command.Parameters.Add(metadata.Name);
                 int rowsUpdated = command.ExecuteNonQuery();
                 command.Parameters.Clear();
                 if (rowsUpdated == 0)
