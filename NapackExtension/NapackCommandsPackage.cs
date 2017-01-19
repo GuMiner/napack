@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace NapackExtension
 {
@@ -24,26 +26,36 @@ namespace NapackExtension
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0")] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(FindNapackCommandPackage.PackageGuidString)]
-    public sealed class FindNapackCommandPackage : Package
+    [ProvideToolWindow(typeof(SearchFormToolWindow), Style = VsDockStyle.Float, PositionX = 0, PositionY = 0, Width = 200, Height = 100, Orientation = ToolWindowOrientation.none, Transient = true)]
+    [Guid(NapackCommandsPackage.PackageGuidString)]
+    public sealed class NapackCommandsPackage : Package
     {
-        /// <summary>
-        /// FindNapackCommandPackage GUID string.
-        /// </summary>
         public const string PackageGuidString = "17bf7a7f-1bc8-4bee-8cdd-f110fc1e5425";
 
+        public static NapackCommandsPackage Instance { get; private set; }
+        
         /// <summary>
-        /// Initializes a new instance of the <see cref="FindNapackCommand"/> class.
+        /// Initializes a new instance of the <see cref="NapackCommands"/> class.
         /// </summary>
-        public FindNapackCommandPackage()
+        public NapackCommandsPackage()
         {
             // Inside this method you can place any initialization code that does not require
             // any Visual Studio service because at this point the package object is created but
             // not sited yet inside Visual Studio environment. The place to do all the other
             // initialization is the Initialize method.
+            NapackCommandsPackage.Instance = this;
         }
 
-        #region Package Members
+        public void ShowSearchPane()
+        {
+            ToolWindowPane toolWindow = this.FindToolWindow(typeof(SearchFormToolWindow), 0, true);
+            if (toolWindow == null || toolWindow.Frame == null)
+            {
+                throw new NotSupportedException("The Napack VSIX package is invalid and cannot perform the requested operation.");
+            }
+            
+            ErrorHandler.ThrowOnFailure((toolWindow.Frame as IVsWindowFrame)?.Show() ?? -1);
+        }
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -51,10 +63,8 @@ namespace NapackExtension
         /// </summary>
         protected override void Initialize()
         {
-            FindNapackCommand.Initialize(this);
+            NapackCommands.Initialize(this);
             base.Initialize();
         }
-
-        #endregion
     }
 }

@@ -7,7 +7,6 @@ Status
 
 The Napack Database is subject to arbitrary deletion until there are no more remaining tasks in this list.
 
-
 Core Functionality
 ------------------
 * Visual Studio Extension to integrate package consumption / creation with the Visual Studio workflow. Update [Download.md](./Download.md), [Creation.md](Creation.md), and [Search.md](./Search.md) when done.

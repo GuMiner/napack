@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace NapackExtension
 {
     /// <summary>
-    /// Command handler
+    /// Handles all Napack commands.
     /// </summary>
-    internal sealed class FindNapackCommand
+    internal sealed class NapackCommands
     {
         /// <summary>
         /// Command menu group (command set GUID).
@@ -22,11 +22,11 @@ namespace NapackExtension
         private readonly Package package;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FindNapackCommand"/> class.
+        /// Initializes a new instance of the <see cref="NapackCommands"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        private FindNapackCommand(Package package)
+        private NapackCommands(Package package)
         {
             if (package == null)
             {
@@ -43,22 +43,12 @@ namespace NapackExtension
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static FindNapackCommand Instance
-        {
-            get;
-            private set;
-        }
+        public static NapackCommands Instance { get; private set; }
 
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+        private IServiceProvider ServiceProvider => this.package;
 
         /// <summary>
         /// Initializes the singleton instance of the command.
@@ -66,7 +56,7 @@ namespace NapackExtension
         /// <param name="package">Owner package, not null.</param>
         public static void Initialize(Package package)
         {
-            Instance = new FindNapackCommand(package);
+            Instance = new NapackCommands(package);
         }
 
         /// <summary>
@@ -78,17 +68,18 @@ namespace NapackExtension
         /// <param name="e">Event args.</param>
         private void FindCallback(object sender, EventArgs e)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "Find a Napack";
-
+            //string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
+            //string title = "Find a Napack";
+            NapackCommandsPackage.Instance.ShowSearchPane();
+            
             // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+          // VsShellUtilities.ShowMessageBox(
+          //     this.ServiceProvider,
+          //     message,
+          //     title,
+          //     OLEMSGICON.OLEMSGICON_INFO,
+          //     OLEMSGBUTTON.OLEMSGBUTTON_OK,
+          //     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         /// <summary>
