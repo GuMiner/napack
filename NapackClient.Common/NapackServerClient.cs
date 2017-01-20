@@ -98,7 +98,7 @@ namespace Napack.Client.Common
         /// <exception cref="InvalidNapackException">If the retrieved Napack is invalid and cannot be deserialized.</exception>
         public Task<NapackVersion> GetMostRecentMajorVersionAsync(NapackMajorVersion partialNapackVersionDefinition)
         {
-            return this.GetWithCommonExceptionHandlingAsync<NapackVersion>("/dependency/" + partialNapackVersionDefinition.Name + "." + partialNapackVersionDefinition.Major,
+            return this.GetWithCommonExceptionHandlingAsync<NapackVersion>("/napackDownload/dependency/" + partialNapackVersionDefinition.Name + "." + partialNapackVersionDefinition.Major,
                 partialNapackVersionDefinition.Name, partialNapackVersionDefinition.Major);
         }
 

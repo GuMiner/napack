@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Napack</id>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
     
     <authors>Gustave Granroth</authors>
     <owners>guminer</owners>
@@ -13,7 +13,7 @@
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     
-    <releaseNotes>Contains the Napack Client with full functionality, but with additional testing necessary.</releaseNotes>
+    <releaseNotes>Contains the Napack Client with full functionality, with bug fixes from various test fixes.</releaseNotes>
     <description>Contains the Napack Framework Client to create and update nano-scale packages. See https://napack.net for a full description.</description>
 
     <copyright>Copyright © 2016 Gustave Granroth</copyright>
