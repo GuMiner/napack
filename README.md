@@ -1,13 +1,11 @@
 # napack
 ## Synopsis
 -----------
-A nano-scale package framework.
+The nano-scale package framework available at [https://napack.net](https://napack.net).
 
-## Intent
+## Contents
 ---------
-This repository will host the Napack Framework Server, Napack documentation, and Napack Client.
+This repository contains the Napack Framework server, client (with NuGet package), Visual Studio extension, documentation, and test code.
 
-## Status
----------
-The usage documentation is complete. I am going to write up the design documentation for the client and server before writing those pieces of code and adding them to this repository.
-
+## Documentation
+[https://napack.net/Documentation/Readme.md](Readme.md)

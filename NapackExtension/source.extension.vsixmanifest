@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="NapackExtension.Company.e79f590a-8e77-48e2-9239-cba6438b6716" Version="1.0" Language="en-US" Publisher="Napack" />
+    <Identity Id="NapackExtension.Company.e79f590a-8e77-48e2-9239-cba6438b6716" Version="1.0" Language="en-US" Publisher="NapackAdmin" />
     <DisplayName>NapackExtension</DisplayName>
     <Description xml:space="preserve">Adds in-box support to Visual Studio for finding Napacks and extracting functionality into new Napacks.</Description>
     <MoreInfo>https://napack.net</MoreInfo>
     <License>LICENSE</License>
     <ReleaseNotes>http://napack.net/Documentation/ReleaseNotes.md</ReleaseNotes>
     <Icon>favicon.ico</Icon>
-    <PreviewImage>favicon.ico</PreviewImage>
+    <PreviewImage>Screenshot.png</PreviewImage>
     <Tags>napack componentization package management</Tags>
   </Metadata>
   <Installation>

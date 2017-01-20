@@ -11,7 +11,7 @@ Workflow
 2. Add the Napack name and version of the Napack you want to use to the **Napack.json** file. 
  - For example, if you add the "PointInSphere" package, version 2.1.2, your **Napack.json** file will look like:
  -  ```{ "PointInSphere": "2.1.2" }```
-4. Build your project. 
+4. Rebuild your project. 
  - In the example above, *PointInSphere* and dependent Napacks will be automatically downloaded and placed in the *{Project Root}/napacks/PointInSphere.2.1.2/* folder.
 5. For each source file you want to use the packages in, write ```using Package_Major``` in that file.
   - To use *PointInSphere*, you would write ```using PointSphere_2```

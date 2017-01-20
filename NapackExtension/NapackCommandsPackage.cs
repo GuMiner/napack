@@ -89,7 +89,7 @@ namespace NapackExtension
                 if (napacks.ContainsKey(napackName))
                 {
                     VsShellUtilities.ShowMessageBox(this,
-                        $"The {projectShortName} project already contains the ${napackName} napack.",
+                        $"The {projectShortName} project already contains the {napackName} napack.",
                         "Napack already added",
                         OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 }
@@ -99,7 +99,7 @@ namespace NapackExtension
                     File.WriteAllText(napackFileName, JsonConvert.SerializeObject(napacks, Formatting.Indented));
 
                     VsShellUtilities.ShowMessageBox(this,
-                        $"Added the ${napackName} napack to the {projectShortName} project.",
+                        $"Added the {napackName} napack to the {projectShortName} project.",
                         "Napack added",
                         OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 }

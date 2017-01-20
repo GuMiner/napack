@@ -64,6 +64,10 @@
     <Compile Include="SearchFormToolWindow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Screenshot.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <VSCTCompile Include="FindNapackCommandPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>

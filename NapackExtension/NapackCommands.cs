@@ -76,8 +76,6 @@ namespace NapackExtension
         /// <param name="e">Event args.</param>
         private void CreateCallback(object sender, EventArgs e)
         {
-            string title = "Create a Napack";
-
             // Show a message box to prove we were here
             VsShellUtilities.ShowMessageBox(
                 this.ServiceProvider,
