@@ -3,11 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" d:DesignHeight="243.789" d:DesignWidth="319.41">
+             mc:Ignorable="d" d:DesignHeight="295.486" d:DesignWidth="511.804">
     <Grid>
-        <Button Content="Search" Height="24" Margin="0,9,10,0" Name="Button1" VerticalAlignment="Top" Click="SearchButtonClick" HorizontalAlignment="Right" Width="62" />
-        <TextBox x:Name="searchInputBox" Height="23" Margin="10,10,77,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <Button Content="Search" Height="24" Margin="0,9,10,0" Name="SearchButton" VerticalAlignment="Top" Click="SearchButtonClick" HorizontalAlignment="Right" Width="62" />
+        <TextBox x:Name="searchInputBox" Background="#F4FFF4" Height="23" Margin="10,10,77,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
         <ProgressBar x:Name="progressBar" Height="10" Margin="10,39,10,0" VerticalAlignment="Top" Minimum="0" Maximum="100"/>
-        <ListBox x:Name="resultsBox" Margin="10,54,10,10"/>
+        <DataGrid x:Name="dataGrid" Margin="10,54,10,89" AutoGenerateColumns="False" SelectionChanged="ItemSelected">
+            <DataGrid.Columns>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="True" CanUserSort="True" IsReadOnly="True" Binding="{Binding Name}" Header="Name" Width="130"></DataGridTextColumn>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="True" CanUserSort="True" IsReadOnly="True" Binding="{Binding Description}" Header="Description" Width="310"></DataGridTextColumn>
+                <DataGridHyperlinkColumn CanUserReorder="False" CanUserResize="True" CanUserSort="True" IsReadOnly="True" Binding="{Binding API}" Header="API" Width="120">
+                    <DataGridHyperlinkColumn.ElementStyle>
+                        <Style>
+                            <EventSetter Event="Hyperlink.Click" Handler="WebBrowserLinkOpener"/>
+                        </Style>
+                    </DataGridHyperlinkColumn.ElementStyle>
+                </DataGridHyperlinkColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="Get Napack" Margin="0,0,10,11" Name="GetButton" Click="GetButtonClick" HorizontalAlignment="Right" Width="78" Height="26" VerticalAlignment="Bottom" />
+        <Label Content="Authors:" HorizontalAlignment="Left" Margin="7,0,0,63" Height="26" VerticalAlignment="Bottom" RenderTransformOrigin="0.591,1.408"/>
+        <Label Content="Dependencies:" HorizontalAlignment="Right" Margin="0,0,219,63" Height="26" VerticalAlignment="Bottom" RenderTransformOrigin="0.591,1.408"/>
+        <ListBox x:Name="authorsListBox" Background="AliceBlue" Margin="10,0,308,10" Height="53" VerticalAlignment="Bottom"/>
+        <ProgressBar x:Name="detailsProgressBar" Margin="0,0,10,42" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="78"/>
+        <ListBox x:Name="dependenciesListBox" Background="AliceBlue" Margin="0,0,96,10" Height="53" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="207"/>
+        <Label x:Name="licenseLabel" Content="" FontWeight="Bold" Visibility="Hidden" FontSize="9" HorizontalAlignment="Right" Margin="0,0,5,65" Width="87" Height="21" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

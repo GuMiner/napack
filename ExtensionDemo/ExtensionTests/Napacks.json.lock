@@ -1,0 +1,39 @@
+{
+  "BasicVector_Core": [
+    {
+      "Major": 1,
+      "Minor": 0,
+      "Patch": 0,
+      "Authors": [
+        "Gustave Granroth"
+      ],
+      "Files": {},
+      "License": {
+        "LicenseType": 0,
+        "LicenseText": null
+      },
+      "Dependencies": [
+        {
+          "Name": "BasicVector",
+          "Major": 1
+        }
+      ]
+    }
+  ],
+  "BasicVector": [
+    {
+      "Major": 1,
+      "Minor": 0,
+      "Patch": 0,
+      "Authors": [
+        "Gustave Granroth"
+      ],
+      "Files": {},
+      "License": {
+        "LicenseType": 0,
+        "LicenseText": null
+      },
+      "Dependencies": []
+    }
+  ]
+}

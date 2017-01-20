@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BasicVector_1;
+using BasicVector_Core_1;
 
 namespace ExtensionTests
 {
@@ -10,6 +8,9 @@ namespace ExtensionTests
     {
         static void Main(string[] args)
         {
+            BasicVector vector = new BasicVector(1.0, 2.0, 1.0);
+            BasicVector secondaryVector = new BasicVector(2.0, 1.0, 2.0);
+            Console.WriteLine("Napack Extension demo test: " + vector.Add(secondaryVector).X);
         }
     }
 }
