@@ -1,0 +1,11 @@
+{0},
+
+Unfortunately due to exceptional circumstances, the "{1}" Napack has been deleted from the Napack Framework Server.
+You are receiving this email because {2}.
+
+As a reminder to prevent future incidents, usage of the Napack Framework Server is contingent on following our Terms of Use at http://napack.net/Content/TermsOfUse.txt
+You can also find our Privacy Policy at http://napack.net/Content/PrivacyPolicy.txt
+
+Sincerely,
+
+The Napack Framework Server Administrators.

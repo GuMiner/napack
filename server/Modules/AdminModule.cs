@@ -1,4 +1,9 @@
-﻿using Nancy;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Nancy;
+using Napack.Common;
 using Napack.Server.Utils;
 
 namespace Napack.Server
@@ -8,30 +13,61 @@ namespace Napack.Server
     /// </summary>
     public class AdminModule : NancyModule
     {
-        public AdminModule() 
+        public const string AdminCredsFile = "../mailCreds.txt";
+
+        public static void ValidateAdmin(NancyContext context)
+        {
+            Dictionary<string, string> flatHeaders = context.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => string.Join(string.Empty, hdr.Value));
+            if (!flatHeaders.ContainsKey(CommonHeaders.AdminId) || !flatHeaders[CommonHeaders.AdminId].Equals(AdminModule.GetAdminPassword(), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UnauthorizedUserException();
+            }
+        }
+
+        public static string GetAdminUserName() => File.ReadAllLines(AdminModule.AdminCredsFile)[0];
+
+        public static string GetAdminPassword() => File.ReadAllLines(AdminModule.AdminCredsFile)[1];
+
+        public AdminModule()
             : base("/admin")
         {
-            // TODO all of these need authorization.
-            Get["/Debug/Shutdown"] = parameters =>
+            // Shuts down the Napack Framework Server cleanly.
+            Post["/Debug/Shutdown"] = parameters =>
             {
+                AdminModule.ValidateAdmin(this.Context);
                 Global.ShutdownEvent.Set();
-                return null;
+                return this.Response.AsJson(new { UtcTime = DateTime.UtcNow }, HttpStatusCode.ImATeapot);
             };
-
+            
+            // Performs the specified user modification to the given user.
             Patch["/users"] = parameters =>
             {
                 UserModification userModification = SerializerExtensions.Deserialize<UserModification>(this.Context);
+                AdminModule.ValidateAdmin(this.Context);
+
+                UserIdentifier user = Global.NapackStorageManager.GetUser(userModification.UserId);
+                switch (userModification.Operation)
+                {
+                    case Operation.DeleteUser:
+                        return UsersModule.DeleteUser(this.Response, user);
+                    case Operation.UpdateAccessKeys:
+                        UsersModule.AssignSecretsAndSendVerificationEmail(user);
+                        Global.NapackStorageManager.UpdateUser(user);
+                        break;
+                }
+
                 return this.Response.AsJson(new
                 {
                     OperationPerformed = userModification.Operation
                 });
             };
 
-            // Recalls packages.
-            Post["/manage/{packageName}/{majorVersion}"] = parameters =>
+            // Recalls a package.
+            Post["/recall/{packageName}/{majorVersion}"] = parameters =>
             {
                 string packageName = parameters.packageName;
                 int majorVersion = int.Parse(parameters.majorVersion);
+                AdminModule.ValidateAdmin(this.Context);
 
                 return this.Response.AsJson(new
                 {
@@ -39,13 +75,100 @@ namespace Napack.Server
                 });
             };
 
-            // Deletes packages.
+            // Deletes a package.
+            // 
+            // Deleting a Napack involves removing:
+            // - The package statistics.
+            // - All of the specs.
+            // - All of the packages.
+            // - The metadata
+
+            // In addition, the package is removed from.
+            // - The listing of packages an author has authored.
+            // - The listing of packages a user has access to.
+            // - Each package that took a dependency on this package*
+            //
+            // Finally, an email is sent to all affected users and authorized users.
             Delete["/manage/{packageName}"] = parameters =>
             {
                 string packageName = parameters.packageName;
+                AdminModule.ValidateAdmin(this.Context);
 
+                // TODO there's a lot of hardening that can be done here to prevent failures.
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                // TODO need a remove napack specs API in the storage manager.
+
+                foreach (string authorizedUser in metadata.AuthorizedUserIds)
+                {
+                    // TODO need a 'Remove authorized package' API on the storage manager.
+                }
+
+                Dictionary<string, List<NapackVersionIdentifier>> packagesToRemovePerAuthor = new Dictionary<string, List<NapackVersionIdentifier>>();
+                foreach(KeyValuePair<int, NapackMajorVersionMetadata> majorVersion in metadata.Versions)
+                {
+                    foreach(KeyValuePair<int, List<int>> minorVersion in majorVersion.Value.Versions)
+                    {
+                        foreach (int patchVersion in minorVersion.Value)
+                        {
+                            NapackVersionIdentifier versionIdentifier = new NapackVersionIdentifier(packageName, majorVersion.Key, minorVersion.Key, patchVersion);
+                            NapackVersion version = Global.NapackStorageManager.GetPackageVersion(versionIdentifier);
+                            
+                            foreach (string author in version.Authors)
+                            {
+                                if (!packagesToRemovePerAuthor.ContainsKey(author))
+                                {
+                                    packagesToRemovePerAuthor.Add(author, new List<NapackVersionIdentifier>());
+                                }
+
+                                packagesToRemovePerAuthor[author].Add(versionIdentifier);
+                            }
+                            
+                            // TODO need a 'Remove napack version' API in the storage manager
+                            // TODO need a 'Remove napack spec API in the storage manager.
+                        }
+                    }
+                }
+
+                HashSet<string> affectedPackages = new HashSet<string>();
+                foreach (NapackMajorVersion majorVersion in metadata.Versions.Keys.Select(value => new NapackMajorVersion(packageName, value)))
+                {
+                    List<NapackVersionIdentifier> consumingPackages = Global.NapackStorageManager.GetPackageConsumers(majorVersion).ToList();
+                    foreach (NapackVersionIdentifier consumingPackage in consumingPackages)
+                    {
+                        // TODO need to write an 'update napack version' API on the storage manager.
+                        affectedPackages.Add(consumingPackage.NapackName);
+                    }
+                }
+
+                HashSet<string> affectedUsers = new HashSet<string>();
+                foreach (string affectedPackage in affectedPackages)
+                {
+                    NapackMetadata affectedPackageMetadata = Global.NapackStorageManager.GetPackageMetadata(affectedPackage);
+                    foreach (string authorizedUserId in affectedPackageMetadata.AuthorizedUserIds)
+                    {
+                        affectedUsers.Add(authorizedUserId);
+                    }
+                }
+
+                // Send the emails now that we're all done.
+                foreach (string authorizedUserId in metadata.AuthorizedUserIds)
+                {
+                    UserIdentifier user = Global.NapackStorageManager.GetUser(authorizedUserId);
+                    EmailManager.SendPackageDeletionEmail(user, packageName, false);
+                    Global.NapackStorageManager.UpdateUser(user);
+                }
+
+                foreach (string authorizedUserId in affectedUsers)
+                {
+                    UserIdentifier user = Global.NapackStorageManager.GetUser(authorizedUserId);
+                    EmailManager.SendPackageDeletionEmail(user, packageName, true);
+                    Global.NapackStorageManager.UpdateUser(user);
+                }
+                
                 return this.Response.AsJson(new
                 {
+                    AuthorizedUsersNotified = metadata.AuthorizedUserIds,
+                    AffectedUsersNotified = affectedUsers,
                     Deleted = true
                 }, HttpStatusCode.Gone);
             };

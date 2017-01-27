@@ -158,6 +158,7 @@
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\Site.css" />
     <EmbeddedResource Include="Utils\EmailValidation_FS.txt" />
+    <EmbeddedResource Include="Utils\PackageDeletion_FS.txt" />
     <Content Include="Views\RootLayout.cshtml" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

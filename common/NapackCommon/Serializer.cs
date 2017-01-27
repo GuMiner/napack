@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -30,14 +32,15 @@ namespace Napack.Common
             return JsonConvert.SerializeObject(@object);
         }
 
-        public static T DeserializeFromBase64<T>(string @object)
+        /// <summary>
+        /// Reads an embedded resource from the specified assembly.
+        /// </summary>
+        public static string ReadFromAssembly(Assembly assembly, string resourceName)
         {
-            return Deserialize<T>(Encoding.UTF8.GetString(Convert.FromBase64String(@object)));
-        }
-
-        public static string SerializeToBase64<T>(T @object)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@object)));
+            using (StreamReader reader = new StreamReader(assembly.GetManifestResourceStream(resourceName)))
+            {
+                return reader.ReadToEnd();
+            }
         }
     }
 }

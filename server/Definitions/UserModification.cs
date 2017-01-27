@@ -8,7 +8,7 @@
 
     public class UserModification
     {
-        string UserId { get; set; }
+        public string UserId { get; set; }
 
         public Operation Operation { get; set; }
     }

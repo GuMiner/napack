@@ -100,10 +100,7 @@ namespace Napack.Common
 
         private static string ReadManifestResource(string manifestResourceName)
         {
-            using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Napack.Common.LicenseFormatStrings." + manifestResourceName)))
-            {
-                return reader.ReadToEnd();
-            }
+            return Serializer.ReadFromAssembly(Assembly.GetExecutingAssembly(), "Napack.Common.LicenseFormatStrings." + manifestResourceName);
         }
     }
 }

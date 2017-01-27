@@ -22,10 +22,7 @@ namespace Napack.Server
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
 
                 EmailManager.ValidateUserEmail(user.Email);
-                UserSecret secret = UserSecret.CreateNewSecret();
-                user.Reset(UserIdentifier.ComputeUserHash(secret.Secrets));
-
-                EmailManager.SendVerificationEmail(user);
+                UserSecret secret = AssignSecretsAndSendVerificationEmail(user);
                 Global.NapackStorageManager.AddUser(user);
 
                 logger.Info($"Assigned user {user.Email} a hash and secrets, and attempted to send a validation email.");
@@ -61,30 +58,43 @@ namespace Napack.Server
             {
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
                 UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, new List<string> { user.Email });
+                return DeleteUser(this.Response, user);
+            };
+        }
 
-                UserIdentifier storedUser = Global.NapackStorageManager.GetUser(user.Email);
+        public static UserSecret AssignSecretsAndSendVerificationEmail(UserIdentifier user)
+        {
+            UserSecret secret = UserSecret.CreateNewSecret();
+            user.Reset(UserIdentifier.ComputeUserHash(secret.Secrets));
 
-                IEnumerable<string> authorizedPackages = Global.NapackStorageManager.GetAuthorizedPackages(storedUser.Email);
-                List<string> orphanedPackages = new List<string>();
-                foreach (string authorizedPackage in authorizedPackages)
+            EmailManager.SendVerificationEmail(user);
+            return secret;
+        }
+
+        public static Response DeleteUser(IResponseFormatter responseFormatter, UserIdentifier user)
+        {
+            UserIdentifier storedUser = Global.NapackStorageManager.GetUser(user.Email);
+
+            IEnumerable<string> authorizedPackages = Global.NapackStorageManager.GetAuthorizedPackages(storedUser.Email);
+            List<string> orphanedPackages = new List<string>();
+            foreach (string authorizedPackage in authorizedPackages)
+            {
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(authorizedPackage);
+                metadata.AuthorizedUserIds.Remove(storedUser.Email);
+                if (metadata.AuthorizedUserIds.Any())
                 {
-                    NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(authorizedPackage);
-                    metadata.AuthorizedUserIds.Remove(storedUser.Email);
-                    if (metadata.AuthorizedUserIds.Any())
-                    {
-                        orphanedPackages.Add(authorizedPackage);
-                    }
-
-                    Global.NapackStorageManager.UpdatePackageMetadata(metadata);
+                    orphanedPackages.Add(authorizedPackage);
                 }
 
-                Global.NapackStorageManager.RemoveUser(user);
-                return this.Response.AsJson(new
-                {
-                    NapacksDeauthenticatedFrom = authorizedPackages,
-                    OrphanedPackages = orphanedPackages,
-                }, HttpStatusCode.Gone);
-            };
+                Global.NapackStorageManager.UpdatePackageMetadata(metadata);
+            }
+
+            Global.NapackStorageManager.RemoveUser(user);
+            return responseFormatter.AsJson(new
+            {
+                NapacksDeauthenticatedFrom = authorizedPackages,
+                OrphanedPackages = orphanedPackages,
+            }, HttpStatusCode.Gone);
         }
     }
 }

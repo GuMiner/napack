@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
@@ -12,23 +11,21 @@ namespace Napack.Server
     public class EmailManager
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private const string MailCredsFile = "../mailCreds.txt";
-
+        
         private static SmtpClient client;
         private static string emailValidationFormatString;
+        private static string packageDeletionFormatString;
 
         public static void Initialize(string host, int port)
         {
             EmailManager.client = new SmtpClient(host, port);
             EmailManager.client.EnableSsl = true;
-            EmailManager.client.Credentials = new NetworkCredential(File.ReadAllLines(EmailManager.MailCredsFile)[0], File.ReadAllLines(EmailManager.MailCredsFile)[1]);
+            EmailManager.client.Credentials = new NetworkCredential(AdminModule.GetAdminUserName(), AdminModule.GetAdminPassword());
             EmailManager.client.SendCompleted += Client_SendCompleted;
             
-            // TODO remove this duplication.
-            using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Napack.Server.Utils.EmailValidation_FS.txt")))
-            {
-                EmailManager.emailValidationFormatString = reader.ReadToEnd();
-            }
+            EmailManager.emailValidationFormatString = Serializer.ReadFromAssembly(Assembly.GetExecutingAssembly(), "Napack.Server.Utils.EmailValidation_FS.txt");
+            EmailManager.packageDeletionFormatString = Serializer.ReadFromAssembly(Assembly.GetExecutingAssembly(), "Napack.Server.Utils.PackageDeletion_FS.txt");
+            
         }
 
         private static void Client_SendCompleted(object sender, AsyncCompletedEventArgs e)
@@ -59,39 +56,53 @@ namespace Napack.Server
         }
 
         /// <summary>
-        /// Attempts to send a verification email for the specified user.
+        /// Sends a package deleted email to the specified user.
+        /// </summary>
+        /// <param name="userId">The ID of the user authorized/affected.</param>
+        /// <param name="packageName">The name of the package being deleted.</param>
+        /// <param name="ifAffectedNotAuthorized">If true, the user was affected indirectly. If false, the user was authorized to ask for the deletion.</param>
+        internal static void SendPackageDeletionEmail(UserIdentifier user, string packageName, bool ifAffectedNotAuthorized)
+        {
+            string subject = "Napack Framework Server Exceptional Circumstances -- Package Deletion";
+            user.EmailSubjectsSent.Add(subject);
+            SendGenericEmail(user.Email, subject, string.Format(EmailManager.packageDeletionFormatString, user.Email, packageName, ifAffectedNotAuthorized ? 
+                "are authorized to update package(s) that have may have broken dependencies after this deletion." :
+                "were authorized to alter the package that has been deleted."));
+        }
+
+        /// <summary>
+        /// Sends a user verification email to the specified user.
         /// </summary>
         /// <param name="user">The user to send the email for.</param>
         internal static void SendVerificationEmail(UserIdentifier user)
         {
             user.EmailVerificationCode = Guid.NewGuid();
-
-            MailAddress from = new MailAddress(Global.SystemConfig.AdministratorEmail, Global.SystemConfig.AdministratorName);
-            MailAddress to = new MailAddress(user.Email);
-
             string subject = "Napack Framework Server User Email Verification";
             user.EmailSubjectsSent.Add(subject);
+            SendGenericEmail(user.Email, subject, string.Format(EmailManager.emailValidationFormatString, user.Email, user.EmailVerificationCode));
+        }
+
+        private static void SendGenericEmail(string userEmail, string subject, string body)
+        {
+            MailAddress from = new MailAddress(Global.SystemConfig.AdministratorEmail, Global.SystemConfig.AdministratorName);
+            MailAddress to = new MailAddress(userEmail);
+            
             MailMessage message = new MailMessage(from, to)
             {
                 Subject = subject,
-                Body = EmailManager.FormVerificationEmail(user.Email, user.EmailVerificationCode),
+                Body = body,
                 IsBodyHtml = false,
             };
 
             try
             {
-                logger.Info($"Sending email to user {user.Email} about {subject}.");
-                client.SendAsync(message, user.Email);
+                logger.Info($"Sending email to user {userEmail} about {subject}.");
+                client.SendAsync(message, userEmail);
             }
             catch (Exception ex)
             {
-                EmailManager.Client_SendCompleted(null, new AsyncCompletedEventArgs(ex, false, user.Email));
+                EmailManager.Client_SendCompleted(null, new AsyncCompletedEventArgs(ex, false, userEmail));
             }
-        }
-
-        private static string FormVerificationEmail(string email, Guid? emailVerificationCode)
-        {
-            return string.Format(EmailManager.emailValidationFormatString, email, emailVerificationCode.ToString());
         }
     }
 }
