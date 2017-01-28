@@ -181,6 +181,7 @@ h4 {
     background-color: #E0FFE0;
 }
 
+/**/
 .errorSubbox {
     background-color: #ff9494;
     padding: 2px 2px 2px 2px;
@@ -212,26 +213,14 @@ a:hover span {
     text-align:right;
 }
 
-/* Articles with side-notes */
-article {
-    text-align: left;
-    float: left;
-    margin: 5px;
-    padding: 4px 8px 4px 8px;
+/* Displays a mostly full-screen search box and adequately spaced search button */
+.searchBox {
+    margin: 5px 0px 5px 0px;
+    width: 90%;
 }
 
-aside {
-    text-align:left;
-    float: right;
-    margin: 5px;
-    padding: 4px 8px 4px 8px;
-    font-weight: 200;
-}
-
-/* Input Boxes*/
-input {
-    float:none;
-    margin: 5px 5px 5px 5px;
+.searchButton {
+    margin: 5px 0px 5px 0px;
 }
 
 select {

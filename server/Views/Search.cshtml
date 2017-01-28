@@ -7,6 +7,7 @@
 
     string loadMoreSearchButton = "loadMoreSearchButton";
     string resultsHolder = "resultsHolder";
+    string resultsHeader = "resultsHeader";
 
     string errorsText = "errorsText";
 
@@ -20,15 +21,14 @@
 <div id="body">
     <div class="titleFlag" style="width: 90px;"></div>
     <h2 class="titleFlagCompensation">@pageName</h2>
-    Query:
-    <input id="@searchTextBox" type="text" value="" />
-    <button id="@searchButton">Search</button>
+    
+    <input class="searchBox" id="@searchTextBox" type="text" value="" />
     <br />
-    <span class="errorSubbox" id="@errorsText"></span>
-    <h2>Results</h2>
-    <ul id="@resultsHolder">
-    </ul>
-    <br />
+    <button id="@searchButton" class="searchButton">Search</button>
+    <span class="errorSubbox" id="@errorsText" hidden></span>
+
+    <h2 id="@resultsHeader" hidden>Results</h2>
+    <ul id="@resultsHolder"></ul>
     <button id="@loadMoreSearchButton" hidden>Load More</button>
 </div>
 
@@ -38,6 +38,14 @@
         var currentSkipAmount = 0;
 
         function loadResults(data) {
+            if (data.results.length === 0) {
+                $("#@errorsText").text("No results found");
+                $("#@resultsHeader").hide();
+                $("#@errorsText").show();
+            } else {
+                $("#@resultsHeader").show();
+            }
+
             var prefix = "<li><div class=\"napack\">";
             var postfix = "</div></li>";
             for (var i = 0; i < data.results.length; i++) {
@@ -64,6 +72,8 @@
         }
 
         function performSearch() {
+            $("#@errorsText").hide();
+
             $.ajax({
                 url: formSearchUri(),
                 type: 'GET',
@@ -72,6 +82,7 @@
                 },
                 error: function (data) {
                     $("#@errorsText").text(data.responseText);
+                    $("#@errorsText").show();
                 }
             });
         }
@@ -90,7 +101,7 @@
                     $("#" + elementName).hide();
                     $("#" + linkName).text("More Details");
                 }
-                
+
             }
             else {
                 $.ajax({
@@ -105,6 +116,7 @@
                     },
                     error: function (data) {
                         $("#@errorsText").text(data.responseText);
+                        $("#@errorsText").show();
                     }
                 });
             }
@@ -115,17 +127,23 @@
         });
 
 
-        $("#@searchButton").click(function () {
+        function handleSearchButtonClick() {
             // Clicking search again clears all existing search results.
             $("#@resultsHolder").empty();
             currentSkipAmount = 0;
 
             performSearch();
+        }
+
+        $("#@searchButton").click(function () {
+            handleSearchButtonClick();
         });
 
-
-        // Run the scripts.
-        $(document).ready(function () {
+        $("#@searchTextBox").keyup(function (e) {
+            var code = e.originalEvent.code;
+            if (code == "Enter") {
+                handleSearchButtonClick();
+            }
         });
     </script>
 }
