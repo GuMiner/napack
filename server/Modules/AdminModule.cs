@@ -69,9 +69,14 @@ namespace Napack.Server
                 int majorVersion = int.Parse(parameters.majorVersion);
                 AdminModule.ValidateAdmin(this.Context);
 
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMajorVersionMetadata majorVersionMetadata = metadata.GetMajorVersion(majorVersion);
+                majorVersionMetadata.Recalled = true;
+                Global.NapackStorageManager.UpdatePackageMetadata(metadata);
+
                 return this.Response.AsJson(new
                 {
-                    VersionsRecalled = 0 // TODO
+                    VersionRecalled = majorVersion
                 });
             };
 

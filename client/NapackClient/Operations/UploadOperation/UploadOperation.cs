@@ -19,8 +19,7 @@ namespace Napack.Client
         [CommandLineArgument(Position = 0, IsRequired = true)]
         [Description("The operation being performed.")]
         public string Operation { get; set; }
-
-        // Todo version arguments, and arguments to determine if this is a create vs update.
+        
         [CommandLineArgument(Position = 1, IsRequired = true)]
         [Description("The JSON file describing the package being uploaded")]
         public string PackageFile { get; set; }
@@ -72,7 +71,7 @@ namespace Napack.Client
 
             string packageName = Path.GetFileNameWithoutExtension(this.PackageFile);
             NapackLocalDescriptor napackDescriptor = Serializer.Deserialize<NapackLocalDescriptor>(File.ReadAllText(this.PackageFile));
-            napackDescriptor.Validate(userId);
+            napackDescriptor.Validate(userId, true);
 
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
@@ -111,10 +110,13 @@ namespace Napack.Client
         {
             NewNapack newNapack = new NewNapack()
             {
-                Description = napackDescriptor.Description,
-                MoreInformation = napackDescriptor.MoreInformation,
-                AuthorizedUserIds = napackDescriptor.AuthorizedUserIds,
-                Tags = napackDescriptor.Tags,
+                metadata = new NewNapackMetadata()
+                {
+                    Description = napackDescriptor.Description,
+                    MoreInformation = napackDescriptor.MoreInformation,
+                    AuthorizedUserIds = napackDescriptor.AuthorizedUserIds,
+                    Tags = napackDescriptor.Tags
+                },
                 NewNapackVersion = this.CreateNapackVersion(napackDescriptor, files)
             };
 

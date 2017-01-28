@@ -183,7 +183,7 @@ namespace Napack.Server
                 AddAuthorConsumption(author, version);
             }
             
-            foreach (string userId in newNapack.AuthorizedUserIds)
+            foreach (string userId in newNapack.metadata.AuthorizedUserIds)
             {
                 AddUserAuthorization(userId, napackName);
             }

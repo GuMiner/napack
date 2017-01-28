@@ -85,7 +85,7 @@ namespace Napack.Server.Modules
                 NewNapack newNapack = SerializerExtensions.Deserialize<NewNapack>(this.Context);
                 newNapack.Validate();
 
-                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, newNapack.AuthorizedUserIds);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, newNapack.metadata.AuthorizedUserIds);
                 NapackSpec generatedApiSpec = NapackAnalyst.CreateNapackSpec(packageName, newNapack.NewNapackVersion.Files);
                 NapackModule.ValidateDependentPackages(Global.NapackStorageManager, newNapack.NewNapackVersion);
 
@@ -96,6 +96,32 @@ namespace Napack.Server.Modules
                 {
                     Message = "Created package " + packageName
                 }, HttpStatusCode.Created);
+            };
+
+            // Updates the definition (metadata) of a Napack package.
+            Put["/{packageName"] = parameters =>
+            {
+                string packageName = parameters.packageName;
+                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+
+                NewNapackMetadata metadata = SerializerExtensions.Deserialize<NewNapackMetadata>(this.Context);
+                UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, metadata.AuthorizedUserIds);
+
+                if (metadata.AuthorizedUserIds.Count == 0)
+                {
+                    throw new InvalidNapackException("At least one authorized user ID must be provided.");
+                }
+
+                package.AuthorizedUserIds = metadata.AuthorizedUserIds;
+                package.Description = metadata.Description;
+                package.MoreInformation = metadata.MoreInformation;
+                package.Tags = metadata.Tags;
+                Global.NapackStorageManager.UpdatePackageMetadata(package);
+
+                return this.Response.AsJson(new
+                {
+                    Message = "Updated package metadata " + packageName
+                });
             };
 
             // Updates an existing Napack package.

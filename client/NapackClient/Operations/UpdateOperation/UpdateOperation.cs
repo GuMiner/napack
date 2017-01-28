@@ -45,7 +45,7 @@ namespace Napack.Client
         public void PerformOperation()
         {
             // The specified napacks.
-            Console.WriteLine("Reading in the Napacks JSON file....");
+            Console.WriteLine("Reading in the Napacks JSON file...");
             Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(this.NapacksFile));
             List<NapackVersionIdentifier> listedNapacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key + "." + item.Value)).ToList();
 

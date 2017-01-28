@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Napack.Common
 {
@@ -13,26 +11,10 @@ namespace Napack.Common
     public class NewNapack
     {
         /// <summary>
-        /// The description of the package.
+        /// Metadata associated with the package, common across all versions.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// The URI containing more information about this package.
-        /// </summary>
-        public Uri MoreInformation { get; set; }
-
-        /// <summary>
-        /// The tags associated with this package.
-        /// </summary>
-        public List<string> Tags { get; set; }
-
-        /// <summary>
-        /// The hashes of users authorized to modify this package.
-        /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public List<string> AuthorizedUserIds { get; set; }
+        public NewNapackMetadata metadata { get; set; }
 
         /// <summary>
         /// The new napack to use to create version 1.0.0 of this package.
@@ -42,7 +24,7 @@ namespace Napack.Common
 
         public void Validate()
         {
-            if (this.AuthorizedUserIds.Count == 0)
+            if (this.metadata.AuthorizedUserIds.Count == 0)
             {
                 throw new InvalidNapackException("At least one authorized user ID must be provided.");
             }

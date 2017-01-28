@@ -35,7 +35,7 @@ namespace Napack.Client
         /// </summary>
         public Dictionary<string, int> Dependencies { get; set; }
         
-        public void Validate(string userId)
+        public void Validate(string userId, bool validateLicense)
         {
             if (string.IsNullOrWhiteSpace(this.Description))
             {

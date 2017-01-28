@@ -68,6 +68,11 @@ namespace Napack.Client.Common
                 napackVersionDefinition.NapackName, napackVersionDefinition.Major, napackVersionDefinition.Minor, napackVersionDefinition.Patch);
         }
 
+        public Task<string> UpdatePackageMetadataAsync(string packageName, NewNapackMetadata metadata, UserSecret userSecret)
+        {
+            return this.PutAsync<string, NewNapackMetadata>("/napacks/" + packageName, metadata, userSecret);
+        }
+
         /// <summary>
         /// Returns true if the specified Napack exists, false otherwise.
         /// </summary>

@@ -56,10 +56,10 @@ namespace Napack.Server
             NapackMetadata napackMetadata = new NapackMetadata()
             {
                 Name = napackName,
-                Description = newNapack.Description,
-                MoreInformation = newNapack.MoreInformation,
-                Tags = newNapack.Tags ?? new List<string>(),
-                AuthorizedUserIds = newNapack.AuthorizedUserIds,
+                Description = newNapack.metadata.Description,
+                MoreInformation = newNapack.metadata.MoreInformation,
+                Tags = newNapack.metadata.Tags ?? new List<string>(),
+                AuthorizedUserIds = newNapack.metadata.AuthorizedUserIds,
                 Versions = new Dictionary<int, NapackMajorVersionMetadata>()
             };
 

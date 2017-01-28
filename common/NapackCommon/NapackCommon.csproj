@@ -64,6 +64,7 @@
     <Compile Include="Exceptions\NapackRecalledException.cs" />
     <Compile Include="NapackFile.cs" />
     <Compile Include="RestClient.cs" />
+    <Compile Include="Uploading\NewNapackMetadata.cs" />
     <Compile Include="Uploading\NewNapackVersion.cs" />
     <Compile Include="Uploading\NewNapack.cs" />
     <Compile Include="NapackVersionIdentifier.cs" />

@@ -471,7 +471,7 @@ namespace Napack.Server
                 AddItem(author.ToUpperInvariant(), version, AuthorPackageTable, "authorName", "packageVersionList", false);
             }
 
-            foreach (string userId in newNapack.AuthorizedUserIds)
+            foreach (string userId in newNapack.metadata.AuthorizedUserIds)
             {
                 AddItem(userId.ToUpperInvariant(), napackName, UserPackageTable, "userId", "packageNameList", true);
             }

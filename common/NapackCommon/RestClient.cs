@@ -38,6 +38,25 @@ namespace Napack.Common
             }
         }
 
+        public async Task<TResponse> PutAsync<TResponse, TBody>(string uriSuffix, TBody body, UserSecret userSecret)
+            where TResponse : class
+        {
+            string serializedContent = typeof(TBody) == typeof(string) ? body as string : Serializer.Serialize(body);
+            using (StringContent content = new StringContent(serializedContent, Encoding.UTF8, RestClient.JsonMediaType))
+            {
+                content.Headers.Add(CommonHeaders.UserId, userSecret.UserId);
+                content.Headers.Add(CommonHeaders.UserKeys, Convert.ToBase64String(Encoding.UTF8.GetBytes(Serializer.Serialize(userSecret.Secrets))));content.Headers.Add(CommonHeaders.UserId, userSecret.UserId);
+                content.Headers.Add(CommonHeaders.UserKeys, Convert.ToBase64String(Encoding.UTF8.GetBytes(Serializer.Serialize(userSecret.Secrets))));
+                using (HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Put, uriSuffix)
+                {
+                    Content = content
+                })
+                {
+                    return await this.SendWithExceptionHandlingAndSerialization<TResponse>(() => client.SendAsync(requestMessage));
+                }
+            }
+        }
+
         public async Task<TResponse> PatchAsync<TResponse, TBody>(string uriSuffix, TBody body, UserSecret userSecret, Dictionary<HttpStatusCode, Exception> exceptionMap = null)
             where TResponse : class
         {

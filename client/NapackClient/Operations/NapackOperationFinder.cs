@@ -9,6 +9,7 @@ namespace Napack.Client
         private static readonly IEnumerable<Type> KnownOperations = new List<Type>
         {
             typeof(UpdateOperation),
+            typeof(UpdateMetadataOperation),
             typeof(UploadOperation),
             typeof(RegisterOperation),
             typeof(VerifyEmailOperation)
