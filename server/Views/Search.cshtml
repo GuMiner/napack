@@ -28,7 +28,7 @@
     <span class="errorSubbox" id="@errorsText" hidden></span>
 
     <h2 id="@resultsHeader" hidden>Results</h2>
-    <ul id="@resultsHolder"></ul>
+    <ul id="@resultsHolder" class="resultsList"></ul>
     <button id="@loadMoreSearchButton" hidden>Load More</button>
 </div>
 
@@ -46,16 +46,17 @@
                 $("#@resultsHeader").show();
             }
 
-            var prefix = "<li><div class=\"napack\">";
+            var prefix = "<li><div class=\"napackResult\">";
             var postfix = "</div></li>";
             for (var i = 0; i < data.results.length; i++) {
                 var moreDetails = "<a id='" + data.results[i].name + "link' href='#' data-napackname='" + data.results[i].name + "' onclick='ToggleTrigger(this)'>More Details</a>" +
-                    "<span class='moreDetails' id='" + data.results[i].name + "details'></span>";
-                var top = "<b>" + data.results[i].name + "</b>. <small>Downloads: " + data.results[i].downloads + ". Relevance: " + data.results[i].relevance + ".</small>";
-                var middle = data.results[i].description + " " + moreDetails;
-                var bottom = "<small> Last Update Time: " + data.results[i].lastUpdateTime + ". License: " + data.results[i].licenseType + ". Views: " + data.results[i].views + ".</small>";
+                    "<span id='" + data.results[i].name + "details'></span>";
 
-                $("#@resultsHolder").append(prefix + top + "<br />" + middle + "<br />" + bottom + postfix);
+                var top = "<div class=\"multiColumnView\"><leftColumn><h3>" + data.results[i].name + "</h3></leftColumn><rightColumn><small class=\"napackResultSmall\">Downloads: " + data.results[i].downloads + " Views: " + data.results[i].views + "</small></rightColumn></div>";
+                var middle = data.results[i].description + " " + moreDetails;
+                var bottom = "<small> Last Update Time: " + data.results[i].lastUpdateTime + ".</small><small class=\"napackResultSmall\">License: " + data.results[i].licenseType + "</small>";
+
+                $("#@resultsHolder").append(prefix + top + middle + "<br />" + bottom + postfix);
             }
 
             // Update the load more button to allow for incremental searches.
@@ -112,7 +113,7 @@
                         var moreInfo = data.moreInformation;
                         var tags = data.tags.join();
                         $("#" + linkName).text("Hide");
-                        $("#" + elementName).html("<br />Major Versions: " + majorVersions + "<br/><small>More information: <a href='" + moreInfo + "'>" + moreInfo + "</a> Tags: " + tags + "</small>");
+                        $("#" + elementName).html("<div class=\"moreNapackDetails\">Major Versions: " + majorVersions + "<br/><small>More information: <a href='" + moreInfo + "'>" + moreInfo + "</small><small class=\"napackResultSmall\"></a> Tags: " + tags + "</small></div>");
                     },
                     error: function (data) {
                         $("#@errorsText").text(data.responseText);

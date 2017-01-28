@@ -112,12 +112,29 @@ h2 {
     text-align: left;
 }
 
+/* Smaller standard page headers. */
+h3 {
+    font-size: 1.2em;
+    font-weight: 300;
+    margin: 0px 2px 2px 2px;
+}
+
 /* Allow for the display of multiple items in a column. */
 .multiColumnView
 {
     display: inline-block;
     text-align: center;
     width: 100%;
+}
+
+leftColumn
+{
+    float: left;
+}
+
+rightColumn
+{
+    float: right;
 }
 
 smallColumn
@@ -153,64 +170,10 @@ largeColumn
     }
 }
 
-h3 {
-    font-size: 1.2em;
-    font-weight: 400;
-}
-h4 {
-    font-size: 1.1em;
-    font-weight: 400;
-    font-style: italic;
-    margin: 2px 8px 2px 8px;
-}
-
-.block-special {
-    display: inline-block;
-    text-align: left;
-    max-width: 100%;
-}
-
-
-.submenu {
-    list-style:none;
-    margin: 0px;
-    padding: 0px 5px 0px 7px;
-}
-
-.subbox {
-    background-color: #E0FFE0;
-}
-
-/**/
+/* A box with red background text to display errors in. */
 .errorSubbox {
     background-color: #ff9494;
     padding: 2px 2px 2px 2px;
-}
-
-.equationSubBox {
-    background-color: #D0FFE0;
-}
-
-.disabled {
-    color: #0E0E0E;
-}
-
-a span {
-    display: none;
-}
-
-a:hover span {
-    display: block;
-    position: absolute;
-    padding: 3px;
-    margin: 2px;
-    z-index: 2;
-    color: #020202;
-    background: white;
-    }
-
-.inline {
-    text-align:right;
 }
 
 /* Displays a mostly full-screen search box and adequately spaced search button */
@@ -223,10 +186,33 @@ a:hover span {
     margin: 5px 0px 5px 0px;
 }
 
-select {
-    width: 220px;
+.resultsList {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
 }
 
-label {
-    margin: 5px 5px 5px 5px;
+.napackResult {
+    background-color: #FFDCA9;
+    color: #553200;
+    margin: 5px 0px 5px 0px;
+}
+
+.napackResultSmall {
+    float: right;
+    margin: 2px 2px 2px 2px;
+}
+
+.moreNapackDetails {
+    background-color: #041E37;
+    color: #FDFEFF;
+    margin: 0px 0px -15px 0px;
+}
+
+.moreNapackDetails a {
+    color: #FFDCA9;
+}
+
+.moreNapackDetails a:hover {
+    color: #FDFEFF;
 }

@@ -9,12 +9,13 @@
 @section Title {@pageName}
 
 <div id="body">
-    <h2>System Status</h2>
+    <div class="titleFlag" style="width: 180px;"></div>
+    <h2 class="titleFlagCompensation">@pageName</h2>
     <h3>Uptime</h3>
-    @Model.Uptime.Days days, @Model.Uptime.Hours hours, @Model.Uptime.Minutes minutes, and @Model.Uptime.Seconds seconds/
+    @Model.Uptime.Days days, @Model.Uptime.Hours hours, @Model.Uptime.Minutes minutes, and @Model.Uptime.Seconds seconds
     <h3>Total Calls Since Last Restart</h3>
-    @Model.TotalCalls total calls.
+    @Model.TotalCalls total calls
     <h3>Unique IPs Since Last Restart</h3>
-    @Model.UniqueIps unique IP addresses.
+    @Model.UniqueIps unique IP addresses
 </div>
     

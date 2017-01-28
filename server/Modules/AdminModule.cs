@@ -32,7 +32,7 @@ namespace Napack.Server
             : base("/admin")
         {
             // Shuts down the Napack Framework Server cleanly.
-            Post["/Debug/Shutdown"] = parameters =>
+            Post["/shutdown"] = parameters =>
             {
                 AdminModule.ValidateAdmin(this.Context);
                 Global.ShutdownEvent.Set();
