@@ -1,6 +1,11 @@
 #ReleaseNotes
 -------------
 
+Features and Bugs
+-----------------
+* [Enhancemnts](https://github.com/GuMiner/napack/issues)
+* [Issues](https://github.com/GuMiner/napack/issues)
+
 Status
 ------
 0.9.0 -- System Validation.
@@ -9,7 +14,7 @@ The Napack Database is subject to arbitrary deletion until the final release ste
 
 Bootstrapping
 -------------
-* Documentation and CSS need a complete overhaul and scrub.
+* Documentation cleaup.
 * Several Napacks around key searching, sorting, vectors, and algorithmic functionality should be created.
 
 Testing
