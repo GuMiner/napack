@@ -53,7 +53,11 @@ namespace Napack.Server
             EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
 
             logger.Info("Database loading...");
-            Global.NapackStorageManager = Global.NapackStorageManager ?? new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName);
+            bool useInMemoryVariant = false;
+            Global.NapackStorageManager = Global.NapackStorageManager ?? 
+                ((args.Length > 1 && bool.TryParse(args[1], out useInMemoryVariant) && useInMemoryVariant) ? 
+                    (INapackStorageManager)new InMemoryNapackStorageManager() :
+                    new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName));
 
             logger.Info("Database backup thread loading...");
             dbBackupTimer = new System.Timers.Timer() 
@@ -76,9 +80,9 @@ namespace Napack.Server
                 return true;
             };
             
-            if (args.Length != 1)
+            if (args.Length < 1)
             {
-                logger.Fatal("Expecting the startup URL as the singleton argument!");
+                logger.Fatal("Expecting at a minimum the startup URL as the first argument!");
             }
             else
             {

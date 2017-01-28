@@ -1,63 +1,52 @@
-﻿/* TODO this entire file needs extensive cleanup and removal of old content. */
-
-/* Special box that looks like a console. */
-.consoleSubBox {
-    background-color: #111111;
-    color: #FFFFFF;
-    font-family:'Segoe UI', Verdana, sans-serif;
+﻿/* Background to all the pages. */
+body {
+    background-color: #C0C0C0;
+    color: #020202;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0px 0px 0px 0px;
 }
 
-.terminalColor {
-    color: #00FFFF;
+/* Background to the main text area. */
+#body {
+    background-color: #FCFCFC;
+    clear: both;
+    padding: 0px 5px 0px 5px;
 }
 
-/* Logo image size and resizing when the screen size decreases.*/
-.logoImage {
-    width: 620px;
-}
-
-@media only screen and (max-width: 670px) {
-    .logoImage {
-        max-width: 100%;
-    }
-}
-
-.aside600px {
-    background-color: #E0FFE0;
-}
-
+/* Everything is centered on small screens. */
 @media only screen and (max-width: 600px) {
-    .aside600px {
-        float: left;
+    #body {
+        text-align: center;
     }
 }
 
-.aside960px {
-}
-
-@media only screen and (max-width: 960px) {
-    .aside960px {
-        float: left;
-    }
-}
-
-.logoMain {
-    float: left;
-    width: 280px;
-}
-
-.menuMain {
+/* Upper menu with major commands */
+/* These links are larger and colored differently. */
+.mainMenu {
     float: right;
 }
 
-@media only screen and (max-width: 800px) {
-    .logoMain {
-        width: 100%;
-    }
-    
-    .menuMain {
-        float: left;
-    }
+ul#mainMenuList {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0px 0px 0px 0px;
+    text-align: center;
+}
+
+ul#mainMenuList li {
+    display: inline;
+    list-style: none;
+    padding: 0px 8px 0px 8px;
+}
+
+ul#mainMenuList li a {
+    color: #3C3C3C;
+    white-space: nowrap;
+}
+
+ul#mainMenuList li a:hover {
+    color: #000000;
+    background-color: #FCFCFC
 }
 
 /* Subheader floats right but not too much when the screen size is very large. */
@@ -77,34 +66,18 @@
     }
 }
 
-/* Background blue, no margin or padding */
-html {
-    background-color: #D0E6EF;
-    margin: 0;
-    padding: 0;
-}
 
-/* Ligher blue body, 10px margin around, 10px padding around. */
-/* Slightly-smaller font, not-quite-black*/
-body {
-    background-color: #D6EEF9;
-    color: #020202;
-    font-size: 0.88em;
-    font-family: "Segoe UI", Sans-Serif;
-    margin: 10px 10px 10px 10px;
-    padding: 10px;
-}
 
 /* Green hyperlinks, no underline, and padding to look like buttons.*/
 a {
     color: #419963;
-    padding: 0px 3px 0px 3px;
+    padding: 0px 2px 0px 2px;
     text-decoration: none;
 }
 
 /* Light green body when links are hovered-over */
 a:hover {
-    background-color: #B2FFD4;
+    color: #B2FFD4;
 }
 
 /* Float left and float right are defined here so we can drop the style for mobile screens. */
@@ -149,13 +122,6 @@ h4 {
     max-width: 100%;
 }
 
-/* Rather simple background color with margin. */
-#body {
-    background-color: #F2FFF2;
-    clear: both;
-    padding: 5px 5px 5px 5px;
-    text-align: center;
-}
 
 .submenu {
     list-style:none;
@@ -227,26 +193,7 @@ footer {
     text-decoration: none;
 }
 
-/* Upper menu with major commands */
-/* These links just plain look different from normal links */
-ul#menu {
-    font-size: 1.3em;
-    font-weight: 600;
-    margin: 0px 0px 0px 0px;
-    text-align: center;
-}
-    ul#menu li {
-        display: inline;
-        list-style: none;
-        padding-left: 5px;
-    }
-        ul#menu li a {
-            background: none;
-            color: #999;
-        }
-        ul#menu li a:hover {
-            color: #020202;
-        }
+
 
 /* Articles with side-notes */
 article {
