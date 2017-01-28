@@ -670,5 +670,61 @@ namespace Napack.Server
 
             backupTimer.Stop();
         }
+
+        public void UpdatePackageVersion(NapackVersionIdentifier packageVersion, NapackVersion updatedVersion)
+        {
+            ExecuteCommand($"UPDATE {PackageStoreTable} SET package = ? WHERE packageVersion = ?", (command) =>
+            {
+                command.Parameters.Add(Serializer.Serialize(updatedVersion));
+                command.Parameters.Add(packageVersion.GetFullName());
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+            });
+        }
+
+        public void RemovePackageVersion(NapackVersionIdentifier packageVersion)
+        {
+            ExecuteCommand($"DELETE FROM {PackageStoreTable} WHERE packageVersion = ?", command =>
+            {
+                command.Parameters.Add(packageVersion.GetFullName());
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+            });
+        }
+
+        public void RemovePackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            ExecuteCommand($"DELETE FROM {PackageSpecsTable} WHERE packageVersion = ?", command =>
+            {
+                command.Parameters.Add(packageVersion.GetFullName());
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+            });
+        }
+
+        public void RemovePackageStatistics(string packageName)
+        {
+            ExecuteCommand($"DELETE FROM {PackageStatsTable} WHERE packageName = ?", command =>
+            {
+                command.Parameters.Add(packageName);
+                command.ExecuteNonQuery();
+                command.Parameters.Clear();
+            });
+        }
+
+        public void RemoveAuthoredPackages(string authorName, string packageName)
+        {
+            ExecuteTransactionCommand((command) =>
+            {
+                List<NapackVersionIdentifier> authoredPackages = this.GetAuthoredPackages(authorName)
+                    .Where(item => !item.NapackName.Equals(packageName))
+                    .ToList();
+
+                command.Parameters.Add(Serializer.Serialize(authoredPackages));
+                command.Parameters.Add(authorName.ToUpperInvariant());
+                command.CommandText = $"UPDATE {AuthorPackageTable} SET packageVersionList = ? WHERE authorName = ?";
+                command.Parameters.Clear();
+            });
+        }
     }
 }

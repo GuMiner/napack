@@ -301,5 +301,36 @@ namespace Napack.Server
         {
             packageMetadataStore[metadata.Name] = metadata;
         }
+
+        public void UpdatePackageVersion(NapackVersionIdentifier packageVersion, NapackVersion updatedVersion)
+        {
+            if (packageStore.ContainsKey(packageVersion.GetFullName()))
+            {
+                packageStore[packageVersion.GetFullName()] = updatedVersion;
+            }
+        }
+
+        public void RemovePackageVersion(NapackVersionIdentifier packageVersion)
+        {
+            packageStore.Remove(packageVersion.GetFullName());
+        }
+
+        public void RemovePackageSpecification(NapackVersionIdentifier packageVersion)
+        {
+            specStore.Remove(packageVersion.GetFullName());
+        }
+
+        public void RemovePackageStatistics(string packageName)
+        {
+            statsStore.Remove(packageName);
+        }
+
+        public void RemoveAuthoredPackages(string authorName, string packageName)
+        {
+            if (authorizedPackages.ContainsKey(authorName))
+            {
+                authorizedPackages[authorName].Remove(packageName);
+            }
+        }
     }
 }

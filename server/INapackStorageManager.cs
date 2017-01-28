@@ -34,9 +34,24 @@ namespace Napack.Server
         NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion);
 
         /// <summary>
+        /// Updates the sepcified package version.
+        /// </summary>
+        void UpdatePackageVersion(NapackVersionIdentifier packageVersion, NapackVersion updatedVersion);
+
+        /// <summary>
+        /// Removes the specified package version.
+        /// </summary>
+        void RemovePackageVersion(NapackVersionIdentifier packageVersion);
+
+        /// <summary>
         /// Gets the Napack-determined publically-facing specification of the specified package version.
         /// </summary>
         NapackSpec GetPackageSpecification(NapackVersionIdentifier packageVersion);
+
+        /// <summary>
+        /// Removes package specification.
+        /// </summary>
+        void RemovePackageSpecification(NapackVersionIdentifier packageVersion);
 
         /// <summary>
         /// Gets all packages consuming the specified major version of a package.
@@ -62,6 +77,11 @@ namespace Napack.Server
         NapackStats GetPackageStatistics(string packageName);
 
         /// <summary>
+        /// Removes a package's statistics.
+        /// </summary>
+        void RemovePackageStatistics(string packageName);
+
+        /// <summary>
         /// Adds a download to the download count for this Napack package
         /// </summary>
         void IncrementPackageDownload(string packageName);
@@ -80,6 +100,11 @@ namespace Napack.Server
         /// Gets all package version for which the given author is listed in the authors list.
         /// </summary>
         IEnumerable<NapackVersionIdentifier> GetAuthoredPackages(string authorName);
+
+        /// <summary>
+        /// Removes an user's authorized package.
+        /// </summary>
+        void RemoveAuthoredPackages(string authorName, string packageName);
 
         /// <summary>
         /// Performs a search through the package name, description, more information, and tags

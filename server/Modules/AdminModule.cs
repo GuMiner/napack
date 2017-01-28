@@ -96,11 +96,11 @@ namespace Napack.Server
 
                 // TODO there's a lot of hardening that can be done here to prevent failures.
                 NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
-                // TODO need a remove napack specs API in the storage manager.
+                Global.NapackStorageManager.RemovePackageStatistics(packageName);
 
                 foreach (string authorizedUser in metadata.AuthorizedUserIds)
                 {
-                    // TODO need a 'Remove authorized package' API on the storage manager.
+                    Global.NapackStorageManager.RemoveAuthoredPackages(authorizedUser, packageName);
                 }
 
                 Dictionary<string, List<NapackVersionIdentifier>> packagesToRemovePerAuthor = new Dictionary<string, List<NapackVersionIdentifier>>();
@@ -122,9 +122,9 @@ namespace Napack.Server
 
                                 packagesToRemovePerAuthor[author].Add(versionIdentifier);
                             }
-                            
-                            // TODO need a 'Remove napack version' API in the storage manager
-                            // TODO need a 'Remove napack spec API in the storage manager.
+
+                            Global.NapackStorageManager.RemovePackageVersion(versionIdentifier);
+                            Global.NapackStorageManager.RemovePackageSpecification(versionIdentifier);
                         }
                     }
                 }
@@ -135,8 +135,12 @@ namespace Napack.Server
                     List<NapackVersionIdentifier> consumingPackages = Global.NapackStorageManager.GetPackageConsumers(majorVersion).ToList();
                     foreach (NapackVersionIdentifier consumingPackage in consumingPackages)
                     {
-                        // TODO need to write an 'update napack version' API on the storage manager.
-                        affectedPackages.Add(consumingPackage.NapackName);
+                        NapackVersion version = Global.NapackStorageManager.GetPackageVersion(consumingPackage);
+                        if (version.Dependencies.Remove(majorVersion))
+                        {
+                            Global.NapackStorageManager.UpdatePackageVersion(consumingPackage, version);
+                            affectedPackages.Add(consumingPackage.NapackName);
+                        }
                     }
                 }
 
