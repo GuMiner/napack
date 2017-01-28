@@ -9,7 +9,11 @@
 @section Title {@pageName -- @Model.Name}
 
 <div id="body">
-    <h1>@pageName -- <i>@Model.Name</i></h1>
+    <div class="titleFlag" style="width: 200px;"></div>
+    <h2 class="titleFlagCompensation">@pageName</h2>
+    <div class="titleFlag" style="width: 210px;"></div>
+    <h2 class="titleFlagCompensationSecondStyle"><i>@Model.Name</i></h2>
+
     @Html.Raw(@Model.Html).
 </div>
 

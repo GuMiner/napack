@@ -112,6 +112,13 @@ h2 {
     text-align: left;
 }
 
+.titleFlagCompensationSecondStyle
+{
+    margin: -80px 4px 2px 2px;
+    color: #FDFEFF;
+    text-align: left;
+}
+
 /* Smaller standard page headers. */
 h3 {
     font-size: 1.2em;
