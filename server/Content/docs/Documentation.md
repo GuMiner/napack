@@ -1,4 +1,3 @@
-#Documentation
 When packages are updated, the Napack framework will automatically scan the publically-facing API of the package code to perform [automatic versioning](./Versioning.md). This operation also generates documentation used to automatically form package documentation.
 
 Operation

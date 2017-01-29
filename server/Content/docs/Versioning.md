@@ -1,8 +1,8 @@
-#Versioning
 Napacks follow a subset of [Semantic Versioning](http://semver.org/) with the basic MAJOR.MINOR.PATCH format.
 When packages are updated, the Napack framework will automatically scan the publically-facing API of the package code, detect API changes, and perform the appropriate version increment.
 
 When the Napack Framewok detects API changes:
+
 * Publically-facing API edits or deletions will increment the MAJOR version.
 * API additions will increment the MINOR version.
 * Napack updates that don't impact the publically-facing API will increment the PATCH version.

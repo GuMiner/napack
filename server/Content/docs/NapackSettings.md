@@ -1,9 +1,7 @@
-# Napack Settings
-
 Changes to the **Napack.settings** file are applied automatically on the next rebuild of your project.
 
 ###Default Settings
-```json
+```
 {
 "napackFrameworkServer":"https://napack.net",
 "allowCommercial":"false",

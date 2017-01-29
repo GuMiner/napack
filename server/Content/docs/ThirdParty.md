@@ -1,6 +1,3 @@
-Third Party Dependencies
-------------------------
-
 The *Napack Framework* depends upon a number of third-party packages.
 
 Packages

@@ -17,7 +17,7 @@ namespace Napack.Client
     internal class UploadOperation : INapackOperation
     {
         [CommandLineArgument(Position = 0, IsRequired = true)]
-        [Description("The operation being performed.")]
+        [Description("Set to 'Upload' to perform this operation.")]
         public string Operation { get; set; }
         
         [CommandLineArgument(Position = 1, IsRequired = true)]
@@ -29,22 +29,18 @@ namespace Napack.Client
         public string NapackSettingsFile { get; set; }
 
         [CommandLineArgument(Position = 3, IsRequired = false)]
-        [Description("Updates the package metadata (description, more information, tags, and authorized users) instead of the package.")]
-        public bool UpdateMetadata { get; set; }
-
-        [CommandLineArgument(Position = 4, IsRequired = false)]
         [Description("Forces any upversioning of this package to at a minimum increment the major version.")]
         public bool ForceMajorUpversioning { get; set; }
 
-        [CommandLineArgument(Position = 5, IsRequired = false)]
+        [CommandLineArgument(Position = 4, IsRequired = false)]
         [Description("Forces any upversioning of this package to at a minimum increment the minor version.")]
         public bool ForceMinorUpversioning { get; set; }
 
-        [CommandLineArgument(Position = 6, IsRequired = false)]
+        [CommandLineArgument(Position = 5, IsRequired = false)]
         [Description("The ID of the user that will create the Napack / is authorized to update the Napack. If not present, the default user will be used.")]
         public string UserId { get; set; }
 
-        [CommandLineArgument(Position = 7, IsRequired = false)]
+        [CommandLineArgument(Position = 6, IsRequired = false)]
         [Description("The semicolon-deliminated keys authorizing the user to update this Napack. If not present, the default keys will be used.")]
         public string AuthorizationKeys { get; set; }
 
@@ -86,17 +82,9 @@ namespace Napack.Client
             files.Remove(Path.GetFileName(this.PackageFile));
 
             bool packageExists = await client.ContainsNapack(packageName).ConfigureAwait(false);
-            if (!packageExists && this.UpdateMetadata)
-            {
-                throw new InvalidOperationException("Cannot create a new package and only perform metadata updates.");
-            }
-            else if (!packageExists)
+            if (!packageExists)
             {
                 await this.CreateNapackPackageAsync(packageName, napackDescriptor, files, userSecret, client).ConfigureAwait(false);
-            }
-            else if (this.UpdateMetadata)
-            {
-                // TODO determine how to perform a metadata update only.
             }
             else
             {

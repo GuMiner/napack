@@ -1,10 +1,6 @@
-# Nano API Creation
--------------------
-
 Recommended Napack Creation Process
 -----------------------------------
-TODO create the recommended process.
-The recommended way to create Napacks is from the Visual Studio Extension.
+Functionality does not yet exist. [Related Issue](https://github.com/GuMiner/napack/issues/1)
 
 Alternative Napack Creation Process
 -----------------------------------
@@ -35,9 +31,9 @@ Alternative Napack Creation Process
 5. The Napack Framework Server will automatically:
  - Verify the license is compatible with the dependent Napacks.
  - Scan the Napack to determine the publically-visible API and generate [documentation](./Documentation.md)
- - Verify the Napack contains no binary files. [Note 1] (#PermittedFiles)
+ - Verify the Napack contains no binary files. [Note 1](#PermittedFiles)
  - Automatically assign a version based on the public API changes.
- - Verify the Napack name is valid [Note 6] (#ValidNames)
+ - Verify the Napack name is valid [Note 6](#ValidNames)
 6. If successful, your Napack will be added to the Napacks on the Napack Framework Server.
 
 ## Notes
@@ -49,6 +45,6 @@ Alternative Napack Creation Process
 
 4 The listing of authors who will be added to the license file. If a custom license is used, this field can be ignored.
 
-5 One of the [Valid License Values](./SupportedLicenses.md),=. A word of warning: packages with copy-left, commercial, or custom licenses require explicit authorization by consumers to be used and are **not recommended.**
+5 One of the [Valid License Values](./SupportedLicenses.md). A word of warning: packages with copy-left, commercial, or custom licenses require explicit authorization by consumers to be used and are **not recommended.**
 
-6 Valid Napack names match the following Regex ```[a-zA-Z0-9\.-]*```, don't start with a number, are within 10 to 100 characters (inclusive), and don't contain any prohibited subphrases. Packages with non-professional names that make it through this filter are subject to removal at administrative discretion.
+<a name="ValidNames">6</a> Valid Napack names match the following Regex ```[a-zA-Z0-9\.-]*```, don't start with a number, are within 10 to 100 characters (inclusive), and don't contain any prohibited subphrases. Packages with non-professional names that make it through this filter are subject to removal at administrative discretion.

@@ -5,7 +5,7 @@ Getting Started
 ---------------
 [Finding Napacks](./Search.md)
 
-[Consume Napacks](./Consumption.md)
+[Downloading Napacks](./Consumption.md)
 
 [Create Napacks](./Creation.md) (Prerequisite: [User Registration](./Registration.md))
 
