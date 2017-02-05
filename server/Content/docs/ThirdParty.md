@@ -11,6 +11,7 @@ Packages
 * [Microsoft Visual Studio SDK](https://www.nuget.org/profiles/VisualStudioExtensibility)
 * [Nancy](https://github.com/NancyFx/Nancy)
 * [NLog](http://nlog-project.org)
+* [Npgsql](http://www.npgsql.org/)
 * [Ookii.CommandLine](http://ookiicommandline.codeplex.com/)
 * [OWIN](https://www.nuget.org/packages/Owin/)
-* [SQLite](https://sqlite.org/)
+* [PostgreSQL](https://www.postgresql.org/)

@@ -57,19 +57,21 @@ namespace Napack.Server
             Global.NapackStorageManager = Global.NapackStorageManager ?? 
                 ((args.Length > 1 && bool.TryParse(args[1], out useInMemoryVariant) && useInMemoryVariant) ? 
                     (INapackStorageManager)new InMemoryNapackStorageManager() :
-                    new SqliteNapackStorageManager(Global.SystemConfig.DatabaseFileName));
+                    new PostgresqlNapackStorageManager());
 
-            logger.Info("Database backup thread loading...");
-            dbBackupTimer = new System.Timers.Timer() 
+            if (Global.NapackStorageManager.PerformsAutomatedBackups)
             {
-                AutoReset = true,
-                Enabled = true,
-                Interval = TimeSpan.FromDays(1).TotalMilliseconds, // Run every day.
-            };
+                logger.Info("Database backup thread loading...");
+                dbBackupTimer = new System.Timers.Timer() 
+                {
+                    AutoReset = true,
+                    Enabled = true,
+                    Interval = TimeSpan.FromDays(1).TotalMilliseconds, // Run every day.
+                };
 
-            dbBackupTimer.Elapsed += Global.NapackStorageManager.RunDbBackup;
-            dbBackupTimer.Start();
-
+                dbBackupTimer.Elapsed += Global.NapackStorageManager.RunDbBackup;
+                dbBackupTimer.Start();
+            }
             logger.Info("System stats management loading...");
             Global.SystemStats = new SystemStats();
 

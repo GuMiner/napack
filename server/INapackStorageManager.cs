@@ -12,6 +12,11 @@ namespace Napack.Server
     public interface INapackStorageManager
     {
         /// <summary>
+        /// If true, performs automated backups. False otherwise.
+        /// </summary>
+        bool PerformsAutomatedBackups { get; }
+
+        /// <summary>
         /// Backups up whatever is storing the database.
         /// </summary>
         /// <param name="sender">Unused</param>

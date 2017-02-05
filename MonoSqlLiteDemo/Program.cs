@@ -79,8 +79,11 @@ namespace MonoSqlLiteDemo
                 Console.WriteLine("Insert One");
                 using (IDbCommand dbcmd = dbcon.CreateCommand())
                 {
-                    dbcmd.CommandText = "INSERT INTO test VALUES (\"A\", \"B\")";
+                    dbcmd.Parameters.Add("One");
+                    dbcmd.Parameters.Add("Two");
+                    dbcmd.CommandText = "INSERT INTO test VALUES (?, ?)";
                     dbcmd.ExecuteNonQuery();
+                    dbcmd.Parameters.Clear();
                 }
 
                 Console.WriteLine("Insert Two");

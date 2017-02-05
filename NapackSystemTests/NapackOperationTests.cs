@@ -63,7 +63,6 @@ namespace NapackSystemTests
                 Operation = "Upload",
                 ForceMajorUpversioning = false,
                 ForceMinorUpversioning = false,
-                UpdateMetadata = false,
                 PackageFile = NapackOperationTests.PackageJsonFileLocation,
                 NapackSettingsFile = NapackOperationTests.SettingsFileLocation
             };
@@ -79,7 +78,6 @@ namespace NapackSystemTests
                 Operation = "Upload",
                 ForceMajorUpversioning = false,
                 ForceMinorUpversioning = false,
-                UpdateMetadata = false,
                 PackageFile = NapackOperationTests.PackageJsonFileLocation,
                 NapackSettingsFile = NapackOperationTests.SettingsFileLocation + NapackOperationTests.ModifierSuffix
             };

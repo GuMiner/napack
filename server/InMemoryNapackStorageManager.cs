@@ -81,6 +81,8 @@ namespace Napack.Server
             return packageMetadataStore.ContainsKey(packageName);
         }
 
+        public bool PerformsAutomatedBackups => false;
+
         public void RunDbBackup(object sender, ElapsedEventArgs e)
         {
             // No use implementing this

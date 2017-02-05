@@ -100,6 +100,19 @@ newaliases
 postfix reload
 service dovecot restart
 
+==PostgreSQL==
+apt-get install postgresql
+Download the admin tooling
+setup server for remote access:
+sudo -u postgres psql
+alter user postgres password 'PASSWORD';
+create user USER createdb createuser password 'PASSWORD';
+\q to exit
+Edit /etc/postgresql/(version)/main/postgresql.conf, enable listen_address to '*' for all.
+Modify pg_hba.conf to allow my current IP to connect to the server (host all all IP/1 md5)
+sudo service postgresql restart
+
+
 ==Building SQLite==
 Download and transfer:
   https://system.data.sqlite.org/downloads/1.0.104.0/sqlite-netFx-full-source-1.0.104.0.zip
