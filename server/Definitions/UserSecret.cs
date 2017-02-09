@@ -5,6 +5,8 @@ namespace Napack.Server
 {
     public class UserSecret
     {
+        public const int SecretCount = 3;
+
         public UserSecret()
         {
             this.Secrets = new List<Guid>();
@@ -17,10 +19,8 @@ namespace Napack.Server
 
         public static UserSecret CreateNewSecret()
         {
-            const int secretCount = 3;
-
             UserSecret secret = new UserSecret();
-            for (int i = 0; i < secretCount; i++)
+            for (int i = 0; i < UserSecret.SecretCount; i++)
             {
                 secret.Secrets.Add(Guid.NewGuid());
             }
