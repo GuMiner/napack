@@ -21,7 +21,7 @@ namespace Napack.Server
             {
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
 
-                EmailManager.ValidateUserEmail(user.Email);
+                Global.EmailManager.ValidateUserEmail(user.Email);
                 UserSecret secret = AssignSecretsAndSendVerificationEmail(user);
                 Global.NapackStorageManager.AddUser(user);
 
@@ -37,7 +37,7 @@ namespace Napack.Server
             Patch["/"] = parameters =>
             {
                 UserIdentifier user = SerializerExtensions.Deserialize<UserIdentifier>(this.Context);
-                EmailManager.ValidateUserEmail(user.Email);
+                Global.EmailManager.ValidateUserEmail(user.Email);
 
                 UserIdentifier serverSideUser = Global.NapackStorageManager.GetUser(user.Email);
                 if (!serverSideUser.EmailConfirmed && user.EmailVerificationCode == serverSideUser.EmailVerificationCode)
@@ -67,7 +67,7 @@ namespace Napack.Server
             UserSecret secret = UserSecret.CreateNewSecret();
             user.Reset(UserIdentifier.ComputeUserHash(secret.Secrets));
 
-            EmailManager.SendVerificationEmail(user);
+            Global.EmailManager.SendVerificationEmail(user);
             return secret;
         }
 

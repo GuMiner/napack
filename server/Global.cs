@@ -9,6 +9,7 @@ using System.Threading;
 using Microsoft.Owin.Hosting;
 using Napack.Analyst;
 using Napack.Common;
+using Napack.Server.Utils;
 using NLog;
 
 namespace Napack.Server
@@ -26,6 +27,8 @@ namespace Napack.Server
         public static SystemConfig SystemConfig { get; set; } = null;
 
         public static INapackStorageManager NapackStorageManager { get; set; } = null;
+
+        public static EmailManager EmailManager { get; set; } = null;
 
         public static SystemStats SystemStats { get; private set; }
 
@@ -50,7 +53,7 @@ namespace Napack.Server
             Global.SystemConfig = Global.SystemConfig ?? Serializer.Deserialize<SystemConfig>(File.ReadAllText(ConfigurationManager.AppSettings["SystemConfigFilename"]));
 
             logger.Info("Email management loading...");
-            EmailManager.Initialize(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort);
+            Global.EmailManager = Global.EmailManager ?? new EmailManager(new SmtpEmailSender(Global.SystemConfig.EmailHost, Global.SystemConfig.EmailPort));
 
             logger.Info("Database loading...");
             bool useInMemoryVariant = false;

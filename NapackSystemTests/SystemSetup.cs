@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Napack.Client.Common;
 using Napack.Common;
 using Napack.Server;
+using Napack.Server.Utils;
 
 namespace NapackSystemTests
 {
@@ -19,12 +20,13 @@ namespace NapackSystemTests
         private static Task napackServerTask;
 
         public static RestClient RestClient;
+        public static InMemoryEmailSender EmailSender;
         public static Napack.Common.UserSecret AuthorizedUser;
 
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext testContent)
         {
-            // Setup server
+            // Setup server with defaults that prevent us from accessing external resources.
             napackServerTask = Task.Factory.StartNew(() =>
             {
                 Global.SystemConfig = new SystemConfig()
@@ -38,9 +40,12 @@ namespace NapackSystemTests
                     RequireEmailValidation = false
                 };
 
-                Global.NapackStorageManager = new InMemoryNapackStorageManager();
+                Global.EmailManager = new EmailManager(new InMemoryEmailSender());
 
-                Global.Main(new[] { SystemSetup.LocalServer });
+                AdminModule.DefaultAdminUserName = "root";
+                AdminModule.DefaultAdminPassword = "password";
+
+                Global.Main(new[] { SystemSetup.LocalServer, "true" });
             }, TaskCreationOptions.LongRunning);
 
             // Setup the REST client for that server.

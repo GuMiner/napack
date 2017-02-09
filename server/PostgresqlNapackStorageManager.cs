@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Timers;
 using Microsoft.Extensions.Logging;
-using Napack.Analyst;
-using Napack.Analyst.ApiSpec;
-using Napack.Common;
 using NLog;
 using Npgsql;
 using Npgsql.Logging;

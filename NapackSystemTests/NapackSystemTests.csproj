@@ -70,6 +70,7 @@
     <Content Include="Content\Napack\PointInSphere.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="InMemoryEmailSender.cs" />
     <Compile Include="ServerValidationTests.cs" />
     <Compile Include="SystemSetup.cs" />
     <Compile Include="NapackOperationTests.cs" />

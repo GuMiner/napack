@@ -5,6 +5,7 @@ using System.Linq;
 using Nancy;
 using Napack.Common;
 using Napack.Server.Utils;
+using NLog;
 
 namespace Napack.Server
 {
@@ -13,6 +14,8 @@ namespace Napack.Server
     /// </summary>
     public class AdminModule : NancyModule
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public const string AdminCredsFile = "../mailCreds.txt";
 
         public static void ValidateAdmin(NancyContext context)
@@ -24,9 +27,9 @@ namespace Napack.Server
             }
         }
 
-        public static string GetAdminUserName() => File.ReadAllLines(AdminModule.AdminCredsFile)[0];
+        public static string GetAdminUserName() => DefaultAdminUserName ?? File.ReadAllLines(AdminModule.AdminCredsFile)[0];
 
-        public static string GetAdminPassword() => File.ReadAllLines(AdminModule.AdminCredsFile)[1];
+        public static string GetAdminPassword() => DefaultAdminPassword ?? File.ReadAllLines(AdminModule.AdminCredsFile)[1];
 
         public AdminModule()
             : base("/admin")
@@ -163,14 +166,14 @@ namespace Napack.Server
                 foreach (string authorizedUserId in metadata.AuthorizedUserIds)
                 {
                     UserIdentifier user = Global.NapackStorageManager.GetUser(authorizedUserId);
-                    EmailManager.SendPackageDeletionEmail(user, packageName, false);
+                    Global.EmailManager.SendPackageDeletionEmail(user, packageName, false);
                     Global.NapackStorageManager.UpdateUser(user);
                 }
 
                 foreach (string authorizedUserId in affectedUsers)
                 {
                     UserIdentifier user = Global.NapackStorageManager.GetUser(authorizedUserId);
-                    EmailManager.SendPackageDeletionEmail(user, packageName, true);
+                    Global.EmailManager.SendPackageDeletionEmail(user, packageName, true);
                     Global.NapackStorageManager.UpdateUser(user);
                 }
                 
@@ -182,5 +185,15 @@ namespace Napack.Server
                 }, HttpStatusCode.Gone);
             };
         }
+        
+        /// <summary>
+        /// Provided for functional testing
+        /// </summary>
+        public static string DefaultAdminUserName { get; set; } = null;
+
+        /// <summary>
+        /// Provided for functional testing
+        /// </summary>
+        public static string DefaultAdminPassword { get; set; } = null;
     }
 }

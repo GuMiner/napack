@@ -275,6 +275,8 @@
     <Compile Include="Modules\NapackModule.cs" />
     <Compile Include="InMemoryNapackStorageManager.cs" />
     <Compile Include="PostgresqlNapackStorageManager.cs" />
+    <Compile Include="Utils\IEmailSender.cs" />
+    <Compile Include="Utils\SmtpEmailSender.cs" />
     <Compile Include="SqliteNapackStorageManager.cs" />
     <Compile Include="SqlNapackStorageManager.cs" />
     <Compile Include="Utils\LambdaComparer.cs" />
