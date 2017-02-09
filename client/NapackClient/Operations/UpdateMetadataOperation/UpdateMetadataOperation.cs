@@ -36,7 +36,7 @@ namespace Napack.Client
 
         public void PerformOperation()
         {
-            Console.WriteLine("Reading in the Napack settings file...");
+            NapackClient.Log("Reading in the Napack settings file...");
             NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettingsFile));
 
             string userId = this.UserId;
@@ -69,7 +69,7 @@ namespace Napack.Client
                 };
 
                 string response = client.UpdatePackageMetadataAsync(packageName, metadata, userSecret).GetAwaiter().GetResult();
-                Console.WriteLine($"Package metadata update result: {response}");
+                NapackClient.Log($"Package metadata update result: {response}");
             }
         }
     }

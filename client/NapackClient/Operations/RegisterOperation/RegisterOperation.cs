@@ -38,10 +38,10 @@ namespace Napack.Client
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
                 UserSecret secret = client.RegisterUserAsync(this.UserEmail).GetAwaiter().GetResult();
-                Console.WriteLine($"User {secret.UserId} successfully registered. Secrets (order&case sensitive):");
+                NapackClient.Log($"User {secret.UserId} successfully registered. Secrets (order&case sensitive):");
                 foreach (Guid individualSecret in secret.Secrets)
                 {
-                    Console.WriteLine($"  {individualSecret}");
+                    NapackClient.Log($"  {individualSecret}");
                 }
 
                 if (this.SaveAsDefault)

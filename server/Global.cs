@@ -75,6 +75,7 @@ namespace Napack.Server
                 dbBackupTimer.Elapsed += Global.NapackStorageManager.RunDbBackup;
                 dbBackupTimer.Start();
             }
+
             logger.Info("System stats management loading...");
             Global.SystemStats = new SystemStats();
 
@@ -105,7 +106,7 @@ namespace Napack.Server
                     logger.Info("Napack Server Shutting down...");
 
                     logger.Info("Databsae backup timer stopped.");
-                    dbBackupTimer.Stop();
+                    dbBackupTimer?.Stop();
 
                     logger.Info("Napack Server Shutdown.");
                 }

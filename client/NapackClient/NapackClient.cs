@@ -9,6 +9,11 @@ namespace Napack.Client
         public const int ERROR = 1;
         public const int SUCCESS = 0;
 
+        /// <summary>
+        /// Support custom logging operations for tests and other scenarios where we want the output programmatically
+        /// </summary>
+        public static Action<string> Log { get; set; } = (line) => Console.WriteLine(line);
+
         public static string GetDefaultCredentialFilePath()
         {
             string path = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
@@ -34,7 +39,7 @@ namespace Napack.Client
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                NapackClient.Log(ex.Message);
                 return ERROR;
             }
 

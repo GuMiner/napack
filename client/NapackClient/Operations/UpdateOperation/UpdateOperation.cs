@@ -45,7 +45,7 @@ namespace Napack.Client
         public void PerformOperation()
         {
             // The specified napacks.
-            Console.WriteLine("Reading in the Napacks JSON file...");
+            NapackClient.Log("Reading in the Napacks JSON file...");
             Dictionary<string, string> rawNapacks = Serializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(this.NapacksFile));
             List<NapackVersionIdentifier> listedNapacks = rawNapacks.Select(item => new NapackVersionIdentifier(item.Key + "." + item.Value)).ToList();
 
@@ -57,10 +57,10 @@ namespace Napack.Client
             }
             catch (Exception)
             {
-                Console.WriteLine("Didn't find the napack lock file; packages may be redownloaded.");
+                NapackClient.Log("Didn't find the napack lock file; packages may be redownloaded.");
             }
 
-            Console.WriteLine("Reading in the Napack Settings JSON file...");
+            NapackClient.Log("Reading in the Napack Settings JSON file...");
             NapackClientSettings settings = Serializer.Deserialize<NapackClientSettings>(File.ReadAllText(this.NapackSettingsFile));
 
             // Now that we've read in everything, start processing.
@@ -119,8 +119,8 @@ namespace Napack.Client
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Directory is not a Napack; removing " + napackDirectoryName);
-                    Console.WriteLine(ex.Message);
+                    NapackClient.Log("Directory is not a Napack; removing " + napackDirectoryName);
+                    NapackClient.Log(ex.Message);
                     Directory.Delete(directory, true);
                     ++unknownFolders;
                 }
@@ -129,7 +129,7 @@ namespace Napack.Client
                     !knownNapacks[napackVersion.NapackName].Any(version => version.Major == napackVersion.Major))
                 {
                     // This is an unknown napack or major version. Delete.
-                    Console.WriteLine("Napack is not used, deleting: " + napackDirectoryName);
+                    NapackClient.Log("Napack is not used, deleting: " + napackDirectoryName);
                     Directory.Delete(directory, true);
                     ++unusedNapacks;
                 }
@@ -154,7 +154,7 @@ namespace Napack.Client
                 }
             }
 
-            Console.WriteLine($"Deleted {unknownFolders} unknown folders and {unusedNapacks} unused napacks.");
+            NapackClient.Log($"Deleted {unknownFolders} unknown folders and {unusedNapacks} unused napacks.");
             return redactedKnownNapacks;
         }
 
@@ -172,7 +172,7 @@ namespace Napack.Client
                 }
             }
 
-            Console.WriteLine($"Found {newNapacks.Count} new napacks to download.");
+            NapackClient.Log($"Found {newNapacks.Count} new napacks to download.");
 
             
             // Ah, for the want of a multiple return...
@@ -180,7 +180,7 @@ namespace Napack.Client
             List<NapackMajorVersion> dependencies = TabulateNewDependencies(knownNapacks, newDownloadedNapacks);
 
             int level = 0;
-            Console.WriteLine("Processed dependency level " + level + " with " + dependencies.Count + " new dependencies found.");
+            NapackClient.Log("Processed dependency level " + level + " with " + dependencies.Count + " new dependencies found.");
 
             while (dependencies.Any())
             {
@@ -188,7 +188,7 @@ namespace Napack.Client
                 dependencies = TabulateNewDependencies(knownNapacks, newDownloadedNapacks);
 
                 ++level;
-                Console.WriteLine("Processed dependency level " + level);
+                NapackClient.Log("Processed dependency level " + level);
             }
         }
 
@@ -262,7 +262,7 @@ namespace Napack.Client
 
             Task.WhenAll(napackDownloadTasks).GetAwaiter().GetResult();
 
-            Console.WriteLine("Downloaded " + newNapacks.Count + " in " + timer.ElapsedMilliseconds + " ms.");
+            NapackClient.Log("Downloaded " + newNapacks.Count + " in " + timer.ElapsedMilliseconds + " ms.");
             return napackDownloadTasks.Select(task => task.Result).ToList();
         }
 
@@ -285,7 +285,7 @@ namespace Napack.Client
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Error saving napack file: " + ex.Message);
+                NapackClient.Log("Error saving napack file: " + ex.Message);
                 throw;
             }
         }

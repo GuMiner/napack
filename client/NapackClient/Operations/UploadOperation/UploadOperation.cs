@@ -90,7 +90,7 @@ namespace Napack.Client
             {
                 // This is a new version creation operation.
                 VersionDescriptor version = await client.UpdatePackageAsync(packageName, this.CreateNapackVersion(napackDescriptor, files), userSecret).ConfigureAwait(false);
-                Console.WriteLine($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
+                NapackClient.Log($"Updated the {packageName} package to version {version.Major}.{version.Minor}.{version.Patch}");
             }
         }
 
@@ -109,7 +109,7 @@ namespace Napack.Client
             };
 
             string response = await client.CreatePackageAsync(packageName, newNapack, secret).ConfigureAwait(false);
-            Console.WriteLine($"Package creation result: {response}");
+            NapackClient.Log($"Package creation result: {response}");
         }
 
         private NewNapackVersion CreateNapackVersion(NapackLocalDescriptor napackDescriptor, Dictionary<string, NapackFile> files)

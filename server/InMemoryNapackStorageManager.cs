@@ -113,6 +113,11 @@ namespace Napack.Server
 
         public UserIdentifier GetUser(string userId)
         {
+            if (!users.ContainsKey(userId))
+            {
+                throw new UserNotFoundException(userId);
+            }
+
             return users[userId];
         }
         

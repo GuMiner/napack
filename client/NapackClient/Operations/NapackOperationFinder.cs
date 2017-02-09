@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Ookii.CommandLine;
 
 namespace Napack.Client
@@ -38,13 +40,25 @@ namespace Napack.Client
         public static void WriteGeneralUsageToConsole()
         {
             const string separator = "******";
-            Console.WriteLine("Operations: ");
+            NapackClient.Log("Operations: ");
             foreach (Type operationType in NapackOperationFinder.KnownOperations)
             {
-                Console.WriteLine(separator + operationType.Name + separator);
+                NapackClient.Log(separator + operationType.Name + separator);
                 CommandLineParser parser = new CommandLineParser(operationType);
-                parser.WriteUsageToConsole();
-                Console.WriteLine(separator + new string('*', operationType.Name.Length) + separator);
+
+                StringBuilder builder = new StringBuilder();
+                using (TextWriter writer = new StringWriter(builder))
+                {
+                    parser.WriteUsage(writer, 0);
+                }
+
+                string[] lines = builder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
+                {
+                    NapackClient.Log(line);
+                }
+
+                NapackClient.Log(separator + new string('*', operationType.Name.Length) + separator);
             }
         }
     }

@@ -38,8 +38,8 @@ namespace Napack.Client
             using (NapackServerClient client = new NapackServerClient(settings.NapackFrameworkServer))
             {
                 string response = client.VerifyUserAsync(this.UserEmail, this.VerificationCode).GetAwaiter().GetResult();
-                Console.WriteLine("Verification status:");
-                Console.WriteLine(response);
+                NapackClient.Log("Verification status:");
+                NapackClient.Log(response);
             }
         }
     }
