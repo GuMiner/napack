@@ -31,7 +31,7 @@ namespace Napack.Server
 
                 if (version == null)
                 {
-                    NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                    NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName, false);
                     return View["NapackVersions", new VersionsModel(metadata)];
                 }
                 else

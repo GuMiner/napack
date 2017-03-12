@@ -115,7 +115,7 @@ namespace Napack.Server
             where T: class
         {
             currentCommand.Parameters.Add(key);
-            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = ?";
+            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = $1";
             T item = null;
             using (IDataReader reader = currentCommand.ExecuteReader())
             {
@@ -133,7 +133,7 @@ namespace Napack.Server
             where T : class
         {
             currentCommand.Parameters.Add(key);
-            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = ?";
+            currentCommand.CommandText = $"SELECT {valueName} FROM {table} WHERE {keyName} = $1";
             T item = null;
             using (IDataReader reader = currentCommand.ExecuteReader())
             {
@@ -161,7 +161,7 @@ namespace Napack.Server
                     string itemsEncoded = Serializer.Serialize(new List<T>() { item });
                     command.Parameters.Add(key);
                     command.Parameters.Add(itemsEncoded);
-                    command.CommandText = $"INSERT INTO {table} VALUES (?, ?)";
+                    command.CommandText = $"INSERT INTO {table} VALUES ($1, $2)";
                     command.ExecuteNonQuery();
                     command.Parameters.Clear();
                 }
@@ -173,7 +173,7 @@ namespace Napack.Server
                     string itemsEncoded = Serializer.Serialize(items);
                     command.Parameters.Add(itemsEncoded);
                     command.Parameters.Add(key);
-                    command.CommandText = $"UPDATE {table} SET {valueName} = ? WHERE {keyName} = ?";
+                    command.CommandText = $"UPDATE {table} SET {valueName} = $1 WHERE {keyName} = $2";
                     command.ExecuteNonQuery();
                     command.Parameters.Clear();
                 }
@@ -250,7 +250,7 @@ namespace Napack.Server
             string userEmail = user.Email.ToUpperInvariant();
             string userJson = Serializer.Serialize(user);
 
-            ExecuteCommand($"INSERT INTO {UsersTable} VALUES (?, ?)", command =>
+            ExecuteCommand($"INSERT INTO {UsersTable} VALUES ($1, $2)", command =>
             {
                 try
                 {
@@ -277,7 +277,7 @@ namespace Napack.Server
         {
             string userEmail = user.Email.ToUpperInvariant();
             string userJson = Serializer.Serialize(user);
-            ExecuteCommand($"UPDATE {UsersTable} SET userData = ? WHERE email = ?", command =>
+            ExecuteCommand($"UPDATE {UsersTable} SET userData = $1 WHERE email = $2", command =>
             {
                 command.Parameters.Add(userJson);
                 command.Parameters.Add(userEmail);
@@ -295,7 +295,7 @@ namespace Napack.Server
         public void RemoveUser(UserIdentifier user)
         {
             string userEmail = user.Email.ToUpperInvariant();
-            ExecuteCommand($"DELETE FROM {UsersTable} WHERE email = ?", command =>
+            ExecuteCommand($"DELETE FROM {UsersTable} WHERE email = $1", command =>
             {
                 command.Parameters.Add(userEmail);
                 int rowsAffected = command.ExecuteNonQuery();
@@ -311,7 +311,7 @@ namespace Napack.Server
 
         public bool ContainsNapack(string packageName)
         {
-            return ExecuteCommand($"SELECT packageName FROM {PackageMetadataTable} WHERE packageName = ?", command =>
+            return ExecuteCommand($"SELECT packageName FROM {PackageMetadataTable} WHERE packageName = $1", command =>
             {
                 bool hasNapack = false;
                 command.Parameters.Add(packageName);
@@ -416,17 +416,50 @@ namespace Napack.Server
                 string packageStatsEncoded = Serializer.Serialize(stats);
                 command.Parameters.Add(packageStatsEncoded);
                 command.Parameters.Add(packageName);
-                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = ? WHERE packageName = ?";
+                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = $1 WHERE packageName = $2";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             });
 
         }
 
-        public NapackMetadata GetPackageMetadata(string packageName)
+        public NapackMetadata GetPackageMetadata(string packageName, bool lockPackage)
         {
-            return ExecuteCommand((command) => GetItem<NapackMetadata>(command, PackageMetadataTable, "packageName", packageName, "metadata",
-                () => { throw new NapackNotFoundException(packageName); }));
+            // Before we do any updates, we need to verify someone else isn't concurrently updating the same Napack.
+            // If someone else is, we will exit with a concurrency exception instead of performing all our calculations again.
+            NapackMetadata package = null;
+            ExecuteTransactionCommand((command) =>
+            {
+                package = this.GetItem<NapackMetadata>(command, PackageMetadataTable, "packageName", packageName, "metadata",
+                    () => { throw new NapackNotFoundException(packageName); });
+
+                if (lockPackage)
+                {
+                    if (package.ConcurrentLock + TimeSpan.FromMinutes(10) > DateTime.UtcNow)
+                    {
+                        // Honestly, this is pretty hacky. Someone could *theoretically* make the code from here on down take > 10 minutes, causing a concurrency problem.
+                        // Ideally, this entire workflow needs another redesign to fail faster -- or I need to implement an ETag-style concurrency mechanism with my data.
+                        throw new ConcurrentOperationException();
+                    }
+
+                    // Take a transient lock
+                    package.ConcurrentLock = DateTime.UtcNow;
+                    string metadataEncoded = Serializer.Serialize(package);
+
+                    command.CommandText = $"UPDATE {PackageMetadataTable} SET metadata = $1, descriptionAndTags = $2 WHERE packageName = $3";
+                    command.Parameters.Add(metadataEncoded);
+                    command.Parameters.Add(GetSafeDescriptionAndTags(package));
+                    command.Parameters.Add(package.Name);
+                    int rowsUpdated = command.ExecuteNonQuery();
+                    command.Parameters.Clear();
+                    if (rowsUpdated == 0)
+                    {
+                        throw new NapackNotFoundException(package.Name);
+                    }
+                }
+            });
+
+            return package;
         }
 
         public NapackVersion GetPackageVersion(NapackVersionIdentifier packageVersion)
@@ -465,7 +498,7 @@ namespace Napack.Server
                 string statsEncoded = Serializer.Serialize(stats);
                 command.Parameters.Add(napackName);
                 command.Parameters.Add(statsEncoded);
-                command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES (?, ?)";
+                command.CommandText = $"INSERT INTO {PackageStatsTable} VALUES ($1, $2)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
@@ -474,21 +507,21 @@ namespace Napack.Server
                 command.Parameters.Add(napackName);
                 command.Parameters.Add(safeDescriptionAndTags);
                 command.Parameters.Add(metadataEncoded);
-                command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES (?, ?, ?)";
+                command.CommandText = $"INSERT INTO {PackageMetadataTable} VALUES ($1, $2, $3)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
                 string napackSpecEncoded = Serializer.Serialize(napackSpec);
                 command.Parameters.Add(version.GetFullName());
                 command.Parameters.Add(napackSpecEncoded);
-                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES (?, ?)";
+                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES ($1, $2)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
                 string packageVersionEncoded = Serializer.Serialize(packageVersion);
                 command.Parameters.Add(version.GetFullName());
                 command.Parameters.Add(packageVersionEncoded);
-                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES (?, ?)";
+                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES ($1, $2)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             });
@@ -498,7 +531,7 @@ namespace Napack.Server
         {
             NapackVersionIdentifier nextVersion = new NapackVersionIdentifier(currentVersion.NapackName, currentVersion.Major, currentVersion.Minor, currentVersion.Patch);
             NapackVersion packageVersion = NapackVersion.CreateFromNewNapack(newNapackVersion);
-
+            
             foreach (string author in newNapackVersion.Authors)
             {
                 AddItem(author.ToUpperInvariant(), nextVersion, AuthorPackageTable, "authorName", "packageVersionList", false);
@@ -513,24 +546,25 @@ namespace Napack.Server
                 AddItem(consumedPackage.ToString(), nextVersion, PackageConsumersTable, "packageMajorVersionId", "consumingPackages", false);
             }
 
-            UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
-
             ExecuteTransactionCommand((command) =>
             {
                 string napackSpecEncoded = Serializer.Serialize(newVersionSpec);
                 command.Parameters.Add(nextVersion.GetFullName());
                 command.Parameters.Add(napackSpecEncoded);
-                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES (?, ?)";
+                command.CommandText = $"INSERT INTO {PackageSpecsTable} VALUES ($1, $2)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
 
                 string packageVersionEncoded = Serializer.Serialize(packageVersion);
                 command.Parameters.Add(nextVersion.GetFullName());
                 command.Parameters.Add(packageVersionEncoded);
-                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES (?, ?)";
+                command.CommandText = $"INSERT INTO {PackageStoreTable} VALUES ($1, $2)";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             });
+
+            // Our lock is cleared at last here.
+            UpdatePackageMetadataStore(package, nextVersion, upversionType, newNapackVersion);
         }
 
         private void UpdatePackageMetadataStore(NapackMetadata package, NapackVersionIdentifier nextVersion, NapackAnalyst.UpversionType upversionType, NewNapackVersion newNapackVersion)
@@ -567,37 +601,36 @@ namespace Napack.Server
                 string statsEncoded = Serializer.Serialize(stats);
                 command.Parameters.Add(statsEncoded);
                 command.Parameters.Add(package.Name);
-                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = ? WHERE packageName = ?";
+                command.CommandText = $"UPDATE {PackageStatsTable} SET packageStat = $1 WHERE packageName = $2";
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
             });
 
-            // TODO unfortunately we really should be getting the metadata and updating it here to avoid multi-user bugs.
-            // I'm putting that down as a future redesign as we'll only hit this with unlucky concurrent updates to the same package.
             UpdatePackageMetadata(package);
         }
 
-        public void UpdatePackageMetadata(NapackMetadata metadata)
+        public void UpdatePackageMetadata(NapackMetadata package)
         {
-            string metadataEncoded = Serializer.Serialize(metadata);
-
-            ExecuteCommand($"UPDATE {PackageMetadataTable} SET metadata = ?, descriptionAndTags = ? WHERE packageName = ?", command =>
+            // Updating a package *always* clears the lock.
+            package.ConcurrentLock = DateTime.MinValue;
+            string metadataEncoded = Serializer.Serialize(package);
+            ExecuteCommand($"UPDATE {PackageMetadataTable} SET metadata = $1, descriptionAndTags = $2 WHERE packageName = $3", command =>
             {
                 command.Parameters.Add(metadataEncoded);
-                command.Parameters.Add(GetSafeDescriptionAndTags(metadata));
-                command.Parameters.Add(metadata.Name);
+                command.Parameters.Add(GetSafeDescriptionAndTags(package));
+                command.Parameters.Add(package.Name);
                 int rowsUpdated = command.ExecuteNonQuery();
                 command.Parameters.Clear();
                 if (rowsUpdated == 0)
                 {
-                    throw new NapackNotFoundException(metadata.Name);
+                    throw new NapackNotFoundException(package.Name);
                 }
             });
         }
-
+        
         public void UpdatePackageVersion(NapackVersionIdentifier packageVersion, NapackVersion updatedVersion)
         {
-            ExecuteCommand($"UPDATE {PackageStoreTable} SET package = ? WHERE packageVersion = ?", (command) =>
+            ExecuteCommand($"UPDATE {PackageStoreTable} SET package = $1 WHERE packageVersion = $2", (command) =>
             {
                 command.Parameters.Add(Serializer.Serialize(updatedVersion));
                 command.Parameters.Add(packageVersion.GetFullName());
@@ -608,7 +641,7 @@ namespace Napack.Server
 
         public void RemovePackageVersion(NapackVersionIdentifier packageVersion)
         {
-            ExecuteCommand($"DELETE FROM {PackageStoreTable} WHERE packageVersion = ?", command =>
+            ExecuteCommand($"DELETE FROM {PackageStoreTable} WHERE packageVersion = $1", command =>
             {
                 command.Parameters.Add(packageVersion.GetFullName());
                 command.ExecuteNonQuery();
@@ -618,7 +651,7 @@ namespace Napack.Server
 
         public void RemovePackageSpecification(NapackVersionIdentifier packageVersion)
         {
-            ExecuteCommand($"DELETE FROM {PackageSpecsTable} WHERE packageVersion = ?", command =>
+            ExecuteCommand($"DELETE FROM {PackageSpecsTable} WHERE packageVersion = $1", command =>
             {
                 command.Parameters.Add(packageVersion.GetFullName());
                 command.ExecuteNonQuery();
@@ -628,7 +661,7 @@ namespace Napack.Server
 
         public void RemovePackageStatistics(string packageName)
         {
-            ExecuteCommand($"DELETE FROM {PackageStatsTable} WHERE packageName = ?", command =>
+            ExecuteCommand($"DELETE FROM {PackageStatsTable} WHERE packageName = $1", command =>
             {
                 command.Parameters.Add(packageName);
                 command.ExecuteNonQuery();
@@ -646,7 +679,7 @@ namespace Napack.Server
 
                 command.Parameters.Add(Serializer.Serialize(authoredPackages));
                 command.Parameters.Add(authorName.ToUpperInvariant());
-                command.CommandText = $"UPDATE {AuthorPackageTable} SET packageVersionList = ? WHERE authorName = ?";
+                command.CommandText = $"UPDATE {AuthorPackageTable} SET packageVersionList = $1 WHERE authorName = $2";
                 command.Parameters.Clear();
             });
         }

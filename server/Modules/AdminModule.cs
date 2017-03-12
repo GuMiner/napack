@@ -72,7 +72,7 @@ namespace Napack.Server
                 int majorVersion = int.Parse(parameters.majorVersion);
                 AdminModule.ValidateAdmin(this.Context);
 
-                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName, true);
                 NapackMajorVersionMetadata majorVersionMetadata = metadata.GetMajorVersion(majorVersion);
                 majorVersionMetadata.Recalled = true;
                 Global.NapackStorageManager.UpdatePackageMetadata(metadata);
@@ -103,7 +103,7 @@ namespace Napack.Server
                 AdminModule.ValidateAdmin(this.Context);
 
                 // TODO there's a lot of hardening that can be done here to prevent failures.
-                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName, true);
                 Global.NapackStorageManager.RemovePackageStatistics(packageName);
 
                 foreach (string authorizedUser in metadata.AuthorizedUserIds)
@@ -155,7 +155,7 @@ namespace Napack.Server
                 HashSet<string> affectedUsers = new HashSet<string>();
                 foreach (string affectedPackage in affectedPackages)
                 {
-                    NapackMetadata affectedPackageMetadata = Global.NapackStorageManager.GetPackageMetadata(affectedPackage);
+                    NapackMetadata affectedPackageMetadata = Global.NapackStorageManager.GetPackageMetadata(affectedPackage, true);
                     foreach (string authorizedUserId in affectedPackageMetadata.AuthorizedUserIds)
                     {
                         affectedUsers.Add(authorizedUserId);

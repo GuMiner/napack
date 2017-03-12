@@ -37,6 +37,11 @@ namespace Napack.Server
         /// </summary>
         public Dictionary<int, NapackMajorVersionMetadata> Versions { get; set; }
 
+        /// <summary>
+        /// Used to prevent concurrent updates. 
+        /// </summary>
+        public DateTime ConcurrentLock { get; set; } = DateTime.MinValue;
+
        /// <summary>
         /// Gets the specified major version.
         /// </summary>

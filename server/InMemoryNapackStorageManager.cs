@@ -163,7 +163,7 @@ namespace Napack.Server
             searchIndices[packageName].Downloads++;
         }
 
-        public NapackMetadata GetPackageMetadata(string packageName)
+        public NapackMetadata GetPackageMetadata(string packageName, bool unusedGetWithLock)
         {
             return packageMetadataStore[packageName];
         }

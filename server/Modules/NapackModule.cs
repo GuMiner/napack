@@ -34,7 +34,7 @@ namespace Napack.Server.Modules
                 if (version == null)
                 {
                     // The user is asking for all major versions of the specified package.
-                    NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                    NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName, false);
                     return this.Response.AsJson(package.AsSummaryJson());
                 }
                 else
@@ -53,7 +53,7 @@ namespace Napack.Server.Modules
                     // Handle the resulting version components.
                     if (components.Count == 1 || components.Count == 2)
                     {
-                        NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                        NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName, false);
                         NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(components[0]);
 
                         return this.Response.AsJson(majorVersion.AsSummaryJson());
@@ -102,7 +102,7 @@ namespace Napack.Server.Modules
             Put["/{packageName"] = parameters =>
             {
                 string packageName = parameters.packageName;
-                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName, true);
 
                 NewNapackMetadata metadata = SerializerExtensions.Deserialize<NewNapackMetadata>(this.Context);
                 UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, metadata.AuthorizedUserIds);
@@ -131,7 +131,7 @@ namespace Napack.Server.Modules
                 newNapackVersion.Validate();
 
                 string packageName = parameters.packageName;
-                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMetadata package = Global.NapackStorageManager.GetPackageMetadata(packageName, true);
                 UserIdentifier.VerifyAuthorization(this.Request.Headers.ToDictionary(hdr => hdr.Key, hdr => hdr.Value), Global.NapackStorageManager, package.AuthorizedUserIds);
                 
                 // Validate and create a spec for this new version.
@@ -184,7 +184,7 @@ namespace Napack.Server.Modules
             // Validate dependent packages exist, aren't recalled, and have valid licenses.
             foreach (NapackMajorVersion napackVersion in newNapack.Dependencies)
             {
-                NapackMetadata package = napackManager.GetPackageMetadata(napackVersion.Name);
+                NapackMetadata package = napackManager.GetPackageMetadata(napackVersion.Name, false);
                 NapackMajorVersionMetadata majorVersionMetadata = package.GetMajorVersion(napackVersion.Major);
                 if (majorVersionMetadata.Recalled)
                 {

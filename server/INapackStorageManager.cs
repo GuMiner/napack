@@ -31,7 +31,7 @@ namespace Napack.Server
         /// <summary>
         /// Gets the metadata for the specified package name.
         /// </summary>
-        NapackMetadata GetPackageMetadata(string packageName);
+        NapackMetadata GetPackageMetadata(string packageName, bool lockPackage);
 
         /// <summary>
         /// Gets the specified package version.

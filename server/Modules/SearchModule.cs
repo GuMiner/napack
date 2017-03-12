@@ -41,7 +41,7 @@ namespace Napack.Server
             Get["/result/{packageName}"] = parameters =>
             {
                 string packageName = parameters.packageName;
-                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName);
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(packageName, false);
                 NapackStats stats = Global.NapackStorageManager.GetPackageStatistics(packageName);
 
                 return this.Response.AsJson(new

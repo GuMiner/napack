@@ -79,7 +79,7 @@ namespace Napack.Server
             List<string> orphanedPackages = new List<string>();
             foreach (string authorizedPackage in authorizedPackages)
             {
-                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(authorizedPackage);
+                NapackMetadata metadata = Global.NapackStorageManager.GetPackageMetadata(authorizedPackage, true);
                 metadata.AuthorizedUserIds.Remove(storedUser.Email);
                 if (metadata.AuthorizedUserIds.Any())
                 {

@@ -44,6 +44,7 @@ namespace Napack.Server
                 // 409 -- Conflict
                 [typeof(DuplicateNapackException)] = HttpStatusCode.Conflict,
                 [typeof(ExistingUserException)] = HttpStatusCode.Conflict,
+                [typeof(ConcurrentOperationException)] = HttpStatusCode.Conflict,
 
                 // 410 -- Gone
                 [typeof(NapackRecalledException)] = HttpStatusCode.Gone,

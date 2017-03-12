@@ -49,7 +49,7 @@ namespace Napack.Server.Modules
         private Response GetPackage(INapackStorageManager napackManager, string name, int major, 
             Func<NapackMajorVersionMetadata, int> minorVersionComputer, Func<NapackMajorVersionMetadata, int> patchVersionComputer)
         {
-            NapackMetadata package = napackManager.GetPackageMetadata(name);
+            NapackMetadata package = napackManager.GetPackageMetadata(name, false);
             NapackMajorVersionMetadata majorVersion = package.GetMajorVersion(major);
             if (majorVersion.Recalled)
             {
