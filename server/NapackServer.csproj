@@ -262,6 +262,8 @@
     <Compile Include="Definitions\NapackVersion.cs" />
     <Compile Include="Definitions\UserSecret.cs" />
     <Compile Include="Definitions\UserIdentifier.cs" />
+    <Compile Include="Graph\GraphModeler.cs" />
+    <Compile Include="Graph\GraphNode.cs" />
     <Compile Include="INapackStorageManager.cs" />
     <Compile Include="Definitions\Models\DocumentationModel.cs" />
     <Compile Include="Modules\StatusModule.cs" />

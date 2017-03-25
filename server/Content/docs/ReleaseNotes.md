@@ -5,11 +5,6 @@ Features and Bugs
 
 Status
 ------
-0.9.0 -- System Validation.
+1.0.0 -- Complete but Decommissioned
 
-The Napack Database is subject to arbitrary deletion until the final release steps have been completed.
-
-Bootstrapping & Testing
------------------------
-* Several Napacks around key searching, sorting, vectors, and algorithmic functionality should be created.
-* Testing framework needs overhaul to include many more FTs, UTs, and setup to test the website locally with a test data store.
+The system has been completed, excluding minor features not necessary. Due to simplicity and viability issues discussed on the main page, the system has also been decommissioned.
