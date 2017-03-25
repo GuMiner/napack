@@ -3,16 +3,14 @@
 -----------
 A nano-scale package framework implementation that supports automatic semantic versioning, automatic documentation generation, and automatic attribution license formatting -- in addition to [NuGet](https://www.nuget.org/)-like functionality such as package searching, downloading, and MSBUILD integration.
 
-![HomePage.png][homepage]
-[homepage]:./HomePage.png
+![Screenshot of the homepage](./HomePage.png)
 **Napack Framework Server Homepage**
 
 ## Contents
 ---------
 This repository contains the Napack Framework server, client (with NuGet package), Visual Studio extension, documentation, and test code.
 
-![Screenshot.png][screenshot]
-[screenshot]:./Screenshot.png
+![Screenshot of the Visual Studio Extension](./Screenshot.png)
 **Napack Visual Studio Extension**
 
 ## Full Documentation
